@@ -14,9 +14,9 @@ suite =
                 \_ ->
                     Expect.equal
                         (ProgrissStore.getAllActions fixtureStore)
-                        [ ( 1, Action "Call architect about garden" Nothing (Just 1) )
-                        , ( 2, Action "Buy cat food" (Just 1) Nothing )
-                        , ( 3, Action "Call Florist about Mom's favourite flowers" (Just 2) (Just 2) )
+                        [ Action 1 "Call architect about garden"
+                        , Action 2 "Buy cat food"
+                        , Action 3 "Call Florist about Mom's favourite flowers"
                         ]
             ]
         , describe "ProgrissStore.getAllProjects"
@@ -24,8 +24,8 @@ suite =
                 \_ ->
                     Expect.equal
                         (ProgrissStore.getAllProjects fixtureStore)
-                        [ ( 1, Project "Build our familiy house" )
-                        , ( 2, Project "Mom's Birthday" )
+                        [ Project 1 "Build our familiy house"
+                        , Project 2 "Mom's Birthday"
                         ]
             ]
         , describe "ProgrissStore.getAllContexts"
@@ -33,9 +33,28 @@ suite =
                 \_ ->
                     Expect.equal
                         (ProgrissStore.getAllContexts fixtureStore)
-                        [ ( 1, Context "Errands" )
-                        , ( 2, Context "Calls" )
+                        [ Context 1 "Errands"
+                        , Context 2 "Calls"
                         ]
+            ]
+        , describe "ProgrissStore.getActionsForContext"
+            [ test "returns all actions that are associated to the context" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getActionsForContext 1 fixtureStore)
+                        [ Action 2 "Buy cat food" ]
+            ]
+        , describe "ProgrissStore.getContextForAction"
+            [ test "returns Nothing if the Action is not associated to a Context" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getContextForAction 1 fixtureStore)
+                        Nothing
+            , test "returns the context the actions is associated to" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getContextForAction 2 fixtureStore)
+                        (Just (Context 1 "Errands"))
             ]
         ]
 

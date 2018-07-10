@@ -9,39 +9,44 @@ type ProgrissStore
     = ProgrissStore Store
 
 
-type ActionFilter
-    = AllActions
-    | ProjectActionsFilter Int
-    | ContextActionsFilter Int
-
-
-type NoteFilter
-    = AllNotes
-    | ProjectNotesFilter Int
-
-
 type alias Store =
-    { projects : Dict Int Project
-    , actions : Dict Int Action
-    , contexts : Dict Int Context
-    , notes : Dict Int Note
+    { projects : Dict Int ProjectData
+    , actions : Dict Int ActionData
+    , contexts : Dict Int ContextData
+    , notes : Dict Int NoteData
     }
 
 
-type alias Action =
+type alias ActionData =
     { description : String, contextId : Maybe Int, projectId : Maybe Int }
 
 
-type alias Project =
+type alias ProjectData =
     { title : String }
 
 
-type alias Context =
+type alias ContextData =
     { name : String }
 
 
-type alias Note =
+type alias NoteData =
     { body : String, projectId : Int }
+
+
+type alias Action =
+    { id : Int, description : String }
+
+
+type alias Project =
+    { id : Int, title : String }
+
+
+type alias Context =
+    { id : Int, name : String }
+
+
+type alias Note =
+    { id : Int, body : String }
 
 
 empty : ProgrissStore
@@ -54,19 +59,52 @@ empty =
         }
 
 
-getAllActions : ProgrissStore -> List ( Int, Action )
+getAllActions : ProgrissStore -> List Action
 getAllActions (ProgrissStore store) =
     Dict.toList store.actions
+        |> List.map castActionDataToAction
 
 
-getAllProjects : ProgrissStore -> List ( Int, Project )
-getAllProjects (ProgrissStore store) =
-    Dict.toList store.projects
+getActionsForContext : Int -> ProgrissStore -> List Action
+getActionsForContext contextId (ProgrissStore store) =
+    Dict.toList store.actions
+        |> List.filter (\( id, actionData ) -> actionData.contextId == Just contextId)
+        |> List.map castActionDataToAction
 
 
-getAllContexts : ProgrissStore -> List ( Int, Context )
+getContextForAction : Int -> ProgrissStore -> Maybe Context
+getContextForAction actionId (ProgrissStore store) =
+    Dict.get actionId store.actions
+        |> Maybe.andThen (\action -> action.contextId)
+        |> Maybe.andThen (\contextId -> Maybe.map (\context -> ( contextId, context )) (Dict.get contextId store.contexts))
+        |> Maybe.map castContextDataToContext
+
+
+getAllContexts : ProgrissStore -> List Context
 getAllContexts (ProgrissStore store) =
     Dict.toList store.contexts
+        |> List.map castContextDataToContext
+
+
+getAllProjects : ProgrissStore -> List Project
+getAllProjects (ProgrissStore store) =
+    Dict.toList store.projects
+        |> List.map castProjectDataToProject
+
+
+castActionDataToAction : ( Int, ActionData ) -> Action
+castActionDataToAction ( id, actionData ) =
+    Action id actionData.description
+
+
+castProjectDataToProject : ( Int, ProjectData ) -> Project
+castProjectDataToProject ( id, projectData ) =
+    Project id projectData.title
+
+
+castContextDataToContext : ( Int, ContextData ) -> Context
+castContextDataToContext ( id, contextData ) =
+    Context id contextData.name
 
 
 decoder : Decoder ProgrissStore
@@ -78,7 +116,7 @@ decoder =
         |> optional "notes" (Json.Decode.list noteDecoder) []
 
 
-progrissStoreConstructor : List ( Int, Action ) -> List ( Int, Context ) -> List ( Int, Project ) -> List ( Int, Note ) -> ProgrissStore
+progrissStoreConstructor : List ( Int, ActionData ) -> List ( Int, ContextData ) -> List ( Int, ProjectData ) -> List ( Int, NoteData ) -> ProgrissStore
 progrissStoreConstructor actions contexts projects notes =
     ProgrissStore
         { actions = Dict.fromList actions
@@ -88,7 +126,7 @@ progrissStoreConstructor actions contexts projects notes =
         }
 
 
-actionDecoder : Decoder ( Int, Action )
+actionDecoder : Decoder ( Int, ActionData )
 actionDecoder =
     decode actionDataConstructor
         |> required "id" int
@@ -97,7 +135,7 @@ actionDecoder =
         |> optional "project_id" (nullable int) Nothing
 
 
-noteDecoder : Decoder ( Int, Note )
+noteDecoder : Decoder ( Int, NoteData )
 noteDecoder =
     decode noteDataConstructor
         |> required "id" int
@@ -105,38 +143,38 @@ noteDecoder =
         |> required "project_id" int
 
 
-projectDecoder : Decoder ( Int, Project )
+projectDecoder : Decoder ( Int, ProjectData )
 projectDecoder =
     decode projectDataConstructor
         |> required "id" int
         |> required "title" string
 
 
-contextDecoder : Decoder ( Int, Context )
+contextDecoder : Decoder ( Int, ContextData )
 contextDecoder =
     decode contextDataConstructor
         |> required "id" int
         |> required "name" string
 
 
-actionDataConstructor : Int -> String -> Maybe Int -> Maybe Int -> ( Int, Action )
+actionDataConstructor : Int -> String -> Maybe Int -> Maybe Int -> ( Int, ActionData )
 actionDataConstructor id description maybeContextId maybeProjectId =
-    ( id, Action description maybeContextId maybeProjectId )
+    ( id, ActionData description maybeContextId maybeProjectId )
 
 
-contextDataConstructor : Int -> String -> ( Int, Context )
+contextDataConstructor : Int -> String -> ( Int, ContextData )
 contextDataConstructor id name =
-    ( id, Context name )
+    ( id, ContextData name )
 
 
-projectDataConstructor : Int -> String -> ( Int, Project )
+projectDataConstructor : Int -> String -> ( Int, ProjectData )
 projectDataConstructor id title =
-    ( id, Project title )
+    ( id, ProjectData title )
 
 
-noteDataConstructor : Int -> String -> Int -> ( Int, Note )
+noteDataConstructor : Int -> String -> Int -> ( Int, NoteData )
 noteDataConstructor id content projectId =
-    ( id, Note content projectId )
+    ( id, NoteData content projectId )
 
 
 
