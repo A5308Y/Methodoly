@@ -2,7 +2,7 @@ module ProgrissStoreTest exposing (..)
 
 import Expect exposing (Expectation)
 import Json.Decode
-import ProgrissStore exposing (Action, ProgrissStore, Project)
+import ProgrissStore exposing (Action, Context, ProgrissStore, Project)
 import Test exposing (..)
 
 
@@ -26,6 +26,15 @@ suite =
                         (ProgrissStore.getAllProjects fixtureStore)
                         [ ( 1, Project "Build our familiy house" )
                         , ( 2, Project "Mom's Birthday" )
+                        ]
+            ]
+        , describe "ProgrissStore.getAllContexts"
+            [ test "returns all contexts in the store" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getAllContexts fixtureStore)
+                        [ ( 1, Context "Errands" )
+                        , ( 2, Context "Calls" )
                         ]
             ]
         ]

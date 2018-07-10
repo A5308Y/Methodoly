@@ -64,6 +64,11 @@ getAllProjects (ProgrissStore store) =
     Dict.toList store.projects
 
 
+getAllContexts : ProgrissStore -> List ( Int, Context )
+getAllContexts (ProgrissStore store) =
+    Dict.toList store.contexts
+
+
 decoder : Decoder ProgrissStore
 decoder =
     decode progrissStoreConstructor
