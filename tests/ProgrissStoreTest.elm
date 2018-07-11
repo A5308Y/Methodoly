@@ -19,6 +19,20 @@ suite =
                         , "Call Florist about Mom's favourite flowers"
                         ]
             ]
+        , describe "ProgrissStore.getAllActionsWithoutContext"
+            [ test "returns all actions in the store" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getAllActionsWithoutContext fixtureStore |> List.map .description)
+                        [ "Call architect about garden" ]
+            ]
+        , describe "ProgrissStore.getAllActionsWithoutProject"
+            [ test "returns all actions in the store" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getAllActionsWithoutProject fixtureStore |> List.map .description)
+                        [ "Buy cat food" ]
+            ]
         , describe "ProgrissStore.getAllContexts"
             [ test "returns all contexts in the store" <|
                 \_ ->

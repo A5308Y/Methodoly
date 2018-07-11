@@ -12,6 +12,8 @@ module ProgrissStore
         , getActionsForContext
         , getActionsForProject
         , getAllActions
+        , getAllActionsWithoutContext
+        , getAllActionsWithoutProject
         , getAllContexts
         , getAllProjects
         , getContextForAction
@@ -50,6 +52,11 @@ type alias ContextData =
 
 type alias NoteData =
     { body : String, projectId : Int }
+
+
+
+{--Don't add the relationships here, because we might switch a graph implementation. Use the store
+to find a project for an action. --}
 
 
 type alias Action =
@@ -173,7 +180,24 @@ associateActionToProject (ActionId actionId) (ProjectId projectId) (ProgrissStor
 
 getAllActions : ProgrissStore -> List Action
 getAllActions (ProgrissStore store) =
-    Dict.toList store.actions
+    store.actions
+        |> Dict.toList
+        |> List.map castActionDataToAction
+
+
+getAllActionsWithoutContext : ProgrissStore -> List Action
+getAllActionsWithoutContext (ProgrissStore store) =
+    store.actions
+        |> Dict.filter (\id actionData -> actionData.contextId == Nothing)
+        |> Dict.toList
+        |> List.map castActionDataToAction
+
+
+getAllActionsWithoutProject : ProgrissStore -> List Action
+getAllActionsWithoutProject (ProgrissStore store) =
+    store.actions
+        |> Dict.filter (\id actionData -> actionData.projectId == Nothing)
+        |> Dict.toList
         |> List.map castActionDataToAction
 
 
