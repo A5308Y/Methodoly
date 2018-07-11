@@ -6,9 +6,21 @@ import Bootstrap.Card.Block as Block
 import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as ListGroup
 import Html exposing (..)
+import Html.Attributes exposing (href)
 import Html.Events exposing (..)
+import Json.Decode
 import ListHelper
-import ProgrissStore as Store exposing (Action, Context, ContextId, ProgrissStore, Project, ProjectId)
+import ProgrissStore as Store
+    exposing
+        ( Action
+        , Context
+        , ContextId
+        , ProgrissStore
+        , Project
+        , ProjectId
+        , decoder
+        , empty
+        )
 
 
 type alias Model =
@@ -27,15 +39,41 @@ type Msg
     = ChangeContext SelectedContext
 
 
+initialStore =
+    let
+        jsonData =
+            """
+                {
+                    "actions": [
+                        {"id": 1, "description": "Call architect about garden", "project_id": 1},
+                        {"id": 2, "description": "Buy cat food", "context_id": 1},
+                        {"id": 3, "description": "Call Florist about Mom's favourite flowers", "project_id": 2, "context_id": 2}
+                    ],
+                    "contexts": [
+                        {"id": 1, "name": "Errands"},
+                        {"id": 2, "name": "Calls"}
+                    ],
+                    "projects": [
+                        {"id": 1, "title": "Build our familiy house"},
+                        {"id": 2, "title": "Mom's Birthday"}
+                    ],
+                    "notes": [
+                        {"id": 1, "body": "Don't forget she likes tulips the best! So if you can get those please do. Whatever you do though, don't get roses. She hates them!", "project_id": 2}
+                    ]
+                }
+            """
+    in
+    case Json.Decode.decodeString Store.decoder jsonData of
+        Ok store ->
+            store
+
+        Err message ->
+            Store.empty
+
+
 initialModel : Model
 initialModel =
-    { store =
-        Store.empty
-            |> Store.createContext "Errands"
-            |> Store.createContext "Office"
-            |> Store.createProject "Build a house"
-            |> Store.createProject "Buy a car"
-            |> Store.createAction "Buy cat food"
+    { store = initialStore
     , selectedContext = AnywhereContext
     }
 
@@ -55,8 +93,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     Grid.container []
-        [ CDN.stylesheet
-        , Grid.row []
+        [ Grid.row []
             [ Grid.col [] [ renderContextMenu model.store model.selectedContext ]
             , Grid.col [] [ renderActions (actionsToRender model.store model.selectedContext) ]
             ]
@@ -67,7 +104,7 @@ view model =
 
 renderContextMenu : ProgrissStore -> SelectedContext -> Html Msg
 renderContextMenu store selectedContext =
-    ListGroup.ul
+    ListGroup.custom
         (store
             |> Store.getAllContexts
             |> List.map (clickableContext selectedContext)
@@ -76,19 +113,19 @@ renderContextMenu store selectedContext =
         )
 
 
-clickableAllContexts : SelectedContext -> ListGroup.Item Msg
+clickableAllContexts : SelectedContext -> ListGroup.CustomItem Msg
 clickableAllContexts selectedContext =
-    ListGroup.li (clickableContextAttributes selectedContext AllContexts) [ text "All" ]
+    ListGroup.anchor (clickableContextAttributes selectedContext AllContexts) [ text "All" ]
 
 
-clickableAnywhereContext : SelectedContext -> ListGroup.Item Msg
+clickableAnywhereContext : SelectedContext -> ListGroup.CustomItem Msg
 clickableAnywhereContext selectedContext =
-    ListGroup.li (clickableContextAttributes selectedContext AnywhereContext) [ text "Anywhere" ]
+    ListGroup.anchor (clickableContextAttributes selectedContext AnywhereContext) [ text "Anywhere" ]
 
 
-clickableContext : SelectedContext -> Context -> ListGroup.Item Msg
+clickableContext : SelectedContext -> Context -> ListGroup.CustomItem Msg
 clickableContext selectedContext context =
-    ListGroup.li
+    ListGroup.anchor
         (clickableContextAttributes selectedContext (SpecificContext context.id))
         [ text context.name ]
 
@@ -96,9 +133,9 @@ clickableContext selectedContext context =
 clickableContextAttributes : SelectedContext -> SelectedContext -> List (ListGroup.ItemOption Msg)
 clickableContextAttributes selectedContext context =
     if selectedContext == context then
-        [ ListGroup.active, ListGroup.attrs [ onClick (ChangeContext context) ] ]
+        [ ListGroup.active, ListGroup.attrs [ href "#", onClick (ChangeContext context) ] ]
     else
-        [ ListGroup.attrs [ onClick (ChangeContext context) ] ]
+        [ ListGroup.attrs [ href "#", onClick (ChangeContext context) ] ]
 
 
 actionsToRender : ProgrissStore -> SelectedContext -> List Action
@@ -108,7 +145,7 @@ actionsToRender store selectedContext =
             Store.getAllActions store
 
         AnywhereContext ->
-            Store.getAllActionsWithoutContext store
+            Store.getActionsWithoutContext store
 
         SpecificContext contextId ->
             Store.getActionsForContext contextId store
@@ -146,10 +183,7 @@ projectCard store project =
     Card.config []
         |> Card.block [] [ Block.titleH3 [] [ text project.title ] ]
         |> Card.listGroup (projectCardActionList project.id store)
-
-
-
---|> Card.block [] [ Block.text [] [ projectCardNoteList project.id store ] ]
+        |> Card.block [] [ Block.text [] [ projectCardNoteList project.id store ] ]
 
 
 projectCardActionList : ProjectId -> ProgrissStore -> List (ListGroup.Item Msg)
@@ -159,14 +193,13 @@ projectCardActionList projectId store =
         (Store.getActionsForProject projectId store)
 
 
-
---projectCardNoteList : Int -> ProgrissStore -> Html Msg
---projectCardNoteList projectId store =
---    ul []
---        (List.map
---            (\note -> li [] [ text note.content ])
---            (Store.getNotesFor (ProjectFilter projectId) store)
---        )
+projectCardNoteList : ProjectId -> ProgrissStore -> Html Msg
+projectCardNoteList projectId store =
+    ul []
+        (List.map
+            (\note -> li [] [ text note.body ])
+            (Store.getNotesForProject projectId store)
+        )
 
 
 projectsPerRow : Int

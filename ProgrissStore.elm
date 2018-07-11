@@ -15,12 +15,13 @@ module ProgrissStore
         , empty
         , getActionsForContext
         , getActionsForProject
+        , getActionsWithoutContext
+        , getActionsWithoutProject
         , getAllActions
-        , getAllActionsWithoutContext
-        , getAllActionsWithoutProject
         , getAllContexts
         , getAllProjects
         , getContextForAction
+        , getNotesForProject
         , getProjectForAction
         , updateAction
         )
@@ -189,16 +190,16 @@ getAllActions (ProgrissStore store) =
         |> List.map castActionDataToAction
 
 
-getAllActionsWithoutContext : ProgrissStore -> List Action
-getAllActionsWithoutContext (ProgrissStore store) =
+getActionsWithoutContext : ProgrissStore -> List Action
+getActionsWithoutContext (ProgrissStore store) =
     store.actions
         |> Dict.filter (\id actionData -> actionData.contextId == Nothing)
         |> Dict.toList
         |> List.map castActionDataToAction
 
 
-getAllActionsWithoutProject : ProgrissStore -> List Action
-getAllActionsWithoutProject (ProgrissStore store) =
+getActionsWithoutProject : ProgrissStore -> List Action
+getActionsWithoutProject (ProgrissStore store) =
     store.actions
         |> Dict.filter (\id actionData -> actionData.projectId == Nothing)
         |> Dict.toList
@@ -217,6 +218,13 @@ getActionsForProject (ProjectId projectId) (ProgrissStore store) =
     Dict.toList store.actions
         |> List.filter (\( id, actionData ) -> actionData.projectId == Just projectId)
         |> List.map castActionDataToAction
+
+
+getNotesForProject : ProjectId -> ProgrissStore -> List Note
+getNotesForProject (ProjectId projectId) (ProgrissStore store) =
+    Dict.toList store.notes
+        |> List.filter (\( id, noteData ) -> noteData.projectId == projectId)
+        |> List.map castNoteDataToNote
 
 
 getContextForAction : ActionId -> ProgrissStore -> Maybe Context
@@ -262,6 +270,11 @@ castContextDataToContext ( id, contextData ) =
     Context (ContextId id) contextData.name
 
 
+castNoteDataToNote : ( Int, NoteData ) -> Note
+castNoteDataToNote ( id, noteData ) =
+    Note (NoteId id) noteData.body
+
+
 decoder : Decoder ProgrissStore
 decoder =
     decode progrissStoreConstructor
@@ -294,7 +307,7 @@ noteDecoder : Decoder ( Int, NoteData )
 noteDecoder =
     decode noteDataConstructor
         |> required "id" int
-        |> required "content" string
+        |> required "body" string
         |> required "project_id" int
 
 
