@@ -9468,6 +9468,326 @@ var _rundis$elm_bootstrap$Bootstrap_Card$imgBottom = F3(
 				}));
 	});
 
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$roleClass = function (role) {
+	var _p0 = role;
+	switch (_p0.ctor) {
+		case 'Primary':
+			return 'primary';
+		case 'Secondary':
+			return 'secondary';
+		case 'Success':
+			return 'success';
+		case 'Info':
+			return 'info';
+		case 'Warning':
+			return 'warning';
+		case 'Danger':
+			return 'danger';
+		case 'Dark':
+			return 'dark';
+		case 'Light':
+			return 'light';
+		default:
+			return 'link';
+	}
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$applyModifier = F2(
+	function (modifier, options) {
+		var _p1 = modifier;
+		switch (_p1.ctor) {
+			case 'Size':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						size: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'Coloring':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						coloring: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'Block':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{block: true});
+			case 'Disabled':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{disabled: _p1._0});
+			default:
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						attributes: A2(_elm_lang$core$Basics_ops['++'], options.attributes, _p1._0)
+					});
+		}
+	});
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$defaultOptions = {
+	coloring: _elm_lang$core$Maybe$Nothing,
+	block: false,
+	disabled: false,
+	size: _elm_lang$core$Maybe$Nothing,
+	attributes: {ctor: '[]'}
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes = function (modifiers) {
+	var options = A3(_elm_lang$core$List$foldl, _rundis$elm_bootstrap$Bootstrap_Internal_Button$applyModifier, _rundis$elm_bootstrap$Bootstrap_Internal_Button$defaultOptions, modifiers);
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$classList(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'btn', _1: true},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'btn-block', _1: options.block},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'disabled', _1: options.disabled},
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$disabled(options.disabled),
+				_1: {ctor: '[]'}
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			function () {
+				var _p2 = A2(_elm_lang$core$Maybe$andThen, _rundis$elm_bootstrap$Bootstrap_General_Internal$screenSizeOption, options.size);
+				if (_p2.ctor === 'Just') {
+					return {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class(
+							A2(_elm_lang$core$Basics_ops['++'], 'btn-', _p2._0)),
+						_1: {ctor: '[]'}
+					};
+				} else {
+					return {ctor: '[]'};
+				}
+			}(),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				function () {
+					var _p3 = options.coloring;
+					if (_p3.ctor === 'Just') {
+						if (_p3._0.ctor === 'Roled') {
+							return {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class(
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'btn-',
+										_rundis$elm_bootstrap$Bootstrap_Internal_Button$roleClass(_p3._0._0))),
+								_1: {ctor: '[]'}
+							};
+						} else {
+							return {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class(
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'btn-outline-',
+										_rundis$elm_bootstrap$Bootstrap_Internal_Button$roleClass(_p3._0._0))),
+								_1: {ctor: '[]'}
+							};
+						}
+					} else {
+						return {ctor: '[]'};
+					}
+				}(),
+				options.attributes)));
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Options = F5(
+	function (a, b, c, d, e) {
+		return {coloring: a, block: b, disabled: c, size: d, attributes: e};
+	});
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Attrs = function (a) {
+	return {ctor: 'Attrs', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Disabled = function (a) {
+	return {ctor: 'Disabled', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Block = {ctor: 'Block'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring = function (a) {
+	return {ctor: 'Coloring', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Size = function (a) {
+	return {ctor: 'Size', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined = function (a) {
+	return {ctor: 'Outlined', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled = function (a) {
+	return {ctor: 'Roled', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Link = {ctor: 'Link'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Light = {ctor: 'Light'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Dark = {ctor: 'Dark'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Danger = {ctor: 'Danger'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Warning = {ctor: 'Warning'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Info = {ctor: 'Info'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Success = {ctor: 'Success'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Secondary = {ctor: 'Secondary'};
+var _rundis$elm_bootstrap$Bootstrap_Internal_Button$Primary = {ctor: 'Primary'};
+
+var _rundis$elm_bootstrap$Bootstrap_Button$disabled = function (disabled) {
+	return _rundis$elm_bootstrap$Bootstrap_Internal_Button$Disabled(disabled);
+};
+var _rundis$elm_bootstrap$Bootstrap_Button$block = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Block;
+var _rundis$elm_bootstrap$Bootstrap_Button$outlineDark = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Dark));
+var _rundis$elm_bootstrap$Bootstrap_Button$outlineLight = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Light));
+var _rundis$elm_bootstrap$Bootstrap_Button$outlineDanger = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Danger));
+var _rundis$elm_bootstrap$Bootstrap_Button$outlineWarning = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Warning));
+var _rundis$elm_bootstrap$Bootstrap_Button$outlineInfo = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Info));
+var _rundis$elm_bootstrap$Bootstrap_Button$outlineSuccess = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Success));
+var _rundis$elm_bootstrap$Bootstrap_Button$outlineSecondary = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Secondary));
+var _rundis$elm_bootstrap$Bootstrap_Button$outlinePrimary = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Outlined(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Primary));
+var _rundis$elm_bootstrap$Bootstrap_Button$roleLink = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Link));
+var _rundis$elm_bootstrap$Bootstrap_Button$dark = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Dark));
+var _rundis$elm_bootstrap$Bootstrap_Button$light = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Light));
+var _rundis$elm_bootstrap$Bootstrap_Button$danger = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Danger));
+var _rundis$elm_bootstrap$Bootstrap_Button$warning = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Warning));
+var _rundis$elm_bootstrap$Bootstrap_Button$info = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Info));
+var _rundis$elm_bootstrap$Bootstrap_Button$success = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Success));
+var _rundis$elm_bootstrap$Bootstrap_Button$secondary = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Secondary));
+var _rundis$elm_bootstrap$Bootstrap_Button$primary = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Coloring(
+	_rundis$elm_bootstrap$Bootstrap_Internal_Button$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Button$Primary));
+var _rundis$elm_bootstrap$Bootstrap_Button$large = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Size(_rundis$elm_bootstrap$Bootstrap_General_Internal$LG);
+var _rundis$elm_bootstrap$Bootstrap_Button$small = _rundis$elm_bootstrap$Bootstrap_Internal_Button$Size(_rundis$elm_bootstrap$Bootstrap_General_Internal$SM);
+var _rundis$elm_bootstrap$Bootstrap_Button$attrs = function (attrs) {
+	return _rundis$elm_bootstrap$Bootstrap_Internal_Button$Attrs(attrs);
+};
+var _rundis$elm_bootstrap$Bootstrap_Button$onClick = function (message) {
+	var defaultOptions = _elm_lang$html$Html_Events$defaultOptions;
+	return _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+		{
+			ctor: '::',
+			_0: A3(
+				_elm_lang$html$Html_Events$onWithOptions,
+				'click',
+				_elm_lang$core$Native_Utils.update(
+					defaultOptions,
+					{preventDefault: true}),
+				_elm_lang$core$Json_Decode$succeed(message)),
+			_1: {ctor: '[]'}
+		});
+};
+var _rundis$elm_bootstrap$Bootstrap_Button$checkboxButton = F3(
+	function (checked, options, children) {
+		return A2(
+			_elm_lang$html$Html$label,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'active', _1: checked},
+						_1: {ctor: '[]'}
+					}),
+				_1: _rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes(options)
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(checked),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$autocomplete(false),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: children
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Button$radioButton = F3(
+	function (checked, options, children) {
+		var hideRadio = A2(_elm_lang$html$Html_Attributes$attribute, 'data-toggle', 'button');
+		return A2(
+			_elm_lang$html$Html$label,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'active', _1: checked},
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: hideRadio,
+					_1: _rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes(options)
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$type_('radio'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$checked(checked),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$autocomplete(false),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{ctor: '[]'}),
+				_1: children
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Button$linkButton = F2(
+	function (options, children) {
+		return A2(
+			_elm_lang$html$Html$a,
+			{
+				ctor: '::',
+				_0: A2(_elm_lang$html$Html_Attributes$attribute, 'role', 'button'),
+				_1: _rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes(options)
+			},
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Button$button = F2(
+	function (options, children) {
+		return A2(
+			_elm_lang$html$Html$button,
+			_rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes(options),
+			children);
+	});
+
 var _rundis$elm_bootstrap$Bootstrap_CDN$fontAwesome = A3(
 	_elm_lang$html$Html$node,
 	'link',
@@ -11211,6 +11531,184 @@ var _user$project$ListHelper$groupsOf = F3(
 		}
 	});
 
+var _user$project$ProgrissStore$encodeNote = function (_p0) {
+	var _p1 = _p0;
+	var _p2 = _p1._1;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'id',
+				_1: _elm_lang$core$Json_Encode$int(_p1._0)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'body',
+					_1: _elm_lang$core$Json_Encode$string(_p2.body)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'project_id',
+						_1: _elm_lang$core$Json_Encode$int(_p2.projectId)
+					},
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$ProgrissStore$encodeProject = function (_p3) {
+	var _p4 = _p3;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'id',
+				_1: _elm_lang$core$Json_Encode$int(_p4._0)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'title',
+					_1: _elm_lang$core$Json_Encode$string(_p4._1.title)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$ProgrissStore$encodeContext = function (_p5) {
+	var _p6 = _p5;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'id',
+				_1: _elm_lang$core$Json_Encode$int(_p6._0)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'name',
+					_1: _elm_lang$core$Json_Encode$string(_p6._1.name)
+				},
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _user$project$ProgrissStore$encodeAction = function (_p7) {
+	var _p8 = _p7;
+	var _p11 = _p8._1;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'id',
+				_1: _elm_lang$core$Json_Encode$int(_p8._0)
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'description',
+					_1: _elm_lang$core$Json_Encode$string(_p11.description)
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'context_id',
+						_1: function () {
+							var _p9 = _p11.contextId;
+							if (_p9.ctor === 'Nothing') {
+								return _elm_lang$core$Json_Encode$null;
+							} else {
+								return _elm_lang$core$Json_Encode$int(_p9._0);
+							}
+						}()
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'project_id',
+							_1: function () {
+								var _p10 = _p11.projectId;
+								if (_p10.ctor === 'Nothing') {
+									return _elm_lang$core$Json_Encode$null;
+								} else {
+									return _elm_lang$core$Json_Encode$int(_p10._0);
+								}
+							}()
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
+var _user$project$ProgrissStore$encoder = function (_p12) {
+	var _p13 = _p12;
+	var _p14 = _p13._0;
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'actions',
+				_1: _elm_lang$core$Json_Encode$list(
+					A2(
+						_elm_lang$core$List$map,
+						_user$project$ProgrissStore$encodeAction,
+						_elm_lang$core$Dict$toList(_p14.actions)))
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'contexts',
+					_1: _elm_lang$core$Json_Encode$list(
+						A2(
+							_elm_lang$core$List$map,
+							_user$project$ProgrissStore$encodeContext,
+							_elm_lang$core$Dict$toList(_p14.contexts)))
+				},
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'projects',
+						_1: _elm_lang$core$Json_Encode$list(
+							A2(
+								_elm_lang$core$List$map,
+								_user$project$ProgrissStore$encodeProject,
+								_elm_lang$core$Dict$toList(_p14.projects)))
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'notes',
+							_1: _elm_lang$core$Json_Encode$list(
+								A2(
+									_elm_lang$core$List$map,
+									_user$project$ProgrissStore$encodeNote,
+									_elm_lang$core$Dict$toList(_p14.notes)))
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		});
+};
 var _user$project$ProgrissStore$getNextFreeId = function (dictionary) {
 	return A2(
 		F2(
@@ -11346,111 +11844,111 @@ var _user$project$ProgrissStore$ProgrissStore = function (a) {
 var _user$project$ProgrissStore$empty = _user$project$ProgrissStore$ProgrissStore(
 	{projects: _elm_lang$core$Dict$empty, actions: _elm_lang$core$Dict$empty, contexts: _elm_lang$core$Dict$empty, notes: _elm_lang$core$Dict$empty});
 var _user$project$ProgrissStore$createAction = F2(
-	function (description, _p0) {
-		var _p1 = _p0;
-		var _p2 = _p1._0;
+	function (description, _p15) {
+		var _p16 = _p15;
+		var _p17 = _p16._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p2.actions),
+			_user$project$ProgrissStore$getNextFreeId(_p17.actions),
 			A3(_user$project$ProgrissStore$ActionData, description, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing),
-			_p2.actions);
+			_p17.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p2,
+				_p17,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$createContext = F2(
-	function (name, _p3) {
-		var _p4 = _p3;
-		var _p5 = _p4._0;
+	function (name, _p18) {
+		var _p19 = _p18;
+		var _p20 = _p19._0;
 		var updatedContexts = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p5.contexts),
+			_user$project$ProgrissStore$getNextFreeId(_p20.contexts),
 			_user$project$ProgrissStore$ContextData(name),
-			_p5.contexts);
+			_p20.contexts);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p5,
+				_p20,
 				{contexts: updatedContexts}));
 	});
 var _user$project$ProgrissStore$createProject = F2(
-	function (name, _p6) {
-		var _p7 = _p6;
-		var _p8 = _p7._0;
+	function (name, _p21) {
+		var _p22 = _p21;
+		var _p23 = _p22._0;
 		var updatedProjects = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p8.projects),
+			_user$project$ProgrissStore$getNextFreeId(_p23.projects),
 			_user$project$ProgrissStore$ProjectData(name),
-			_p8.projects);
+			_p23.projects);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p8,
+				_p23,
 				{projects: updatedProjects}));
 	});
 var _user$project$ProgrissStore$updateAction = F2(
-	function (action, _p9) {
-		var _p10 = _p9;
-		var _p12 = _p10._0;
-		var _p11 = action.id;
+	function (action, _p24) {
+		var _p25 = _p24;
+		var _p27 = _p25._0;
+		var _p26 = action.id;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p11._0,
+			_p26._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{description: action.description});
 				}),
-			_p12.actions);
+			_p27.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p12,
+				_p27,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$associateActionToContext = F3(
-	function (_p15, _p14, _p13) {
-		var _p16 = _p15;
-		var _p17 = _p14;
-		var _p18 = _p13;
-		var _p19 = _p18._0;
+	function (_p30, _p29, _p28) {
+		var _p31 = _p30;
+		var _p32 = _p29;
+		var _p33 = _p28;
+		var _p34 = _p33._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p16._0,
+			_p31._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{
-							contextId: _elm_lang$core$Maybe$Just(_p17._0)
+							contextId: _elm_lang$core$Maybe$Just(_p32._0)
 						});
 				}),
-			_p19.actions);
+			_p34.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p19,
+				_p34,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$associateActionToProject = F3(
-	function (_p22, _p21, _p20) {
-		var _p23 = _p22;
-		var _p24 = _p21;
-		var _p25 = _p20;
-		var _p26 = _p25._0;
+	function (_p37, _p36, _p35) {
+		var _p38 = _p37;
+		var _p39 = _p36;
+		var _p40 = _p35;
+		var _p41 = _p40._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p23._0,
+			_p38._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{
-							projectId: _elm_lang$core$Maybe$Just(_p24._0)
+							projectId: _elm_lang$core$Maybe$Just(_p39._0)
 						});
 				}),
-			_p26.actions);
+			_p41.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p26,
+				_p41,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$progrissStoreConstructor = F4(
@@ -11487,22 +11985,22 @@ var _user$project$ProgrissStore$decoder = A4(
 var _user$project$ProgrissStore$ActionId = function (a) {
 	return {ctor: 'ActionId', _0: a};
 };
-var _user$project$ProgrissStore$castActionDataToAction = function (_p27) {
-	var _p28 = _p27;
+var _user$project$ProgrissStore$castActionDataToAction = function (_p42) {
+	var _p43 = _p42;
 	return A2(
 		_user$project$ProgrissStore$Action,
-		_user$project$ProgrissStore$ActionId(_p28._0),
-		_p28._1.description);
+		_user$project$ProgrissStore$ActionId(_p43._0),
+		_p43._1.description);
 };
-var _user$project$ProgrissStore$getAllActions = function (_p29) {
-	var _p30 = _p29;
+var _user$project$ProgrissStore$getAllActions = function (_p44) {
+	var _p45 = _p44;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
-		_elm_lang$core$Dict$toList(_p30._0.actions));
+		_elm_lang$core$Dict$toList(_p45._0.actions));
 };
-var _user$project$ProgrissStore$getActionsWithoutContext = function (_p31) {
-	var _p32 = _p31;
+var _user$project$ProgrissStore$getActionsWithoutContext = function (_p46) {
+	var _p47 = _p46;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
@@ -11513,10 +12011,10 @@ var _user$project$ProgrissStore$getActionsWithoutContext = function (_p31) {
 					function (id, actionData) {
 						return _elm_lang$core$Native_Utils.eq(actionData.contextId, _elm_lang$core$Maybe$Nothing);
 					}),
-				_p32._0.actions)));
+				_p47._0.actions)));
 };
-var _user$project$ProgrissStore$getActionsWithoutProject = function (_p33) {
-	var _p34 = _p33;
+var _user$project$ProgrissStore$getActionsWithoutProject = function (_p48) {
+	var _p49 = _p48;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
@@ -11527,57 +12025,57 @@ var _user$project$ProgrissStore$getActionsWithoutProject = function (_p33) {
 					function (id, actionData) {
 						return _elm_lang$core$Native_Utils.eq(actionData.projectId, _elm_lang$core$Maybe$Nothing);
 					}),
-				_p34._0.actions)));
+				_p49._0.actions)));
 };
 var _user$project$ProgrissStore$getActionsForContext = F2(
-	function (_p36, _p35) {
-		var _p37 = _p36;
-		var _p38 = _p35;
+	function (_p51, _p50) {
+		var _p52 = _p51;
+		var _p53 = _p50;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castActionDataToAction,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p39) {
-					var _p40 = _p39;
+				function (_p54) {
+					var _p55 = _p54;
 					return _elm_lang$core$Native_Utils.eq(
-						_p40._1.contextId,
-						_elm_lang$core$Maybe$Just(_p37._0));
+						_p55._1.contextId,
+						_elm_lang$core$Maybe$Just(_p52._0));
 				},
-				_elm_lang$core$Dict$toList(_p38._0.actions)));
+				_elm_lang$core$Dict$toList(_p53._0.actions)));
 	});
 var _user$project$ProgrissStore$getActionsForProject = F2(
-	function (_p42, _p41) {
-		var _p43 = _p42;
-		var _p44 = _p41;
+	function (_p57, _p56) {
+		var _p58 = _p57;
+		var _p59 = _p56;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castActionDataToAction,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p45) {
-					var _p46 = _p45;
+				function (_p60) {
+					var _p61 = _p60;
 					return _elm_lang$core$Native_Utils.eq(
-						_p46._1.projectId,
-						_elm_lang$core$Maybe$Just(_p43._0));
+						_p61._1.projectId,
+						_elm_lang$core$Maybe$Just(_p58._0));
 				},
-				_elm_lang$core$Dict$toList(_p44._0.actions)));
+				_elm_lang$core$Dict$toList(_p59._0.actions)));
 	});
 var _user$project$ProgrissStore$ContextId = function (a) {
 	return {ctor: 'ContextId', _0: a};
 };
-var _user$project$ProgrissStore$castContextDataToContext = function (_p47) {
-	var _p48 = _p47;
+var _user$project$ProgrissStore$castContextDataToContext = function (_p62) {
+	var _p63 = _p62;
 	return A2(
 		_user$project$ProgrissStore$Context,
-		_user$project$ProgrissStore$ContextId(_p48._0),
-		_p48._1.name);
+		_user$project$ProgrissStore$ContextId(_p63._0),
+		_p63._1.name);
 };
 var _user$project$ProgrissStore$getContextForAction = F2(
-	function (_p50, _p49) {
-		var _p51 = _p50;
-		var _p52 = _p49;
-		var _p53 = _p52._0;
+	function (_p65, _p64) {
+		var _p66 = _p65;
+		var _p67 = _p64;
+		var _p68 = _p67._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castContextDataToContext,
@@ -11589,37 +12087,37 @@ var _user$project$ProgrissStore$getContextForAction = F2(
 						function (context) {
 							return {ctor: '_Tuple2', _0: contextId, _1: context};
 						},
-						A2(_elm_lang$core$Dict$get, contextId, _p53.contexts));
+						A2(_elm_lang$core$Dict$get, contextId, _p68.contexts));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.contextId;
 					},
-					A2(_elm_lang$core$Dict$get, _p51._0, _p53.actions))));
+					A2(_elm_lang$core$Dict$get, _p66._0, _p68.actions))));
 	});
-var _user$project$ProgrissStore$getAllContexts = function (_p54) {
-	var _p55 = _p54;
+var _user$project$ProgrissStore$getAllContexts = function (_p69) {
+	var _p70 = _p69;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castContextDataToContext,
-		_elm_lang$core$Dict$toList(_p55._0.contexts));
+		_elm_lang$core$Dict$toList(_p70._0.contexts));
 };
 var _user$project$ProgrissStore$ProjectId = function (a) {
 	return {ctor: 'ProjectId', _0: a};
 };
-var _user$project$ProgrissStore$castProjectDataToProject = function (_p56) {
-	var _p57 = _p56;
+var _user$project$ProgrissStore$castProjectDataToProject = function (_p71) {
+	var _p72 = _p71;
 	return A2(
 		_user$project$ProgrissStore$Project,
-		_user$project$ProgrissStore$ProjectId(_p57._0),
-		_p57._1.title);
+		_user$project$ProgrissStore$ProjectId(_p72._0),
+		_p72._1.title);
 };
 var _user$project$ProgrissStore$getProjectForAction = F2(
-	function (_p59, _p58) {
-		var _p60 = _p59;
-		var _p61 = _p58;
-		var _p62 = _p61._0;
+	function (_p74, _p73) {
+		var _p75 = _p74;
+		var _p76 = _p73;
+		var _p77 = _p76._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castProjectDataToProject,
@@ -11631,46 +12129,46 @@ var _user$project$ProgrissStore$getProjectForAction = F2(
 						function (project) {
 							return {ctor: '_Tuple2', _0: projectId, _1: project};
 						},
-						A2(_elm_lang$core$Dict$get, projectId, _p62.projects));
+						A2(_elm_lang$core$Dict$get, projectId, _p77.projects));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.projectId;
 					},
-					A2(_elm_lang$core$Dict$get, _p60._0, _p62.actions))));
+					A2(_elm_lang$core$Dict$get, _p75._0, _p77.actions))));
 	});
-var _user$project$ProgrissStore$getAllProjects = function (_p63) {
-	var _p64 = _p63;
+var _user$project$ProgrissStore$getAllProjects = function (_p78) {
+	var _p79 = _p78;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castProjectDataToProject,
-		_elm_lang$core$Dict$toList(_p64._0.projects));
+		_elm_lang$core$Dict$toList(_p79._0.projects));
 };
 var _user$project$ProgrissStore$NoteId = function (a) {
 	return {ctor: 'NoteId', _0: a};
 };
-var _user$project$ProgrissStore$castNoteDataToNote = function (_p65) {
-	var _p66 = _p65;
+var _user$project$ProgrissStore$castNoteDataToNote = function (_p80) {
+	var _p81 = _p80;
 	return A2(
 		_user$project$ProgrissStore$Note,
-		_user$project$ProgrissStore$NoteId(_p66._0),
-		_p66._1.body);
+		_user$project$ProgrissStore$NoteId(_p81._0),
+		_p81._1.body);
 };
 var _user$project$ProgrissStore$getNotesForProject = F2(
-	function (_p68, _p67) {
-		var _p69 = _p68;
-		var _p70 = _p67;
+	function (_p83, _p82) {
+		var _p84 = _p83;
+		var _p85 = _p82;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castNoteDataToNote,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p71) {
-					var _p72 = _p71;
-					return _elm_lang$core$Native_Utils.eq(_p72._1.projectId, _p69._0);
+				function (_p86) {
+					var _p87 = _p86;
+					return _elm_lang$core$Native_Utils.eq(_p87._1.projectId, _p84._0);
 				},
-				_elm_lang$core$Dict$toList(_p70._0.notes)));
+				_elm_lang$core$Dict$toList(_p85._0.notes)));
 	});
 
 var _user$project$Main$projectsPerRow = 3;
@@ -11722,7 +12220,42 @@ var _user$project$Main$projectCard = F2(
 					{
 						ctor: '::',
 						_0: A2(_user$project$Main$projectCardNoteList, project.id, store),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_rundis$elm_bootstrap$Bootstrap_Button$button,
+								{
+									ctor: '::',
+									_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+									_1: {
+										ctor: '::',
+										_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$i,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('grade'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
 					}),
 				_1: {ctor: '[]'}
 			},
@@ -11747,6 +12280,26 @@ var _user$project$Main$projectCard = F2(
 					_rundis$elm_bootstrap$Bootstrap_Card$config(
 						{ctor: '[]'}))));
 	});
+var _user$project$Main$actionCard = function (action) {
+	return _rundis$elm_bootstrap$Bootstrap_Card$view(
+		A3(
+			_rundis$elm_bootstrap$Bootstrap_Card$block,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_rundis$elm_bootstrap$Bootstrap_Card_Block$text,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(action.description),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			_rundis$elm_bootstrap$Bootstrap_Card$config(
+				{ctor: '[]'})));
+};
 var _user$project$Main$projectsCardOverview = function (store) {
 	var allProjects = _user$project$ProgrissStore$getAllProjects(store);
 	var groupedProjects = A3(
@@ -11779,19 +12332,12 @@ var _user$project$Main$getActions = F2(
 	});
 var _user$project$Main$renderActions = function (actions) {
 	return A2(
-		_elm_lang$html$Html$ul,
+		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		A2(
 			_elm_lang$core$List$map,
 			function (action) {
-				return A2(
-					_elm_lang$html$Html$li,
-					{ctor: '[]'},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text(action.description),
-						_1: {ctor: '[]'}
-					});
+				return _user$project$Main$actionCard(action);
 			},
 			actions));
 };
@@ -11807,22 +12353,81 @@ var _user$project$Main$actionsToRender = F2(
 				return A2(_user$project$ProgrissStore$getActionsForContext, _p1._0, store);
 		}
 	});
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p2 = msg;
-		return _elm_lang$core$Native_Utils.update(
-			model,
-			{selectedContext: _p2._0});
-	});
 var _user$project$Main$initialStore = function () {
 	var jsonData = '\n                {\n                    \"actions\": [\n                        {\"id\": 1, \"description\": \"Call architect about garden\", \"project_id\": 1},\n                        {\"id\": 2, \"description\": \"Buy cat food\", \"context_id\": 1},\n                        {\"id\": 3, \"description\": \"Call Florist about Mom\'s favourite flowers\", \"project_id\": 2, \"context_id\": 2}\n                    ],\n                    \"contexts\": [\n                        {\"id\": 1, \"name\": \"Errands\"},\n                        {\"id\": 2, \"name\": \"Calls\"}\n                    ],\n                    \"projects\": [\n                        {\"id\": 1, \"title\": \"Build our familiy house\"},\n                        {\"id\": 2, \"title\": \"Mom\'s Birthday\"}\n                    ],\n                    \"notes\": [\n                        {\"id\": 1, \"body\": \"Don\'t forget she likes tulips the best! So if you can get those please do. Whatever you do though, don\'t get roses. She hates them!\", \"project_id\": 2}\n                    ]\n                }\n            ';
-	var _p3 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, jsonData);
-	if (_p3.ctor === 'Ok') {
-		return _p3._0;
+	var _p2 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, jsonData);
+	if (_p2.ctor === 'Ok') {
+		return _p2._0;
 	} else {
 		return _user$project$ProgrissStore$empty;
 	}
 }();
+var _user$project$Main$persistStore = _elm_lang$core$Native_Platform.outgoingPort(
+	'persistStore',
+	function (v) {
+		return v;
+	});
+var _user$project$Main$loadStore = _elm_lang$core$Native_Platform.incomingPort('loadStore', _elm_lang$core$Json_Decode$string);
+var _user$project$Main$triggerStoreLoad = _elm_lang$core$Native_Platform.outgoingPort(
+	'triggerStoreLoad',
+	function (v) {
+		return null;
+	});
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
+			case 'ChangeContext':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{selectedContext: _p3._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Save':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Main$persistStore(
+						A2(
+							_elm_lang$core$Json_Encode$encode,
+							2,
+							_user$project$ProgrissStore$encoder(model.store)))
+				};
+			case 'TriggerLoad':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Main$triggerStoreLoad(
+						{ctor: '_Tuple0'})
+				};
+			case 'ReceiveStore':
+				var _p4 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, _p3._0);
+				if (_p4.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{store: _p4._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					var debug = A2(_elm_lang$core$Debug$log, 'Error', _p4._0);
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							store: A2(_user$project$ProgrissStore$createAction, 'Demo Action', model.store)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
 var _user$project$Main$Model = F2(
 	function (a, b) {
 		return {store: a, selectedContext: b};
@@ -11832,7 +12437,20 @@ var _user$project$Main$SpecificContext = function (a) {
 	return {ctor: 'SpecificContext', _0: a};
 };
 var _user$project$Main$AnywhereContext = {ctor: 'AnywhereContext'};
-var _user$project$Main$initialModel = {store: _user$project$Main$initialStore, selectedContext: _user$project$Main$AnywhereContext};
+var _user$project$Main$initialModel = {
+	ctor: '_Tuple2',
+	_0: {store: _user$project$Main$initialStore, selectedContext: _user$project$Main$AnywhereContext},
+	_1: _elm_lang$core$Platform_Cmd$none
+};
+var _user$project$Main$AddDemoAction = {ctor: 'AddDemoAction'};
+var _user$project$Main$TriggerLoad = {ctor: 'TriggerLoad'};
+var _user$project$Main$ReceiveStore = function (a) {
+	return {ctor: 'ReceiveStore', _0: a};
+};
+var _user$project$Main$subscriptions = function (model) {
+	return _user$project$Main$loadStore(_user$project$Main$ReceiveStore);
+};
+var _user$project$Main$Save = {ctor: 'Save'};
 var _user$project$Main$ChangeContext = function (a) {
 	return {ctor: 'ChangeContext', _0: a};
 };
@@ -11968,13 +12586,130 @@ var _user$project$Main$view = function (model) {
 				_1: {
 					ctor: '::',
 					_0: _user$project$Main$projectsCardOverview(model.store),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_rundis$elm_bootstrap$Bootstrap_Button$button,
+							{
+								ctor: '::',
+								_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+								_1: {
+									ctor: '::',
+									_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Save),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab'),
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$i,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('save'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_rundis$elm_bootstrap$Bootstrap_Button$button,
+								{
+									ctor: '::',
+									_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+									_1: {
+										ctor: '::',
+										_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$TriggerLoad),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab'),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$i,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('restore'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_rundis$elm_bootstrap$Bootstrap_Button$button,
+									{
+										ctor: '::',
+										_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+										_1: {
+											ctor: '::',
+											_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddDemoAction),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab'),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$i,
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+												_1: {ctor: '[]'}
+											},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text('add'),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
 				}
 			}
 		});
 };
-var _user$project$Main$main = _elm_lang$html$Html$beginnerProgram(
-	{model: _user$project$Main$initialModel, view: _user$project$Main$view, update: _user$project$Main$update})();
+var _user$project$Main$main = _elm_lang$html$Html$program(
+	{init: _user$project$Main$initialModel, view: _user$project$Main$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};

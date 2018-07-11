@@ -13,6 +13,7 @@ module ProgrissStore
         , createProject
         , decoder
         , empty
+        , encoder
         , getActionsForContext
         , getActionsForProject
         , getActionsWithoutContext
@@ -29,6 +30,7 @@ module ProgrissStore
 import Dict exposing (Dict)
 import Json.Decode exposing (Decoder, float, int, nullable, string)
 import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required)
+import Json.Encode
 
 
 type ProgrissStore
@@ -343,3 +345,66 @@ projectDataConstructor id title =
 noteDataConstructor : Int -> String -> Int -> ( Int, NoteData )
 noteDataConstructor id content projectId =
     ( id, NoteData content projectId )
+
+
+
+-- Encoder
+
+
+encoder : ProgrissStore -> Json.Decode.Value
+encoder (ProgrissStore store) =
+    Json.Encode.object
+        [ ( "actions", Json.Encode.list (List.map encodeAction (store.actions |> Dict.toList)) )
+        , ( "contexts", Json.Encode.list (List.map encodeContext (store.contexts |> Dict.toList)) )
+        , ( "projects", Json.Encode.list (List.map encodeProject (store.projects |> Dict.toList)) )
+        , ( "notes", Json.Encode.list (List.map encodeNote (store.notes |> Dict.toList)) )
+        ]
+
+
+encodeAction : ( Int, ActionData ) -> Json.Decode.Value
+encodeAction ( id, actionData ) =
+    Json.Encode.object
+        [ ( "id", Json.Encode.int id )
+        , ( "description", Json.Encode.string actionData.description )
+        , ( "context_id"
+          , case actionData.contextId of
+                Nothing ->
+                    Json.Encode.null
+
+                Just contextId ->
+                    Json.Encode.int contextId
+          )
+        , ( "project_id"
+          , case actionData.projectId of
+                Nothing ->
+                    Json.Encode.null
+
+                Just projectId ->
+                    Json.Encode.int projectId
+          )
+        ]
+
+
+encodeContext : ( Int, ContextData ) -> Json.Decode.Value
+encodeContext ( id, contextData ) =
+    Json.Encode.object
+        [ ( "id", Json.Encode.int id )
+        , ( "name", Json.Encode.string contextData.name )
+        ]
+
+
+encodeProject : ( Int, ProjectData ) -> Json.Decode.Value
+encodeProject ( id, projectData ) =
+    Json.Encode.object
+        [ ( "id", Json.Encode.int id )
+        , ( "title", Json.Encode.string projectData.title )
+        ]
+
+
+encodeNote : ( Int, NoteData ) -> Json.Decode.Value
+encodeNote ( id, noteData ) =
+    Json.Encode.object
+        [ ( "id", Json.Encode.int id )
+        , ( "body", Json.Encode.string noteData.body )
+        , ( "project_id", Json.Encode.int noteData.projectId )
+        ]

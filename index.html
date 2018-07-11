@@ -2,14 +2,36 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>My App</title>
+        <title>Progriss 2.0</title>
         <script src="main.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
-				<script src="https://unpkg.com/bootstrap-material-design@4.1.1/dist/js/bootstrap-material-design.js" integrity="sha384-CauSuKpEqAFajSpkdjv3z9t8E7RlpJ1UP0lKM/+NdtSarroVKu069AlsRPKkFBz9" crossorigin="anonymous"></script>
+        <!-- Material Design for Bootstrap fonts and icons -->
+		    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons">
+
+		    <!-- Material Design for Bootstrap CSS -->
+		    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
     </head>
     <body>
+        <script>var app = Elm.Main.fullscreen();</script>
         <script>
-            Elm.Main.fullscreen();
+					const storage = window.localStorage || {
+					  setItem(key, value) {
+					    this[key] = value;
+					  },
+					  getItem(key) {
+					    return this[key];
+					  }
+					};
+			    var storageKey = "progrissStore";
+
+			    app.ports.persistStore.subscribe(function(value) {
+			      localStorage.setItem(storageKey, value);
+			    });
+
+			    app.ports.triggerStoreLoad.subscribe(function() {
+			      if (localStorage.getItem(storageKey) != null) {
+			        app.ports.loadStore.send(localStorage.getItem(storageKey));
+			      };
+			    });
         </script>
     </body>
 </html>

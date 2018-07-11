@@ -1,5 +1,6 @@
-module Main exposing (..)
+port module Main exposing (..)
 
+import Bootstrap.Button as Button
 import Bootstrap.CDN as CDN
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
@@ -9,6 +10,7 @@ import Html exposing (..)
 import Html.Attributes exposing (href)
 import Html.Events exposing (..)
 import Json.Decode
+import Json.Encode
 import ListHelper
 import ProgrissStore as Store
     exposing
@@ -37,8 +39,22 @@ type SelectedContext
 
 type Msg
     = ChangeContext SelectedContext
+    | Save
+    | ReceiveStore String
+    | TriggerLoad
+    | AddDemoAction
 
 
+port persistStore : String -> Cmd msg
+
+
+port loadStore : (String -> msg) -> Sub msg
+
+
+port triggerStoreLoad : () -> Cmd msg
+
+
+initialStore : ProgrissStore
 initialStore =
     let
         jsonData =
@@ -71,23 +87,51 @@ initialStore =
             Store.empty
 
 
-initialModel : Model
+initialModel : ( Model, Cmd Msg )
 initialModel =
-    { store = initialStore
-    , selectedContext = AnywhereContext
-    }
+    ( { store = initialStore
+      , selectedContext = AnywhereContext
+      }
+    , Cmd.none
+    )
 
 
 main : Program Never Model Msg
 main =
-    Html.beginnerProgram { model = initialModel, view = view, update = update }
+    Html.program { init = initialModel, view = view, update = update, subscriptions = subscriptions }
 
 
-update : Msg -> Model -> Model
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    loadStore ReceiveStore
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeContext selectedContext ->
-            { model | selectedContext = selectedContext }
+            ( { model | selectedContext = selectedContext }, Cmd.none )
+
+        Save ->
+            ( model, persistStore (Json.Encode.encode 2 (Store.encoder model.store)) )
+
+        TriggerLoad ->
+            ( model, triggerStoreLoad () )
+
+        ReceiveStore value ->
+            case Json.Decode.decodeString Store.decoder value of
+                Ok store ->
+                    ( { model | store = store }, Cmd.none )
+
+                Err message ->
+                    let
+                        debug =
+                            Debug.log "Error" message
+                    in
+                    ( model, Cmd.none )
+
+        AddDemoAction ->
+            ( { model | store = Store.createAction "Demo Action" model.store }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -99,6 +143,15 @@ view model =
             ]
         , hr [] []
         , projectsCardOverview model.store
+        , Button.button
+            [ Button.primary, Button.attrs [ onClick Save, Html.Attributes.class "bmd-btn-fab" ] ]
+            [ i [ Html.Attributes.class "material-icons" ] [ text "save" ] ]
+        , Button.button
+            [ Button.primary, Button.attrs [ onClick TriggerLoad, Html.Attributes.class "bmd-btn-fab" ] ]
+            [ i [ Html.Attributes.class "material-icons" ] [ text "restore" ] ]
+        , Button.button
+            [ Button.primary, Button.attrs [ onClick AddDemoAction, Html.Attributes.class "bmd-btn-fab" ] ]
+            [ i [ Html.Attributes.class "material-icons" ] [ text "add" ] ]
         ]
 
 
@@ -151,9 +204,9 @@ actionsToRender store selectedContext =
             Store.getActionsForContext contextId store
 
 
-renderActions : List Action -> Html msg
+renderActions : List Action -> Html Msg
 renderActions actions =
-    ul [] (List.map (\action -> li [] [ text action.description ]) actions)
+    div [] (List.map (\action -> actionCard action) actions)
 
 
 getActions : Maybe ContextId -> ProgrissStore -> List Action
@@ -178,12 +231,26 @@ projectsCardOverview store =
     div [] (List.map (\projectGroup -> Card.deck (List.map (projectCard store) projectGroup)) groupedProjects)
 
 
+actionCard : Action -> Html Msg
+actionCard action =
+    Card.config []
+        |> Card.block [] [ Block.text [] [ text action.description ] ]
+        |> Card.view
+
+
 projectCard : ProgrissStore -> Project -> Card.Config Msg
 projectCard store project =
     Card.config []
         |> Card.block [] [ Block.titleH3 [] [ text project.title ] ]
         |> Card.listGroup (projectCardActionList project.id store)
-        |> Card.block [] [ Block.text [] [ projectCardNoteList project.id store ] ]
+        |> Card.block []
+            [ Block.text []
+                [ projectCardNoteList project.id store
+                , Button.button
+                    [ Button.primary, Button.attrs [ Html.Attributes.class "bmd-btn-fab" ] ]
+                    [ i [ Html.Attributes.class "material-icons" ] [ text "grade" ] ]
+                ]
+            ]
 
 
 projectCardActionList : ProjectId -> ProgrissStore -> List (ListGroup.Item Msg)
@@ -216,5 +283,5 @@ projectsPerRow =
 -- Proper interface that shows everything in the graph
 -- DoneState = Done Int (Completed At)| Active | SomedayMaybe Int (Resubmit At) | Deleted Int (Deleted At) for Projects
 -- DoneState = Done Int (Completed At)| Active | Deleted Int (Deleted At) for Actions
--- Store the DoneState in the record. I thought about calculating the state from stored Events int he Graph, but that doesn't seem a good idea, because the data structure allows me to store two DoneAt events for a single Action. What would this mean?
+-- Store the DoneState in the record. I thought about calculating the state from stored Events int the Graph, but that doesn't seem a good idea, because the data structure allows me to store two DoneAt events for a single Action. What would this mean?
 -- Benchmark to see if the store is fast
