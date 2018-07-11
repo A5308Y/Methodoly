@@ -129,21 +129,15 @@ getNextFreeId dictionary =
 updateAction : Action -> ProgrissStore -> ProgrissStore
 updateAction action (ProgrissStore store) =
     case action.id of
-        ActionId id ->
-            store.actions
-                |> Dict.get id
-                |> Maybe.map
-                    (\actionData ->
-                        ProgrissStore
-                            { store
-                                | actions =
-                                    Dict.insert
-                                        id
-                                        { actionData | description = action.description }
-                                        store.actions
-                            }
-                    )
-                |> Maybe.withDefault (ProgrissStore store)
+        ActionId actionId ->
+            let
+                updatedActions =
+                    Dict.update
+                        actionId
+                        (Maybe.map (\actionData -> { actionData | description = action.description }))
+                        store.actions
+            in
+            ProgrissStore { store | actions = updatedActions }
 
 
 associateActionToContext : ActionId -> ContextId -> ProgrissStore -> ProgrissStore
