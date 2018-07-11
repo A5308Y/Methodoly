@@ -7,6 +7,9 @@ module ProgrissStore
         , ProgrissStore
         , Project
         , ProjectId(ProjectId)
+        , associateActionToContext
+        , createAction
+        , createContext
         , decoder
         , empty
         , getActionsForContext
@@ -93,6 +96,36 @@ empty =
         }
 
 
+createAction : String -> ProgrissStore -> ProgrissStore
+createAction description (ProgrissStore store) =
+    let
+        updatedActions =
+            Dict.insert
+                (getNextFreeId store.actions)
+                (ActionData description Nothing Nothing)
+                store.actions
+    in
+    ProgrissStore { store | actions = updatedActions }
+
+
+createContext : String -> ProgrissStore -> ProgrissStore
+createContext name (ProgrissStore store) =
+    let
+        updatedContexts =
+            Dict.insert (getNextFreeId store.contexts) (ContextData name) store.contexts
+    in
+    ProgrissStore { store | contexts = updatedContexts }
+
+
+getNextFreeId : Dict Int a -> Int
+getNextFreeId dictionary =
+    dictionary
+        |> Dict.keys
+        |> List.maximum
+        |> Maybe.withDefault 0
+        |> (+) 1
+
+
 updateAction : Action -> ProgrissStore -> ProgrissStore
 updateAction action (ProgrissStore store) =
     case action.id of
@@ -111,6 +144,18 @@ updateAction action (ProgrissStore store) =
                             }
                     )
                 |> Maybe.withDefault (ProgrissStore store)
+
+
+associateActionToContext : ActionId -> ContextId -> ProgrissStore -> ProgrissStore
+associateActionToContext (ActionId actionId) (ContextId contextId) (ProgrissStore store) =
+    let
+        updatedActions =
+            Dict.update
+                actionId
+                (Maybe.map (\actionData -> { actionData | contextId = Just contextId }))
+                store.actions
+    in
+    ProgrissStore { store | actions = updatedActions }
 
 
 getAllActions : ProgrissStore -> List Action

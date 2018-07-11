@@ -77,16 +77,32 @@ suite =
                         (ProgrissStore.getProjectForAction (ActionId 2) fixtureStore)
                         Nothing
             ]
-
-        --, describe "ProgrissStore.createAction"
-        --    [ test "returns a new store with the newly created action" <|
-        --        \_ ->
-        --            Expect.equal
-        --                ProgrissStore.empty
-        --                |> ProgrissStore.createAction "Call Electrician"
-        --                |> ProgrissStore.getAllActions
-        --                    [ Action (ActionId 1) "Call Electrician" ]
-        --    ]
+        , describe "ProgrissStore.createAction"
+            [ test "returns a new store with the newly created action" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.empty
+                            |> ProgrissStore.createAction "Call Electrician"
+                            |> ProgrissStore.createAction "Call Sam"
+                            |> ProgrissStore.getAllActions
+                        )
+                        [ Action (ActionId 1) "Call Electrician"
+                        , Action (ActionId 2) "Call Sam"
+                        ]
+            ]
+        , describe "ProgrissStore.associateActionToContext"
+            [ test "returns a new store with the newly associated action" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.empty
+                            |> ProgrissStore.createAction "Call Electrician"
+                            |> ProgrissStore.createContext "Calls"
+                            |> ProgrissStore.associateActionToContext (ActionId 1) (ContextId 1)
+                            |> ProgrissStore.getActionsForContext (ContextId 1)
+                        )
+                        [ Action (ActionId 1) "Call Electrician"
+                        ]
+            ]
         , describe "ProgrissStore.updateAction"
             [ test "returns a new store with the updated action" <|
                 \_ ->
