@@ -2,16 +2,7 @@ module ProgrissStoreTest exposing (..)
 
 import Expect exposing (Expectation)
 import Json.Decode
-import ProgrissStore
-    exposing
-        ( Action
-        , ActionId(ActionId)
-        , Context
-        , ContextId(ContextId)
-        , ProgrissStore
-        , Project
-        , ProjectId(ProjectId)
-        )
+import ProgrissStore exposing (Action, ProgrissStore)
 import Test exposing (..)
 
 
@@ -22,60 +13,120 @@ suite =
             [ test "returns all actions in the store" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getAllActions fixtureStore)
-                        [ Action (ActionId 1) "Call architect about garden"
-                        , Action (ActionId 2) "Buy cat food"
-                        , Action (ActionId 3) "Call Florist about Mom's favourite flowers"
+                        (ProgrissStore.getAllActions fixtureStore |> List.map .description)
+                        [ "Call architect about garden"
+                        , "Buy cat food"
+                        , "Call Florist about Mom's favourite flowers"
                         ]
             ]
         , describe "ProgrissStore.getAllContexts"
             [ test "returns all contexts in the store" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getAllContexts fixtureStore)
-                        [ Context (ContextId 1) "Errands"
-                        , Context (ContextId 2) "Calls"
-                        ]
+                        (ProgrissStore.getAllContexts fixtureStore |> List.map .name)
+                        [ "Errands", "Calls" ]
             ]
         , describe "ProgrissStore.getAllProjects"
             [ test "returns all projects in the store" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getAllProjects fixtureStore)
-                        [ Project (ProjectId 1) "Build our familiy house"
-                        , Project (ProjectId 2) "Mom's Birthday"
-                        ]
+                        (ProgrissStore.getAllProjects fixtureStore |> List.map .title)
+                        [ "Build our familiy house", "Mom's Birthday" ]
             ]
         , describe "ProgrissStore.getActionsForContext"
             [ test "returns all actions that are associated to the context" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getActionsForContext (ContextId 1) fixtureStore)
-                        [ Action (ActionId 2) "Buy cat food" ]
+                        (fixtureStore
+                            |> ProgrissStore.getAllContexts
+                            |> List.map
+                                (\context ->
+                                    ( context.name
+                                    , fixtureStore
+                                        |> ProgrissStore.getActionsForContext context.id
+                                        |> List.map .description
+                                    )
+                                )
+                        )
+                        [ ( "Errands", [ "Buy cat food" ] )
+                        , ( "Calls", [ "Call Florist about Mom's favourite flowers" ] )
+                        ]
             ]
         , describe "ProgrissStore.getContextForAction"
             [ test "returns Nothing if the Action is not associated to a Context" <|
                 \_ ->
+                    let
+                        populatedStore =
+                            ProgrissStore.empty
+                                |> ProgrissStore.createAction "Call Electrician"
+                    in
                     Expect.equal
-                        (ProgrissStore.getContextForAction (ActionId 1) fixtureStore)
-                        Nothing
+                        (populatedStore
+                            |> ProgrissStore.getAllActions
+                            |> List.map (\action -> ProgrissStore.getContextForAction action.id populatedStore)
+                        )
+                        [ Nothing ]
             , test "returns the context the actions is associated to" <|
                 \_ ->
+                    let
+                        populatedStore =
+                            decodeStore """
+                                {
+                                    "actions": [{"id": 1, "description": "Buy cat food", "context_id": 1}],
+                                    "contexts": [{"id": 1, "name": "Errands"}]
+                                }
+                            """
+                    in
                     Expect.equal
-                        (ProgrissStore.getContextForAction (ActionId 2) fixtureStore)
-                        (Just (Context (ContextId 1) "Errands"))
+                        (populatedStore
+                            |> ProgrissStore.getAllActions
+                            |> List.map
+                                (\action ->
+                                    ProgrissStore.getContextForAction action.id populatedStore
+                                        |> Maybe.map .name
+                                )
+                        )
+                        [ Just "Errands" ]
             ]
         , describe "ProgrissStore.getProjectForAction"
             [ test "returns Nothing if the Action is not associated to a project" <|
                 \_ ->
+                    let
+                        populatedStore =
+                            ProgrissStore.empty
+                                |> ProgrissStore.createAction "Call Electrician"
+                    in
                     Expect.equal
-                        (ProgrissStore.getProjectForAction (ActionId 1) fixtureStore)
-                        (Just (Project (ProjectId 1) "Build our familiy house"))
-            , test "returns the project the actions is associated to" <|
+                        (populatedStore
+                            |> ProgrissStore.getAllActions
+                            |> List.map
+                                (\action ->
+                                    ProgrissStore.getProjectForAction action.id populatedStore
+                                        |> Maybe.map .title
+                                )
+                        )
+                        [ Nothing ]
+            , test "returns the project the action is associated to" <|
                 \_ ->
+                    let
+                        populatedStore =
+                            decodeStore """
+                                {
+                                    "actions": [{"id": 1, "description": "Buy cat food", "project_id": 1}],
+                                    "projects": [{"id": 1, "title": "Get a cat"}]
+                                }
+                            """
+                    in
                     Expect.equal
-                        (ProgrissStore.getProjectForAction (ActionId 2) fixtureStore)
-                        Nothing
+                        (populatedStore
+                            |> ProgrissStore.getAllActions
+                            |> List.map
+                                (\action ->
+                                    ProgrissStore.getProjectForAction action.id populatedStore
+                                        |> Maybe.map .title
+                                )
+                        )
+                        [ Just "Get a cat" ]
             ]
         , describe "ProgrissStore.createAction"
             [ test "returns a new store with the newly created action" <|
@@ -85,45 +136,98 @@ suite =
                             |> ProgrissStore.createAction "Call Electrician"
                             |> ProgrissStore.createAction "Call Sam"
                             |> ProgrissStore.getAllActions
+                            |> List.map .description
                         )
-                        [ Action (ActionId 1) "Call Electrician"
-                        , Action (ActionId 2) "Call Sam"
-                        ]
+                        [ "Call Electrician", "Call Sam" ]
             ]
         , describe "ProgrissStore.associateActionToContext"
             [ test "returns a new store with the newly associated action" <|
                 \_ ->
+                    let
+                        populatedStore =
+                            ProgrissStore.empty
+                                |> ProgrissStore.createAction "Call Electrician"
+                                |> ProgrissStore.createContext "Calls"
+
+                        firstAction =
+                            List.head (ProgrissStore.getAllActions populatedStore)
+
+                        firstContext =
+                            List.head (ProgrissStore.getAllContexts populatedStore)
+
+                        updatedStore =
+                            Maybe.map2
+                                (\firstAction firstContext ->
+                                    populatedStore
+                                        |> ProgrissStore.associateActionToContext firstAction.id firstContext.id
+                                        |> ProgrissStore.getActionsForContext firstContext.id
+                                )
+                                firstAction
+                                firstContext
+                    in
                     Expect.equal
-                        (ProgrissStore.empty
-                            |> ProgrissStore.createAction "Call Electrician"
-                            |> ProgrissStore.createContext "Calls"
-                            |> ProgrissStore.associateActionToContext (ActionId 1) (ContextId 1)
-                            |> ProgrissStore.getActionsForContext (ContextId 1)
-                        )
-                        [ Action (ActionId 1) "Call Electrician"
-                        ]
+                        (Maybe.map (List.map .description) updatedStore)
+                        (Just [ "Call Electrician" ])
+            ]
+        , describe "ProgrissStore.associateActionToProject"
+            [ test "returns a new store with the newly associated action" <|
+                \_ ->
+                    let
+                        populatedStore =
+                            ProgrissStore.empty
+                                |> ProgrissStore.createAction "Call Electrician"
+                                |> ProgrissStore.createProject "Renovate House"
+
+                        firstAction =
+                            List.head (ProgrissStore.getAllActions populatedStore)
+
+                        firstProject =
+                            List.head (ProgrissStore.getAllProjects populatedStore)
+
+                        updatedStore =
+                            Maybe.map2
+                                (\firstAction firstProject ->
+                                    populatedStore
+                                        |> ProgrissStore.associateActionToProject firstAction.id firstProject.id
+                                        |> ProgrissStore.getActionsForProject firstProject.id
+                                )
+                                firstAction
+                                firstProject
+                    in
+                    Expect.equal
+                        (Maybe.map (List.map .description) updatedStore)
+                        (Just [ "Call Electrician" ])
             ]
         , describe "ProgrissStore.updateAction"
             [ test "returns a new store with the updated action" <|
                 \_ ->
+                    let
+                        firstAction =
+                            List.head (ProgrissStore.getAllActions fixtureStore)
+                    in
                     Expect.equal
-                        (fixtureStore
-                            |> ProgrissStore.updateAction (Action (ActionId 1) "Call architect about possible garden path layouts")
-                            |> ProgrissStore.getAllActions
+                        (Maybe.map
+                            (\action ->
+                                fixtureStore
+                                    |> ProgrissStore.updateAction (Action action.id "Call architect about possible garden path layouts")
+                                    |> ProgrissStore.getAllActions
+                                    |> List.map .description
+                            )
+                            firstAction
                         )
-                        [ Action (ActionId 1) "Call architect about possible garden path layouts"
-                        , Action (ActionId 2) "Buy cat food"
-                        , Action (ActionId 3) "Call Florist about Mom's favourite flowers"
-                        ]
+                        (Just
+                            [ "Call architect about possible garden path layouts"
+                            , "Buy cat food"
+                            , "Call Florist about Mom's favourite flowers"
+                            ]
+                        )
             ]
         ]
 
 
 fixtureStore : ProgrissStore
 fixtureStore =
-    let
-        jsonData =
-            """
+    decodeStore """
             {
                 "actions": [
                     {"id": 1, "description": "Call architect about garden", "project_id": 1},
@@ -140,7 +244,10 @@ fixtureStore =
                 ]
             }
             """
-    in
+
+
+decodeStore : String -> ProgrissStore
+decodeStore jsonData =
     case Json.Decode.decodeString ProgrissStore.decoder jsonData of
         Err message ->
             Debug.crash message

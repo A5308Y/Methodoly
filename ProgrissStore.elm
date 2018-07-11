@@ -1,18 +1,16 @@
 module ProgrissStore
     exposing
         ( Action
-        , ActionId(ActionId)
-        , Context
-        , ContextId(ContextId)
         , ProgrissStore
-        , Project
-        , ProjectId(ProjectId)
         , associateActionToContext
+        , associateActionToProject
         , createAction
         , createContext
+        , createProject
         , decoder
         , empty
         , getActionsForContext
+        , getActionsForProject
         , getAllActions
         , getAllContexts
         , getAllProjects
@@ -117,6 +115,15 @@ createContext name (ProgrissStore store) =
     ProgrissStore { store | contexts = updatedContexts }
 
 
+createProject : String -> ProgrissStore -> ProgrissStore
+createProject name (ProgrissStore store) =
+    let
+        updatedProjects =
+            Dict.insert (getNextFreeId store.projects) (ProjectData name) store.projects
+    in
+    ProgrissStore { store | projects = updatedProjects }
+
+
 getNextFreeId : Dict Int a -> Int
 getNextFreeId dictionary =
     dictionary
@@ -152,6 +159,18 @@ associateActionToContext (ActionId actionId) (ContextId contextId) (ProgrissStor
     ProgrissStore { store | actions = updatedActions }
 
 
+associateActionToProject : ActionId -> ProjectId -> ProgrissStore -> ProgrissStore
+associateActionToProject (ActionId actionId) (ProjectId projectId) (ProgrissStore store) =
+    let
+        updatedActions =
+            Dict.update
+                actionId
+                (Maybe.map (\actionData -> { actionData | projectId = Just projectId }))
+                store.actions
+    in
+    ProgrissStore { store | actions = updatedActions }
+
+
 getAllActions : ProgrissStore -> List Action
 getAllActions (ProgrissStore store) =
     Dict.toList store.actions
@@ -162,6 +181,13 @@ getActionsForContext : ContextId -> ProgrissStore -> List Action
 getActionsForContext (ContextId contextId) (ProgrissStore store) =
     Dict.toList store.actions
         |> List.filter (\( id, actionData ) -> actionData.contextId == Just contextId)
+        |> List.map castActionDataToAction
+
+
+getActionsForProject : ProjectId -> ProgrissStore -> List Action
+getActionsForProject (ProjectId projectId) (ProgrissStore store) =
+    Dict.toList store.actions
+        |> List.filter (\( id, actionData ) -> actionData.projectId == Just projectId)
         |> List.map castActionDataToAction
 
 
