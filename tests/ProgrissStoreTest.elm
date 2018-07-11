@@ -28,15 +28,6 @@ suite =
                         , Action (ActionId 3) "Call Florist about Mom's favourite flowers"
                         ]
             ]
-        , describe "ProgrissStore.getAllProjects"
-            [ test "returns all projects in the store" <|
-                \_ ->
-                    Expect.equal
-                        (ProgrissStore.getAllProjects fixtureStore)
-                        [ Project (ProjectId 1) "Build our familiy house"
-                        , Project (ProjectId 2) "Mom's Birthday"
-                        ]
-            ]
         , describe "ProgrissStore.getAllContexts"
             [ test "returns all contexts in the store" <|
                 \_ ->
@@ -44,6 +35,15 @@ suite =
                         (ProgrissStore.getAllContexts fixtureStore)
                         [ Context (ContextId 1) "Errands"
                         , Context (ContextId 2) "Calls"
+                        ]
+            ]
+        , describe "ProgrissStore.getAllProjects"
+            [ test "returns all projects in the store" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getAllProjects fixtureStore)
+                        [ Project (ProjectId 1) "Build our familiy house"
+                        , Project (ProjectId 2) "Mom's Birthday"
                         ]
             ]
         , describe "ProgrissStore.getActionsForContext"
@@ -76,6 +76,29 @@ suite =
                     Expect.equal
                         (ProgrissStore.getProjectForAction (ActionId 2) fixtureStore)
                         Nothing
+            ]
+
+        --, describe "ProgrissStore.createAction"
+        --    [ test "returns a new store with the newly created action" <|
+        --        \_ ->
+        --            Expect.equal
+        --                ProgrissStore.empty
+        --                |> ProgrissStore.createAction "Call Electrician"
+        --                |> ProgrissStore.getAllActions
+        --                    [ Action (ActionId 1) "Call Electrician" ]
+        --    ]
+        , describe "ProgrissStore.updateAction"
+            [ test "returns a new store with the updated action" <|
+                \_ ->
+                    Expect.equal
+                        (fixtureStore
+                            |> ProgrissStore.updateAction (Action (ActionId 1) "Call architect about possible garden path layouts")
+                            |> ProgrissStore.getAllActions
+                        )
+                        [ Action (ActionId 1) "Call architect about possible garden path layouts"
+                        , Action (ActionId 2) "Buy cat food"
+                        , Action (ActionId 3) "Call Florist about Mom's favourite flowers"
+                        ]
             ]
         ]
 

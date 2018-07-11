@@ -8,12 +8,14 @@ module ProgrissStore
         , Project
         , ProjectId(ProjectId)
         , decoder
+        , empty
         , getActionsForContext
         , getAllActions
         , getAllContexts
         , getAllProjects
         , getContextForAction
         , getProjectForAction
+        , updateAction
         )
 
 import Dict exposing (Dict)
@@ -89,6 +91,26 @@ empty =
         , contexts = Dict.empty
         , notes = Dict.empty
         }
+
+
+updateAction : Action -> ProgrissStore -> ProgrissStore
+updateAction action (ProgrissStore store) =
+    case action.id of
+        ActionId id ->
+            store.actions
+                |> Dict.get id
+                |> Maybe.map
+                    (\actionData ->
+                        ProgrissStore
+                            { store
+                                | actions =
+                                    Dict.insert
+                                        id
+                                        { actionData | description = action.description }
+                                        store.actions
+                            }
+                    )
+                |> Maybe.withDefault (ProgrissStore store)
 
 
 getAllActions : ProgrissStore -> List Action
