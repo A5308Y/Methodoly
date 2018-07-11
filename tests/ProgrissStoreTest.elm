@@ -2,7 +2,16 @@ module ProgrissStoreTest exposing (..)
 
 import Expect exposing (Expectation)
 import Json.Decode
-import ProgrissStore exposing (Action, Context, ProgrissStore, Project)
+import ProgrissStore
+    exposing
+        ( Action
+        , ActionId(ActionId)
+        , Context
+        , ContextId(ContextId)
+        , ProgrissStore
+        , Project
+        , ProjectId(ProjectId)
+        )
 import Test exposing (..)
 
 
@@ -14,9 +23,9 @@ suite =
                 \_ ->
                     Expect.equal
                         (ProgrissStore.getAllActions fixtureStore)
-                        [ Action 1 "Call architect about garden"
-                        , Action 2 "Buy cat food"
-                        , Action 3 "Call Florist about Mom's favourite flowers"
+                        [ Action (ActionId 1) "Call architect about garden"
+                        , Action (ActionId 2) "Buy cat food"
+                        , Action (ActionId 3) "Call Florist about Mom's favourite flowers"
                         ]
             ]
         , describe "ProgrissStore.getAllProjects"
@@ -24,8 +33,8 @@ suite =
                 \_ ->
                     Expect.equal
                         (ProgrissStore.getAllProjects fixtureStore)
-                        [ Project 1 "Build our familiy house"
-                        , Project 2 "Mom's Birthday"
+                        [ Project (ProjectId 1) "Build our familiy house"
+                        , Project (ProjectId 2) "Mom's Birthday"
                         ]
             ]
         , describe "ProgrissStore.getAllContexts"
@@ -33,28 +42,40 @@ suite =
                 \_ ->
                     Expect.equal
                         (ProgrissStore.getAllContexts fixtureStore)
-                        [ Context 1 "Errands"
-                        , Context 2 "Calls"
+                        [ Context (ContextId 1) "Errands"
+                        , Context (ContextId 2) "Calls"
                         ]
             ]
         , describe "ProgrissStore.getActionsForContext"
             [ test "returns all actions that are associated to the context" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getActionsForContext 1 fixtureStore)
-                        [ Action 2 "Buy cat food" ]
+                        (ProgrissStore.getActionsForContext (ContextId 1) fixtureStore)
+                        [ Action (ActionId 2) "Buy cat food" ]
             ]
         , describe "ProgrissStore.getContextForAction"
             [ test "returns Nothing if the Action is not associated to a Context" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getContextForAction 1 fixtureStore)
+                        (ProgrissStore.getContextForAction (ActionId 1) fixtureStore)
                         Nothing
             , test "returns the context the actions is associated to" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getContextForAction 2 fixtureStore)
-                        (Just (Context 1 "Errands"))
+                        (ProgrissStore.getContextForAction (ActionId 2) fixtureStore)
+                        (Just (Context (ContextId 1) "Errands"))
+            ]
+        , describe "ProgrissStore.getProjectForAction"
+            [ test "returns Nothing if the Action is not associated to a project" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getProjectForAction (ActionId 1) fixtureStore)
+                        (Just (Project (ProjectId 1) "Build our familiy house"))
+            , test "returns the project the actions is associated to" <|
+                \_ ->
+                    Expect.equal
+                        (ProgrissStore.getProjectForAction (ActionId 2) fixtureStore)
+                        Nothing
             ]
         ]
 

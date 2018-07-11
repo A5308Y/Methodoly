@@ -1,4 +1,20 @@
-module ProgrissStore exposing (..)
+module ProgrissStore
+    exposing
+        ( Action
+        , ActionId(ActionId)
+        , Context
+        , ContextId(ContextId)
+        , ProgrissStore
+        , Project
+        , ProjectId(ProjectId)
+        , decoder
+        , getActionsForContext
+        , getAllActions
+        , getAllContexts
+        , getAllProjects
+        , getContextForAction
+        , getProjectForAction
+        )
 
 import Dict exposing (Dict)
 import Json.Decode exposing (Decoder, float, int, nullable, string)
@@ -34,19 +50,35 @@ type alias NoteData =
 
 
 type alias Action =
-    { id : Int, description : String }
+    { id : ActionId, description : String }
 
 
 type alias Project =
-    { id : Int, title : String }
+    { id : ProjectId, title : String }
 
 
 type alias Context =
-    { id : Int, name : String }
+    { id : ContextId, name : String }
 
 
 type alias Note =
-    { id : Int, body : String }
+    { id : NoteId, body : String }
+
+
+type ActionId
+    = ActionId Int
+
+
+type ContextId
+    = ContextId Int
+
+
+type ProjectId
+    = ProjectId Int
+
+
+type NoteId
+    = NoteId Int
 
 
 empty : ProgrissStore
@@ -65,19 +97,27 @@ getAllActions (ProgrissStore store) =
         |> List.map castActionDataToAction
 
 
-getActionsForContext : Int -> ProgrissStore -> List Action
-getActionsForContext contextId (ProgrissStore store) =
+getActionsForContext : ContextId -> ProgrissStore -> List Action
+getActionsForContext (ContextId contextId) (ProgrissStore store) =
     Dict.toList store.actions
         |> List.filter (\( id, actionData ) -> actionData.contextId == Just contextId)
         |> List.map castActionDataToAction
 
 
-getContextForAction : Int -> ProgrissStore -> Maybe Context
-getContextForAction actionId (ProgrissStore store) =
+getContextForAction : ActionId -> ProgrissStore -> Maybe Context
+getContextForAction (ActionId actionId) (ProgrissStore store) =
     Dict.get actionId store.actions
         |> Maybe.andThen (\action -> action.contextId)
         |> Maybe.andThen (\contextId -> Maybe.map (\context -> ( contextId, context )) (Dict.get contextId store.contexts))
         |> Maybe.map castContextDataToContext
+
+
+getProjectForAction : ActionId -> ProgrissStore -> Maybe Project
+getProjectForAction (ActionId actionId) (ProgrissStore store) =
+    Dict.get actionId store.actions
+        |> Maybe.andThen (\action -> action.projectId)
+        |> Maybe.andThen (\projectId -> Maybe.map (\project -> ( projectId, project )) (Dict.get projectId store.projects))
+        |> Maybe.map castProjectDataToProject
 
 
 getAllContexts : ProgrissStore -> List Context
@@ -94,17 +134,17 @@ getAllProjects (ProgrissStore store) =
 
 castActionDataToAction : ( Int, ActionData ) -> Action
 castActionDataToAction ( id, actionData ) =
-    Action id actionData.description
+    Action (ActionId id) actionData.description
 
 
 castProjectDataToProject : ( Int, ProjectData ) -> Project
 castProjectDataToProject ( id, projectData ) =
-    Project id projectData.title
+    Project (ProjectId id) projectData.title
 
 
 castContextDataToContext : ( Int, ContextData ) -> Context
 castContextDataToContext ( id, contextData ) =
-    Context id contextData.name
+    Context (ContextId id) contextData.name
 
 
 decoder : Decoder ProgrissStore
@@ -175,29 +215,3 @@ projectDataConstructor id title =
 noteDataConstructor : Int -> String -> Int -> ( Int, NoteData )
 noteDataConstructor id content projectId =
     ( id, NoteData content projectId )
-
-
-
---        ProjectActionsFilter projectId ->
---            store.actions
---                |> Dict.filter (\id action -> action.projectId == Just projectId)
---                |> Dict.toList
---        ContextActionsFilter contextId ->
---            store.actions
---                |> Dict.filter (\id action -> action.contextId == Just contextId)
---                |> Dict.toList
---getNotes : NoteFilter -> ProgrissStore -> List ( Int, Note )
---getNotes noteFilter (ProgrissStore store) =
---    case noteFilter of
---        AllNotes ->
---            Dict.toList store.notes
---        ProjectNotesFilter projectId ->
---            store.notes
---                |> Dict.filter (\id note -> note.projectId == projectId)
---                |> Dict.toList
---getContexts : ProgrissStore -> List ( Int, Context )
---getContexts (ProgrissStore store) =
---    Dict.toList store.contexts
---getProjects : ProgrissStore -> List ( Int, Project )
---getProjects (ProgrissStore store) =
---    Dict.toList store.projects
