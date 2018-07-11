@@ -1,7 +1,11 @@
 module ProgrissStore
     exposing
         ( Action
+        , Context
+        , ContextId
         , ProgrissStore
+        , Project
+        , ProjectId
         , associateActionToContext
         , associateActionToProject
         , createAction
@@ -55,8 +59,8 @@ type alias NoteData =
 
 
 
-{--Don't add the relationships here, because we might switch a graph implementation. Use the store
-to find a project for an action. --}
+{--Don't add the relationships to these records, because we might switch a graph implementation. Use
+ the store to find a project or context for an action. --}
 
 
 type alias Action =
