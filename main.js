@@ -15217,23 +15217,31 @@ var _user$project$Workflows_SimpleTodos$iconForActionState = function (state) {
 		return 'check_box_outline_blank';
 	}
 };
+var _user$project$Workflows_SimpleTodos$buttonColorForActionState = function (state) {
+	var _p2 = state;
+	if (_p2.ctor === 'Done') {
+		return _rundis$elm_bootstrap$Bootstrap_Button$success;
+	} else {
+		return _rundis$elm_bootstrap$Bootstrap_Button$primary;
+	}
+};
 var _user$project$Workflows_SimpleTodos$update = F3(
 	function (msg, store, model) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'UpdateNewActionDescription':
 				return {
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{newActionDescription: _p2._0}),
+						{newActionDescription: _p3._0}),
 					_1: store,
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'CreateNewAction':
-				var _p3 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, store);
-				var actionId = _p3._0;
-				var updatedStore = _p3._1;
+				var _p4 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, store);
+				var actionId = _p4._0;
+				var updatedStore = _p4._1;
 				return {
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -15246,7 +15254,7 @@ var _user$project$Workflows_SimpleTodos$update = F3(
 				return {
 					ctor: '_Tuple3',
 					_0: model,
-					_1: A2(_user$project$ProgrissStore$checkOffAction, _p2._0, store),
+					_1: A2(_user$project$ProgrissStore$checkOffAction, _p3._0, store),
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
 		}
@@ -15292,7 +15300,7 @@ var _user$project$Workflows_SimpleTodos$actionCard = function (action) {
 										_rundis$elm_bootstrap$Bootstrap_Button$button,
 										{
 											ctor: '::',
-											_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+											_0: _user$project$Workflows_SimpleTodos$buttonColorForActionState(action.state),
 											_1: {
 												ctor: '::',
 												_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(

@@ -90,7 +90,7 @@ actionCard action =
                 (Grid.row [ Row.middleXs ]
                     [ Grid.col [ Col.xs2, Col.md1 ]
                         [ Button.button
-                            [ Button.primary
+                            [ buttonColorForActionState action.state
                             , Button.attrs
                                 [ Html.Events.onClick (CheckOffAction action.id)
                                 , Html.Attributes.class "bmd-btn-fab bmd-btn-fab-sm"
@@ -107,6 +107,16 @@ actionCard action =
         |> Card.view
 
 
+buttonColorForActionState : ActionState -> Button.Option Msg
+buttonColorForActionState state =
+    case state of
+        Done time ->
+            Button.success
+
+        _ ->
+            Button.primary
+
+
 iconForActionState : ActionState -> String
 iconForActionState state =
     case state of
@@ -117,7 +127,7 @@ iconForActionState state =
             "check_box_outline_blank"
 
 
-cardConfigForAction : Action -> List (Card.Option msg)
+cardConfigForAction : Action -> List (Card.Option Msg)
 cardConfigForAction action =
     case action.state of
         Done time ->

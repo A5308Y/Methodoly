@@ -1,0 +1,23 @@
+// Bootstrap overrides
+//
+// Copy variables from `_variables.scss` to this file to override default values
+// without modifying source files.
+
+$theme-colors: (
+  primary: $amber,
+  success: $green,
+  info: $light-blue,
+  warning: $deep-orange,
+  danger: $red,
+  light: $grey-100,
+  dark: $grey-800
+);
+
+// primary: $blue,
+// secondary: $gray-600,
+// "success": #0097A7,
+// info: $cyan,
+// warning: $yellow,
+// danger: $red,
+// light: $gray-100,
+// dark: $gray-800
