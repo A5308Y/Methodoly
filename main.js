@@ -10867,33 +10867,6 @@ var _rundis$elm_bootstrap$Bootstrap_Button$button = F2(
 			children);
 	});
 
-var _rundis$elm_bootstrap$Bootstrap_CDN$fontAwesome = A3(
-	_elm_lang$html$Html$node,
-	'link',
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$rel('stylesheet'),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$href('https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'),
-			_1: {ctor: '[]'}
-		}
-	},
-	{ctor: '[]'});
-var _rundis$elm_bootstrap$Bootstrap_CDN$stylesheet = A3(
-	_elm_lang$html$Html$node,
-	'link',
-	{
-		ctor: '::',
-		_0: _elm_lang$html$Html_Attributes$rel('stylesheet'),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$href('https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'),
-			_1: {ctor: '[]'}
-		}
-	},
-	{ctor: '[]'});
-
 var _rundis$elm_bootstrap$Bootstrap_Dropdown$isToggle = A2(
 	_elm_lang$core$Json_Decode$andThen,
 	function ($class) {
@@ -14599,8 +14572,308 @@ var _user$project$ProgrissStore$getNotesForProject = F2(
 				_elm_lang$core$Dict$toList(_p85._0.notes)));
 	});
 
-var _user$project$Main$projectsPerRow = 3;
-var _user$project$Main$projectCardNoteList = F2(
+var _user$project$Workflows_GtdActionLists$actionCard = function (action) {
+	return _rundis$elm_bootstrap$Bootstrap_Card$view(
+		A3(
+			_rundis$elm_bootstrap$Bootstrap_Card$block,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_rundis$elm_bootstrap$Bootstrap_Card_Block$text,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text(action.description),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			},
+			_rundis$elm_bootstrap$Bootstrap_Card$config(
+				{ctor: '[]'})));
+};
+var _user$project$Workflows_GtdActionLists$renderActions = function (actions) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		A2(
+			_elm_lang$core$List$map,
+			function (action) {
+				return _user$project$Workflows_GtdActionLists$actionCard(action);
+			},
+			actions));
+};
+var _user$project$Workflows_GtdActionLists$actionsToRender = F2(
+	function (store, selectedContext) {
+		var _p0 = selectedContext;
+		switch (_p0.ctor) {
+			case 'AllContexts':
+				return _user$project$ProgrissStore$getAllActions(store);
+			case 'AnywhereContext':
+				return _user$project$ProgrissStore$getActionsWithoutContext(store);
+			default:
+				return A2(_user$project$ProgrissStore$getActionsForContext, _p0._0, store);
+		}
+	});
+var _user$project$Workflows_GtdActionLists$update = F3(
+	function (msg, store, model) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'UpdateNewActionDescription':
+				return {
+					ctor: '_Tuple3',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{newActionDescription: _p1._0}),
+					_1: store,
+					_2: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'ChangeContext':
+				return {
+					ctor: '_Tuple3',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{selectedContext: _p1._0}),
+					_1: store,
+					_2: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				var _p2 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, store);
+				var actionId = _p2._0;
+				var storeWithNewAction = _p2._1;
+				var updatedStore = function () {
+					var _p3 = model.selectedContext;
+					switch (_p3.ctor) {
+						case 'SpecificContext':
+							return A3(_user$project$ProgrissStore$associateActionToContext, actionId, _p3._0, storeWithNewAction);
+						case 'AllContexts':
+							return storeWithNewAction;
+						default:
+							return storeWithNewAction;
+					}
+				}();
+				return {
+					ctor: '_Tuple3',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{newActionDescription: ''}),
+					_1: updatedStore,
+					_2: _elm_lang$core$Platform_Cmd$none
+				};
+		}
+	});
+var _user$project$Workflows_GtdActionLists$Model = F2(
+	function (a, b) {
+		return {selectedContext: a, newActionDescription: b};
+	});
+var _user$project$Workflows_GtdActionLists$AllContexts = {ctor: 'AllContexts'};
+var _user$project$Workflows_GtdActionLists$SpecificContext = function (a) {
+	return {ctor: 'SpecificContext', _0: a};
+};
+var _user$project$Workflows_GtdActionLists$AnywhereContext = {ctor: 'AnywhereContext'};
+var _user$project$Workflows_GtdActionLists$initialModel = {selectedContext: _user$project$Workflows_GtdActionLists$AnywhereContext, newActionDescription: ''};
+var _user$project$Workflows_GtdActionLists$CreateNewAction = {ctor: 'CreateNewAction'};
+var _user$project$Workflows_GtdActionLists$UpdateNewActionDescription = function (a) {
+	return {ctor: 'UpdateNewActionDescription', _0: a};
+};
+var _user$project$Workflows_GtdActionLists$ChangeContext = function (a) {
+	return {ctor: 'ChangeContext', _0: a};
+};
+var _user$project$Workflows_GtdActionLists$clickableContextAttributes = F2(
+	function (selectedContext, context) {
+		return _elm_lang$core$Native_Utils.eq(selectedContext, context) ? {
+			ctor: '::',
+			_0: _rundis$elm_bootstrap$Bootstrap_ListGroup$active,
+			_1: {
+				ctor: '::',
+				_0: _rundis$elm_bootstrap$Bootstrap_ListGroup$attrs(
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$href('#'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(
+								_user$project$Workflows_GtdActionLists$ChangeContext(context)),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			}
+		} : {
+			ctor: '::',
+			_0: _rundis$elm_bootstrap$Bootstrap_ListGroup$attrs(
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$href('#'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$Workflows_GtdActionLists$ChangeContext(context)),
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		};
+	});
+var _user$project$Workflows_GtdActionLists$clickableAllContexts = function (selectedContext) {
+	return A2(
+		_rundis$elm_bootstrap$Bootstrap_ListGroup$anchor,
+		A2(_user$project$Workflows_GtdActionLists$clickableContextAttributes, selectedContext, _user$project$Workflows_GtdActionLists$AllContexts),
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('All'),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Workflows_GtdActionLists$clickableAnywhereContext = function (selectedContext) {
+	return A2(
+		_rundis$elm_bootstrap$Bootstrap_ListGroup$anchor,
+		A2(_user$project$Workflows_GtdActionLists$clickableContextAttributes, selectedContext, _user$project$Workflows_GtdActionLists$AnywhereContext),
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('Anywhere'),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Workflows_GtdActionLists$clickableContext = F2(
+	function (selectedContext, context) {
+		return A2(
+			_rundis$elm_bootstrap$Bootstrap_ListGroup$anchor,
+			A2(
+				_user$project$Workflows_GtdActionLists$clickableContextAttributes,
+				selectedContext,
+				_user$project$Workflows_GtdActionLists$SpecificContext(context.id)),
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html$text(context.name),
+				_1: {ctor: '[]'}
+			});
+	});
+var _user$project$Workflows_GtdActionLists$renderContextMenu = F2(
+	function (store, selectedContext) {
+		return _rundis$elm_bootstrap$Bootstrap_ListGroup$custom(
+			A2(
+				F2(
+					function (x, y) {
+						return {ctor: '::', _0: x, _1: y};
+					}),
+				_user$project$Workflows_GtdActionLists$clickableAllContexts(selectedContext),
+				A2(
+					F2(
+						function (x, y) {
+							return {ctor: '::', _0: x, _1: y};
+						}),
+					_user$project$Workflows_GtdActionLists$clickableAnywhereContext(selectedContext),
+					A2(
+						_elm_lang$core$List$map,
+						_user$project$Workflows_GtdActionLists$clickableContext(selectedContext),
+						_user$project$ProgrissStore$getAllContexts(store)))));
+	});
+var _user$project$Workflows_GtdActionLists$view = F2(
+	function (store, model) {
+		return A2(
+			_rundis$elm_bootstrap$Bootstrap_Grid$container,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_rundis$elm_bootstrap$Bootstrap_Grid$row,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: A2(
+							_rundis$elm_bootstrap$Bootstrap_Grid$col,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(_user$project$Workflows_GtdActionLists$renderContextMenu, store, model.selectedContext),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_rundis$elm_bootstrap$Bootstrap_Grid$col,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _user$project$Workflows_GtdActionLists$renderActions(
+										A2(_user$project$Workflows_GtdActionLists$actionsToRender, store, model.selectedContext)),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$hr,
+											{ctor: '[]'},
+											{ctor: '[]'}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_rundis$elm_bootstrap$Bootstrap_Form$form,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$view(
+														A2(
+															_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$successors,
+															{
+																ctor: '::',
+																_0: A2(
+																	_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$button,
+																	{
+																		ctor: '::',
+																		_0: _rundis$elm_bootstrap$Bootstrap_Button$secondary,
+																		_1: {
+																			ctor: '::',
+																			_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Events$onClick(_user$project$Workflows_GtdActionLists$CreateNewAction),
+																					_1: {ctor: '[]'}
+																				}),
+																			_1: {ctor: '[]'}
+																		}
+																	},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('Create Action'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															},
+															_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$config(
+																_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$text(
+																	{
+																		ctor: '::',
+																		_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$placeholder('Type action description here'),
+																		_1: {
+																			ctor: '::',
+																			_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$attrs(
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$value(model.newActionDescription),
+																					_1: {
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Events$onInput(_user$project$Workflows_GtdActionLists$UpdateNewActionDescription),
+																						_1: {ctor: '[]'}
+																					}
+																				}),
+																			_1: {ctor: '[]'}
+																		}
+																	})))),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+
+var _user$project$Workflows_ProjectCardOverview$projectsPerRow = 3;
+var _user$project$Workflows_ProjectCardOverview$projectCardNoteList = F2(
 	function (projectId, store) {
 		return A2(
 			_elm_lang$html$Html$ul,
@@ -14619,7 +14892,7 @@ var _user$project$Main$projectCardNoteList = F2(
 				},
 				A2(_user$project$ProgrissStore$getNotesForProject, projectId, store)));
 	});
-var _user$project$Main$projectCardActionList = F2(
+var _user$project$Workflows_ProjectCardOverview$projectCardActionList = F2(
 	function (projectId, store) {
 		return A2(
 			_elm_lang$core$List$map,
@@ -14635,7 +14908,7 @@ var _user$project$Main$projectCardActionList = F2(
 			},
 			A2(_user$project$ProgrissStore$getActionsForProject, projectId, store));
 	});
-var _user$project$Main$projectCard = F2(
+var _user$project$Workflows_ProjectCardOverview$projectCard = F2(
 	function (store, project) {
 		return A3(
 			_rundis$elm_bootstrap$Bootstrap_Card$block,
@@ -14647,7 +14920,7 @@ var _user$project$Main$projectCard = F2(
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: A2(_user$project$Main$projectCardNoteList, project.id, store),
+						_0: A2(_user$project$Workflows_ProjectCardOverview$projectCardNoteList, project.id, store),
 						_1: {
 							ctor: '::',
 							_0: A2(
@@ -14689,7 +14962,7 @@ var _user$project$Main$projectCard = F2(
 			},
 			A2(
 				_rundis$elm_bootstrap$Bootstrap_Card$listGroup,
-				A2(_user$project$Main$projectCardActionList, project.id, store),
+				A2(_user$project$Workflows_ProjectCardOverview$projectCardActionList, project.id, store),
 				A3(
 					_rundis$elm_bootstrap$Bootstrap_Card$block,
 					{ctor: '[]'},
@@ -14708,7 +14981,37 @@ var _user$project$Main$projectCard = F2(
 					_rundis$elm_bootstrap$Bootstrap_Card$config(
 						{ctor: '[]'}))));
 	});
-var _user$project$Main$actionCard = function (action) {
+var _user$project$Workflows_ProjectCardOverview$view = F2(
+	function (store, model) {
+		var allProjects = _user$project$ProgrissStore$getAllProjects(store);
+		var groupedProjects = A3(
+			_user$project$ListHelper$groupsOf,
+			_user$project$Workflows_ProjectCardOverview$projectsPerRow,
+			allProjects,
+			{ctor: '[]'});
+		return A2(
+			_rundis$elm_bootstrap$Bootstrap_Grid$container,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$map,
+				function (projectGroup) {
+					return _rundis$elm_bootstrap$Bootstrap_Card$deck(
+						A2(
+							_elm_lang$core$List$map,
+							_user$project$Workflows_ProjectCardOverview$projectCard(store),
+							projectGroup));
+				},
+				groupedProjects));
+	});
+var _user$project$Workflows_ProjectCardOverview$update = F3(
+	function (msg, store, model) {
+		return {ctor: '_Tuple3', _0: model, _1: store, _2: _elm_lang$core$Platform_Cmd$none};
+	});
+var _user$project$Workflows_ProjectCardOverview$initialModel = {};
+var _user$project$Workflows_ProjectCardOverview$Model = {};
+var _user$project$Workflows_ProjectCardOverview$Never = {ctor: 'Never'};
+
+var _user$project$Workflows_SimpleTodos$actionCard = function (action) {
 	return _rundis$elm_bootstrap$Bootstrap_Card$view(
 		A3(
 			_rundis$elm_bootstrap$Bootstrap_Card$block,
@@ -14728,306 +15031,70 @@ var _user$project$Main$actionCard = function (action) {
 			_rundis$elm_bootstrap$Bootstrap_Card$config(
 				{ctor: '[]'})));
 };
-var _user$project$Main$projectsCardOverview = function (store) {
-	var allProjects = _user$project$ProgrissStore$getAllProjects(store);
-	var groupedProjects = A3(
-		_user$project$ListHelper$groupsOf,
-		_user$project$Main$projectsPerRow,
-		allProjects,
-		{ctor: '[]'});
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$List$map,
-			function (projectGroup) {
-				return _rundis$elm_bootstrap$Bootstrap_Card$deck(
-					A2(
-						_elm_lang$core$List$map,
-						_user$project$Main$projectCard(store),
-						projectGroup));
-			},
-			groupedProjects));
-};
-var _user$project$Main$getActions = F2(
-	function (selectedContext, store) {
-		var _p0 = selectedContext;
-		if (_p0.ctor === 'Nothing') {
-			return _user$project$ProgrissStore$getAllActions(store);
-		} else {
-			return A2(_user$project$ProgrissStore$getActionsForContext, _p0._0, store);
-		}
-	});
-var _user$project$Main$renderActions = function (actions) {
+var _user$project$Workflows_SimpleTodos$renderActions = function (actions) {
 	return A2(
 		_elm_lang$html$Html$div,
 		{ctor: '[]'},
 		A2(
 			_elm_lang$core$List$map,
 			function (action) {
-				return _user$project$Main$actionCard(action);
+				return _user$project$Workflows_SimpleTodos$actionCard(action);
 			},
 			actions));
 };
-var _user$project$Main$actionsToRender = F2(
-	function (store, selectedContext) {
-		var _p1 = selectedContext;
-		switch (_p1.ctor) {
-			case 'AllContexts':
-				return _user$project$ProgrissStore$getAllActions(store);
-			case 'AnywhereContext':
-				return _user$project$ProgrissStore$getActionsWithoutContext(store);
-			default:
-				return A2(_user$project$ProgrissStore$getActionsForContext, _p1._0, store);
+var _user$project$Workflows_SimpleTodos$update = F3(
+	function (msg, store, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'UpdateNewActionDescription') {
+			return {
+				ctor: '_Tuple3',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{newActionDescription: _p0._0}),
+				_1: store,
+				_2: _elm_lang$core$Platform_Cmd$none
+			};
+		} else {
+			var _p1 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, store);
+			var actionId = _p1._0;
+			var updatedStore = _p1._1;
+			return {
+				ctor: '_Tuple3',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{newActionDescription: ''}),
+				_1: updatedStore,
+				_2: _elm_lang$core$Platform_Cmd$none
+			};
 		}
 	});
-var _user$project$Main$initialStore = function () {
-	var jsonData = '\n                {\n                    \"actions\": [\n                        {\"id\": 1, \"description\": \"Call architect about garden\", \"project_id\": 1},\n                        {\"id\": 2, \"description\": \"Buy cat food\", \"context_id\": 1},\n                        {\"id\": 3, \"description\": \"Call Florist about Mom\'s favourite flowers\", \"project_id\": 2, \"context_id\": 2}\n                    ],\n                    \"contexts\": [\n                        {\"id\": 1, \"name\": \"Errands\"},\n                        {\"id\": 2, \"name\": \"Calls\"}\n                    ],\n                    \"projects\": [\n                        {\"id\": 1, \"title\": \"Build our familiy house\"},\n                        {\"id\": 2, \"title\": \"Mom\'s Birthday\"}\n                    ],\n                    \"notes\": [\n                        {\"id\": 1, \"body\": \"Don\'t forget she likes tulips the best! So if you can get those please do. Whatever you do though, don\'t get roses. She hates them!\", \"project_id\": 2}\n                    ]\n                }\n            ';
-	var _p2 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, jsonData);
-	if (_p2.ctor === 'Ok') {
-		return _p2._0;
-	} else {
-		return _user$project$ProgrissStore$empty;
-	}
-}();
-var _user$project$Main$persistStore = _elm_lang$core$Native_Platform.outgoingPort(
-	'persistStore',
-	function (v) {
-		return v;
-	});
-var _user$project$Main$loadStore = _elm_lang$core$Native_Platform.incomingPort('loadStore', _elm_lang$core$Json_Decode$string);
-var _user$project$Main$triggerStoreLoad = _elm_lang$core$Native_Platform.outgoingPort(
-	'triggerStoreLoad',
-	function (v) {
-		return null;
-	});
-var _user$project$Main$update = F2(
-	function (msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
-			case 'UpdateNewActionDescription':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{newActionDescription: _p3._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'ChangeContext':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{selectedContext: _p3._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'Save':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _user$project$Main$persistStore(
-						A2(
-							_elm_lang$core$Json_Encode$encode,
-							2,
-							_user$project$ProgrissStore$encoder(model.store)))
-				};
-			case 'TriggerLoad':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _user$project$Main$triggerStoreLoad(
-						{ctor: '_Tuple0'})
-				};
-			case 'ReceiveStore':
-				var _p4 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, _p3._0);
-				if (_p4.ctor === 'Ok') {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{store: _p4._0}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				} else {
-					return {
-						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{store: _user$project$ProgrissStore$empty}),
-						_1: _elm_lang$core$Platform_Cmd$none
-					};
-				}
-			default:
-				var _p5 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, model.store);
-				var actionId = _p5._0;
-				var storeWithNewAction = _p5._1;
-				var updatedStore = function () {
-					var _p6 = model.selectedContext;
-					switch (_p6.ctor) {
-						case 'SpecificContext':
-							return A3(_user$project$ProgrissStore$associateActionToContext, actionId, _p6._0, storeWithNewAction);
-						case 'AllContexts':
-							return storeWithNewAction;
-						default:
-							return storeWithNewAction;
-					}
-				}();
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{store: updatedStore, newActionDescription: ''}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-		}
-	});
-var _user$project$Main$Model = F3(
-	function (a, b, c) {
-		return {store: a, selectedContext: b, newActionDescription: c};
-	});
-var _user$project$Main$AllContexts = {ctor: 'AllContexts'};
-var _user$project$Main$SpecificContext = function (a) {
-	return {ctor: 'SpecificContext', _0: a};
+var _user$project$Workflows_SimpleTodos$initialModel = {newActionDescription: ''};
+var _user$project$Workflows_SimpleTodos$Model = function (a) {
+	return {newActionDescription: a};
 };
-var _user$project$Main$AnywhereContext = {ctor: 'AnywhereContext'};
-var _user$project$Main$initialModel = {
-	ctor: '_Tuple2',
-	_0: {store: _user$project$Main$initialStore, selectedContext: _user$project$Main$AnywhereContext, newActionDescription: ''},
-	_1: _elm_lang$core$Platform_Cmd$none
-};
-var _user$project$Main$CreateNewAction = {ctor: 'CreateNewAction'};
-var _user$project$Main$UpdateNewActionDescription = function (a) {
+var _user$project$Workflows_SimpleTodos$CreateNewAction = {ctor: 'CreateNewAction'};
+var _user$project$Workflows_SimpleTodos$UpdateNewActionDescription = function (a) {
 	return {ctor: 'UpdateNewActionDescription', _0: a};
 };
-var _user$project$Main$TriggerLoad = {ctor: 'TriggerLoad'};
-var _user$project$Main$ReceiveStore = function (a) {
-	return {ctor: 'ReceiveStore', _0: a};
-};
-var _user$project$Main$subscriptions = function (model) {
-	return _user$project$Main$loadStore(_user$project$Main$ReceiveStore);
-};
-var _user$project$Main$Save = {ctor: 'Save'};
-var _user$project$Main$ChangeContext = function (a) {
-	return {ctor: 'ChangeContext', _0: a};
-};
-var _user$project$Main$clickableContextAttributes = F2(
-	function (selectedContext, context) {
-		return _elm_lang$core$Native_Utils.eq(selectedContext, context) ? {
-			ctor: '::',
-			_0: _rundis$elm_bootstrap$Bootstrap_ListGroup$active,
-			_1: {
-				ctor: '::',
-				_0: _rundis$elm_bootstrap$Bootstrap_ListGroup$attrs(
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href('#'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								_user$project$Main$ChangeContext(context)),
-							_1: {ctor: '[]'}
-						}
-					}),
-				_1: {ctor: '[]'}
-			}
-		} : {
-			ctor: '::',
-			_0: _rundis$elm_bootstrap$Bootstrap_ListGroup$attrs(
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$href('#'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(
-							_user$project$Main$ChangeContext(context)),
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		};
-	});
-var _user$project$Main$clickableAllContexts = function (selectedContext) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_ListGroup$anchor,
-		A2(_user$project$Main$clickableContextAttributes, selectedContext, _user$project$Main$AllContexts),
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('All'),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Main$clickableAnywhereContext = function (selectedContext) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_ListGroup$anchor,
-		A2(_user$project$Main$clickableContextAttributes, selectedContext, _user$project$Main$AnywhereContext),
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text('Anywhere'),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Main$clickableContext = F2(
-	function (selectedContext, context) {
+var _user$project$Workflows_SimpleTodos$view = F2(
+	function (store, model) {
 		return A2(
-			_rundis$elm_bootstrap$Bootstrap_ListGroup$anchor,
-			A2(
-				_user$project$Main$clickableContextAttributes,
-				selectedContext,
-				_user$project$Main$SpecificContext(context.id)),
+			_rundis$elm_bootstrap$Bootstrap_Grid$container,
+			{ctor: '[]'},
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text(context.name),
-				_1: {ctor: '[]'}
-			});
-	});
-var _user$project$Main$renderContextMenu = F2(
-	function (store, selectedContext) {
-		return _rundis$elm_bootstrap$Bootstrap_ListGroup$custom(
-			A2(
-				F2(
-					function (x, y) {
-						return {ctor: '::', _0: x, _1: y};
-					}),
-				_user$project$Main$clickableAllContexts(selectedContext),
-				A2(
-					F2(
-						function (x, y) {
-							return {ctor: '::', _0: x, _1: y};
-						}),
-					_user$project$Main$clickableAnywhereContext(selectedContext),
-					A2(
-						_elm_lang$core$List$map,
-						_user$project$Main$clickableContext(selectedContext),
-						_user$project$ProgrissStore$getAllContexts(store)))));
-	});
-var _user$project$Main$view = function (model) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Grid$container,
-		{ctor: '[]'},
-		{
-			ctor: '::',
-			_0: A2(
-				_rundis$elm_bootstrap$Bootstrap_Grid$row,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_rundis$elm_bootstrap$Bootstrap_Grid$col,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: A2(_user$project$Main$renderContextMenu, model.store, model.selectedContext),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
+				_0: A2(
+					_rundis$elm_bootstrap$Bootstrap_Grid$row,
+					{ctor: '[]'},
+					{
 						ctor: '::',
 						_0: A2(
 							_rundis$elm_bootstrap$Bootstrap_Grid$col,
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _user$project$Main$renderActions(
-									A2(_user$project$Main$actionsToRender, model.store, model.selectedContext)),
+								_0: _user$project$Workflows_SimpleTodos$renderActions(
+									_user$project$ProgrissStore$getAllActions(store)),
 								_1: {
 									ctor: '::',
 									_0: A2(
@@ -15056,7 +15123,7 @@ var _user$project$Main$view = function (model) {
 																		_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
 																			{
 																				ctor: '::',
-																				_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$CreateNewAction),
+																				_0: _elm_lang$html$Html_Events$onClick(_user$project$Workflows_SimpleTodos$CreateNewAction),
 																				_1: {ctor: '[]'}
 																			}),
 																		_1: {ctor: '[]'}
@@ -15082,7 +15149,7 @@ var _user$project$Main$view = function (model) {
 																				_0: _elm_lang$html$Html_Attributes$value(model.newActionDescription),
 																				_1: {
 																					ctor: '::',
-																					_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$UpdateNewActionDescription),
+																					_0: _elm_lang$html$Html_Events$onInput(_user$project$Workflows_SimpleTodos$UpdateNewActionDescription),
 																					_1: {ctor: '[]'}
 																				}
 																			}),
@@ -15096,8 +15163,151 @@ var _user$project$Main$view = function (model) {
 								}
 							}),
 						_1: {ctor: '[]'}
-					}
-				}),
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
+
+var _user$project$Main$initialStore = function () {
+	var jsonData = '\n                {\n                    \"actions\": [\n                        {\"id\": 1, \"description\": \"Call architect about garden\", \"project_id\": 1},\n                        {\"id\": 2, \"description\": \"Buy cat food\", \"context_id\": 1},\n                        {\"id\": 3, \"description\": \"Call Florist about Mom\'s favourite flowers\", \"project_id\": 2, \"context_id\": 2}\n                    ],\n                    \"contexts\": [\n                        {\"id\": 1, \"name\": \"Errands\"},\n                        {\"id\": 2, \"name\": \"Calls\"}\n                    ],\n                    \"projects\": [\n                        {\"id\": 1, \"title\": \"Build our familiy house\"},\n                        {\"id\": 2, \"title\": \"Mom\'s Birthday\"}\n                    ],\n                    \"notes\": [\n                        {\"id\": 1, \"body\": \"Don\'t forget she likes tulips the best! So if you can get those please do. Whatever you do though, don\'t get roses. She hates them!\", \"project_id\": 2}\n                    ]\n                }\n            ';
+	var _p0 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, jsonData);
+	if (_p0.ctor === 'Ok') {
+		return _p0._0;
+	} else {
+		return _user$project$ProgrissStore$empty;
+	}
+}();
+var _user$project$Main$initialModel = {
+	ctor: '_Tuple2',
+	_0: {store: _user$project$Main$initialStore, gtdActionListsModel: _user$project$Workflows_GtdActionLists$initialModel, projectCardOverviewModel: _user$project$Workflows_ProjectCardOverview$initialModel, simpleTodosModel: _user$project$Workflows_SimpleTodos$initialModel},
+	_1: _elm_lang$core$Platform_Cmd$none
+};
+var _user$project$Main$persistStore = _elm_lang$core$Native_Platform.outgoingPort(
+	'persistStore',
+	function (v) {
+		return v;
+	});
+var _user$project$Main$loadStore = _elm_lang$core$Native_Platform.incomingPort('loadStore', _elm_lang$core$Json_Decode$string);
+var _user$project$Main$triggerStoreLoad = _elm_lang$core$Native_Platform.outgoingPort(
+	'triggerStoreLoad',
+	function (v) {
+		return null;
+	});
+var _user$project$Main$Model = F4(
+	function (a, b, c, d) {
+		return {store: a, gtdActionListsModel: b, projectCardOverviewModel: c, simpleTodosModel: d};
+	});
+var _user$project$Main$TriggerLoad = {ctor: 'TriggerLoad'};
+var _user$project$Main$ReceiveStore = function (a) {
+	return {ctor: 'ReceiveStore', _0: a};
+};
+var _user$project$Main$subscriptions = function (model) {
+	return _user$project$Main$loadStore(_user$project$Main$ReceiveStore);
+};
+var _user$project$Main$Save = {ctor: 'Save'};
+var _user$project$Main$SimpleTodosMsg = function (a) {
+	return {ctor: 'SimpleTodosMsg', _0: a};
+};
+var _user$project$Main$ProjectCardOverviewMsg = function (a) {
+	return {ctor: 'ProjectCardOverviewMsg', _0: a};
+};
+var _user$project$Main$GtdActionListsMsg = function (a) {
+	return {ctor: 'GtdActionListsMsg', _0: a};
+};
+var _user$project$Main$update = F2(
+	function (msg, model) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
+			case 'Save':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Main$persistStore(
+						A2(
+							_elm_lang$core$Json_Encode$encode,
+							2,
+							_user$project$ProgrissStore$encoder(model.store)))
+				};
+			case 'TriggerLoad':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Main$triggerStoreLoad(
+						{ctor: '_Tuple0'})
+				};
+			case 'ReceiveStore':
+				var _p2 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, _p1._0);
+				if (_p2.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{store: _p2._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{store: _user$project$ProgrissStore$empty}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
+			case 'GtdActionListsMsg':
+				var _p3 = A3(_user$project$Workflows_GtdActionLists$update, _p1._0, model.store, model.gtdActionListsModel);
+				var gtdActionListsModel = _p3._0;
+				var store = _p3._1;
+				var cmd = _p3._2;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{store: store, gtdActionListsModel: gtdActionListsModel}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$GtdActionListsMsg, cmd)
+				};
+			case 'ProjectCardOverviewMsg':
+				var _p4 = A3(_user$project$Workflows_ProjectCardOverview$update, _p1._0, model.store, model.projectCardOverviewModel);
+				var projectCardOverviewModel = _p4._0;
+				var store = _p4._1;
+				var cmd = _p4._2;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{store: store, projectCardOverviewModel: projectCardOverviewModel}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectCardOverviewMsg, cmd)
+				};
+			default:
+				var _p5 = A3(_user$project$Workflows_SimpleTodos$update, _p1._0, model.store, model.simpleTodosModel);
+				var simpleTodosModel = _p5._0;
+				var store = _p5._1;
+				var cmd = _p5._2;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{store: store, simpleTodosModel: simpleTodosModel}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SimpleTodosMsg, cmd)
+				};
+		}
+	});
+var _user$project$Main$renderWorkflow = function (model) {
+	return (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$List$length(
+			_user$project$ProgrissStore$getAllActions(model.store)),
+		10) < 0) ? A2(
+		_elm_lang$html$Html$map,
+		_user$project$Main$SimpleTodosMsg,
+		A2(_user$project$Workflows_SimpleTodos$view, model.store, model.simpleTodosModel)) : A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$map,
+				_user$project$Main$GtdActionListsMsg,
+				A2(_user$project$Workflows_GtdActionLists$view, model.store, model.gtdActionListsModel)),
 			_1: {
 				ctor: '::',
 				_0: A2(
@@ -15106,14 +15316,34 @@ var _user$project$Main$view = function (model) {
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: _user$project$Main$projectsCardOverview(model.store),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$hr,
-							{ctor: '[]'},
-							{ctor: '[]'}),
-						_1: {
+					_0: A2(
+						_elm_lang$html$Html$map,
+						_user$project$Main$ProjectCardOverviewMsg,
+						A2(_user$project$Workflows_ProjectCardOverview$view, model.store, model.projectCardOverviewModel)),
+					_1: {ctor: '[]'}
+				}
+			}
+		});
+};
+var _user$project$Main$view = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _user$project$Main$renderWorkflow(model),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$hr,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{ctor: '[]'},
+						{
 							ctor: '::',
 							_0: A2(
 								_rundis$elm_bootstrap$Bootstrap_Button$button,
@@ -15191,8 +15421,8 @@ var _user$project$Main$view = function (model) {
 									}),
 								_1: {ctor: '[]'}
 							}
-						}
-					}
+						}),
+					_1: {ctor: '[]'}
 				}
 			}
 		});
