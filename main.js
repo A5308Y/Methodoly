@@ -5837,6 +5837,902 @@ var _NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required = F3(
 			decoder);
 	});
 
+var _debois$elm_dom$DOM$className = A2(
+	_elm_lang$core$Json_Decode$at,
+	{
+		ctor: '::',
+		_0: 'className',
+		_1: {ctor: '[]'}
+	},
+	_elm_lang$core$Json_Decode$string);
+var _debois$elm_dom$DOM$scrollTop = A2(_elm_lang$core$Json_Decode$field, 'scrollTop', _elm_lang$core$Json_Decode$float);
+var _debois$elm_dom$DOM$scrollLeft = A2(_elm_lang$core$Json_Decode$field, 'scrollLeft', _elm_lang$core$Json_Decode$float);
+var _debois$elm_dom$DOM$offsetTop = A2(_elm_lang$core$Json_Decode$field, 'offsetTop', _elm_lang$core$Json_Decode$float);
+var _debois$elm_dom$DOM$offsetLeft = A2(_elm_lang$core$Json_Decode$field, 'offsetLeft', _elm_lang$core$Json_Decode$float);
+var _debois$elm_dom$DOM$offsetHeight = A2(_elm_lang$core$Json_Decode$field, 'offsetHeight', _elm_lang$core$Json_Decode$float);
+var _debois$elm_dom$DOM$offsetWidth = A2(_elm_lang$core$Json_Decode$field, 'offsetWidth', _elm_lang$core$Json_Decode$float);
+var _debois$elm_dom$DOM$childNodes = function (decoder) {
+	var loop = F2(
+		function (idx, xs) {
+			return A2(
+				_elm_lang$core$Json_Decode$andThen,
+				function (_p0) {
+					return A2(
+						_elm_lang$core$Maybe$withDefault,
+						_elm_lang$core$Json_Decode$succeed(xs),
+						A2(
+							_elm_lang$core$Maybe$map,
+							function (x) {
+								return A2(
+									loop,
+									idx + 1,
+									{ctor: '::', _0: x, _1: xs});
+							},
+							_p0));
+				},
+				_elm_lang$core$Json_Decode$maybe(
+					A2(
+						_elm_lang$core$Json_Decode$field,
+						_elm_lang$core$Basics$toString(idx),
+						decoder)));
+		});
+	return A2(
+		_elm_lang$core$Json_Decode$map,
+		_elm_lang$core$List$reverse,
+		A2(
+			_elm_lang$core$Json_Decode$field,
+			'childNodes',
+			A2(
+				loop,
+				0,
+				{ctor: '[]'})));
+};
+var _debois$elm_dom$DOM$childNode = function (idx) {
+	return _elm_lang$core$Json_Decode$at(
+		{
+			ctor: '::',
+			_0: 'childNodes',
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$core$Basics$toString(idx),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _debois$elm_dom$DOM$parentElement = function (decoder) {
+	return A2(_elm_lang$core$Json_Decode$field, 'parentElement', decoder);
+};
+var _debois$elm_dom$DOM$previousSibling = function (decoder) {
+	return A2(_elm_lang$core$Json_Decode$field, 'previousSibling', decoder);
+};
+var _debois$elm_dom$DOM$nextSibling = function (decoder) {
+	return A2(_elm_lang$core$Json_Decode$field, 'nextSibling', decoder);
+};
+var _debois$elm_dom$DOM$offsetParent = F2(
+	function (x, decoder) {
+		return _elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$core$Json_Decode$field,
+					'offsetParent',
+					_elm_lang$core$Json_Decode$null(x)),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$core$Json_Decode$field, 'offsetParent', decoder),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _debois$elm_dom$DOM$position = F2(
+	function (x, y) {
+		return A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (_p1) {
+				var _p2 = _p1;
+				var _p4 = _p2._1;
+				var _p3 = _p2._0;
+				return A2(
+					_debois$elm_dom$DOM$offsetParent,
+					{ctor: '_Tuple2', _0: _p3, _1: _p4},
+					A2(_debois$elm_dom$DOM$position, _p3, _p4));
+			},
+			A5(
+				_elm_lang$core$Json_Decode$map4,
+				F4(
+					function (scrollLeft, scrollTop, offsetLeft, offsetTop) {
+						return {ctor: '_Tuple2', _0: (x + offsetLeft) - scrollLeft, _1: (y + offsetTop) - scrollTop};
+					}),
+				_debois$elm_dom$DOM$scrollLeft,
+				_debois$elm_dom$DOM$scrollTop,
+				_debois$elm_dom$DOM$offsetLeft,
+				_debois$elm_dom$DOM$offsetTop));
+	});
+var _debois$elm_dom$DOM$boundingClientRect = A4(
+	_elm_lang$core$Json_Decode$map3,
+	F3(
+		function (_p5, width, height) {
+			var _p6 = _p5;
+			return {top: _p6._1, left: _p6._0, width: width, height: height};
+		}),
+	A2(_debois$elm_dom$DOM$position, 0, 0),
+	_debois$elm_dom$DOM$offsetWidth,
+	_debois$elm_dom$DOM$offsetHeight);
+var _debois$elm_dom$DOM$target = function (decoder) {
+	return A2(_elm_lang$core$Json_Decode$field, 'target', decoder);
+};
+var _debois$elm_dom$DOM$Rectangle = F4(
+	function (a, b, c, d) {
+		return {top: a, left: b, width: c, height: d};
+	});
+
+var _elm_lang$core$Task$onError = _elm_lang$core$Native_Scheduler.onError;
+var _elm_lang$core$Task$andThen = _elm_lang$core$Native_Scheduler.andThen;
+var _elm_lang$core$Task$spawnCmd = F2(
+	function (router, _p0) {
+		var _p1 = _p0;
+		return _elm_lang$core$Native_Scheduler.spawn(
+			A2(
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Platform$sendToApp(router),
+				_p1._0));
+	});
+var _elm_lang$core$Task$fail = _elm_lang$core$Native_Scheduler.fail;
+var _elm_lang$core$Task$mapError = F2(
+	function (convert, task) {
+		return A2(
+			_elm_lang$core$Task$onError,
+			function (_p2) {
+				return _elm_lang$core$Task$fail(
+					convert(_p2));
+			},
+			task);
+	});
+var _elm_lang$core$Task$succeed = _elm_lang$core$Native_Scheduler.succeed;
+var _elm_lang$core$Task$map = F2(
+	function (func, taskA) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return _elm_lang$core$Task$succeed(
+					func(a));
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map2 = F3(
+	function (func, taskA, taskB) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return _elm_lang$core$Task$succeed(
+							A2(func, a, b));
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map3 = F4(
+	function (func, taskA, taskB, taskC) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return _elm_lang$core$Task$succeed(
+									A3(func, a, b, c));
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map4 = F5(
+	function (func, taskA, taskB, taskC, taskD) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return _elm_lang$core$Task$succeed(
+											A4(func, a, b, c, d));
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$map5 = F6(
+	function (func, taskA, taskB, taskC, taskD, taskE) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (a) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (b) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (c) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									function (d) {
+										return A2(
+											_elm_lang$core$Task$andThen,
+											function (e) {
+												return _elm_lang$core$Task$succeed(
+													A5(func, a, b, c, d, e));
+											},
+											taskE);
+									},
+									taskD);
+							},
+							taskC);
+					},
+					taskB);
+			},
+			taskA);
+	});
+var _elm_lang$core$Task$sequence = function (tasks) {
+	var _p3 = tasks;
+	if (_p3.ctor === '[]') {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '[]'});
+	} else {
+		return A3(
+			_elm_lang$core$Task$map2,
+			F2(
+				function (x, y) {
+					return {ctor: '::', _0: x, _1: y};
+				}),
+			_p3._0,
+			_elm_lang$core$Task$sequence(_p3._1));
+	}
+};
+var _elm_lang$core$Task$onEffects = F3(
+	function (router, commands, state) {
+		return A2(
+			_elm_lang$core$Task$map,
+			function (_p4) {
+				return {ctor: '_Tuple0'};
+			},
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					_elm_lang$core$Task$spawnCmd(router),
+					commands)));
+	});
+var _elm_lang$core$Task$init = _elm_lang$core$Task$succeed(
+	{ctor: '_Tuple0'});
+var _elm_lang$core$Task$onSelfMsg = F3(
+	function (_p7, _p6, _p5) {
+		return _elm_lang$core$Task$succeed(
+			{ctor: '_Tuple0'});
+	});
+var _elm_lang$core$Task$command = _elm_lang$core$Native_Platform.leaf('Task');
+var _elm_lang$core$Task$Perform = function (a) {
+	return {ctor: 'Perform', _0: a};
+};
+var _elm_lang$core$Task$perform = F2(
+	function (toMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(_elm_lang$core$Task$map, toMessage, task)));
+	});
+var _elm_lang$core$Task$attempt = F2(
+	function (resultToMessage, task) {
+		return _elm_lang$core$Task$command(
+			_elm_lang$core$Task$Perform(
+				A2(
+					_elm_lang$core$Task$onError,
+					function (_p8) {
+						return _elm_lang$core$Task$succeed(
+							resultToMessage(
+								_elm_lang$core$Result$Err(_p8)));
+					},
+					A2(
+						_elm_lang$core$Task$andThen,
+						function (_p9) {
+							return _elm_lang$core$Task$succeed(
+								resultToMessage(
+									_elm_lang$core$Result$Ok(_p9)));
+						},
+						task))));
+	});
+var _elm_lang$core$Task$cmdMap = F2(
+	function (tagger, _p10) {
+		var _p11 = _p10;
+		return _elm_lang$core$Task$Perform(
+			A2(_elm_lang$core$Task$map, tagger, _p11._0));
+	});
+_elm_lang$core$Native_Platform.effectManagers['Task'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Task$init, onEffects: _elm_lang$core$Task$onEffects, onSelfMsg: _elm_lang$core$Task$onSelfMsg, tag: 'cmd', cmdMap: _elm_lang$core$Task$cmdMap};
+
+//import Native.Scheduler //
+
+var _elm_lang$core$Native_Time = function() {
+
+var now = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+{
+	callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
+});
+
+function setInterval_(interval, task)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var id = setInterval(function() {
+			_elm_lang$core$Native_Scheduler.rawSpawn(task);
+		}, interval);
+
+		return function() { clearInterval(id); };
+	});
+}
+
+return {
+	now: now,
+	setInterval_: F2(setInterval_)
+};
+
+}();
+var _elm_lang$core$Time$setInterval = _elm_lang$core$Native_Time.setInterval_;
+var _elm_lang$core$Time$spawnHelp = F3(
+	function (router, intervals, processes) {
+		var _p0 = intervals;
+		if (_p0.ctor === '[]') {
+			return _elm_lang$core$Task$succeed(processes);
+		} else {
+			var _p1 = _p0._0;
+			var spawnRest = function (id) {
+				return A3(
+					_elm_lang$core$Time$spawnHelp,
+					router,
+					_p0._1,
+					A3(_elm_lang$core$Dict$insert, _p1, id, processes));
+			};
+			var spawnTimer = _elm_lang$core$Native_Scheduler.spawn(
+				A2(
+					_elm_lang$core$Time$setInterval,
+					_p1,
+					A2(_elm_lang$core$Platform$sendToSelf, router, _p1)));
+			return A2(_elm_lang$core$Task$andThen, spawnRest, spawnTimer);
+		}
+	});
+var _elm_lang$core$Time$addMySub = F2(
+	function (_p2, state) {
+		var _p3 = _p2;
+		var _p6 = _p3._1;
+		var _p5 = _p3._0;
+		var _p4 = A2(_elm_lang$core$Dict$get, _p5, state);
+		if (_p4.ctor === 'Nothing') {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{
+					ctor: '::',
+					_0: _p6,
+					_1: {ctor: '[]'}
+				},
+				state);
+		} else {
+			return A3(
+				_elm_lang$core$Dict$insert,
+				_p5,
+				{ctor: '::', _0: _p6, _1: _p4._0},
+				state);
+		}
+	});
+var _elm_lang$core$Time$inMilliseconds = function (t) {
+	return t;
+};
+var _elm_lang$core$Time$millisecond = 1;
+var _elm_lang$core$Time$second = 1000 * _elm_lang$core$Time$millisecond;
+var _elm_lang$core$Time$minute = 60 * _elm_lang$core$Time$second;
+var _elm_lang$core$Time$hour = 60 * _elm_lang$core$Time$minute;
+var _elm_lang$core$Time$inHours = function (t) {
+	return t / _elm_lang$core$Time$hour;
+};
+var _elm_lang$core$Time$inMinutes = function (t) {
+	return t / _elm_lang$core$Time$minute;
+};
+var _elm_lang$core$Time$inSeconds = function (t) {
+	return t / _elm_lang$core$Time$second;
+};
+var _elm_lang$core$Time$now = _elm_lang$core$Native_Time.now;
+var _elm_lang$core$Time$onSelfMsg = F3(
+	function (router, interval, state) {
+		var _p7 = A2(_elm_lang$core$Dict$get, interval, state.taggers);
+		if (_p7.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var tellTaggers = function (time) {
+				return _elm_lang$core$Task$sequence(
+					A2(
+						_elm_lang$core$List$map,
+						function (tagger) {
+							return A2(
+								_elm_lang$core$Platform$sendToApp,
+								router,
+								tagger(time));
+						},
+						_p7._0));
+			};
+			return A2(
+				_elm_lang$core$Task$andThen,
+				function (_p8) {
+					return _elm_lang$core$Task$succeed(state);
+				},
+				A2(_elm_lang$core$Task$andThen, tellTaggers, _elm_lang$core$Time$now));
+		}
+	});
+var _elm_lang$core$Time$subscription = _elm_lang$core$Native_Platform.leaf('Time');
+var _elm_lang$core$Time$State = F2(
+	function (a, b) {
+		return {taggers: a, processes: b};
+	});
+var _elm_lang$core$Time$init = _elm_lang$core$Task$succeed(
+	A2(_elm_lang$core$Time$State, _elm_lang$core$Dict$empty, _elm_lang$core$Dict$empty));
+var _elm_lang$core$Time$onEffects = F3(
+	function (router, subs, _p9) {
+		var _p10 = _p9;
+		var rightStep = F3(
+			function (_p12, id, _p11) {
+				var _p13 = _p11;
+				return {
+					ctor: '_Tuple3',
+					_0: _p13._0,
+					_1: _p13._1,
+					_2: A2(
+						_elm_lang$core$Task$andThen,
+						function (_p14) {
+							return _p13._2;
+						},
+						_elm_lang$core$Native_Scheduler.kill(id))
+				};
+			});
+		var bothStep = F4(
+			function (interval, taggers, id, _p15) {
+				var _p16 = _p15;
+				return {
+					ctor: '_Tuple3',
+					_0: _p16._0,
+					_1: A3(_elm_lang$core$Dict$insert, interval, id, _p16._1),
+					_2: _p16._2
+				};
+			});
+		var leftStep = F3(
+			function (interval, taggers, _p17) {
+				var _p18 = _p17;
+				return {
+					ctor: '_Tuple3',
+					_0: {ctor: '::', _0: interval, _1: _p18._0},
+					_1: _p18._1,
+					_2: _p18._2
+				};
+			});
+		var newTaggers = A3(_elm_lang$core$List$foldl, _elm_lang$core$Time$addMySub, _elm_lang$core$Dict$empty, subs);
+		var _p19 = A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			newTaggers,
+			_p10.processes,
+			{
+				ctor: '_Tuple3',
+				_0: {ctor: '[]'},
+				_1: _elm_lang$core$Dict$empty,
+				_2: _elm_lang$core$Task$succeed(
+					{ctor: '_Tuple0'})
+			});
+		var spawnList = _p19._0;
+		var existingDict = _p19._1;
+		var killTask = _p19._2;
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (newProcesses) {
+				return _elm_lang$core$Task$succeed(
+					A2(_elm_lang$core$Time$State, newTaggers, newProcesses));
+			},
+			A2(
+				_elm_lang$core$Task$andThen,
+				function (_p20) {
+					return A3(_elm_lang$core$Time$spawnHelp, router, spawnList, existingDict);
+				},
+				killTask));
+	});
+var _elm_lang$core$Time$Every = F2(
+	function (a, b) {
+		return {ctor: 'Every', _0: a, _1: b};
+	});
+var _elm_lang$core$Time$every = F2(
+	function (interval, tagger) {
+		return _elm_lang$core$Time$subscription(
+			A2(_elm_lang$core$Time$Every, interval, tagger));
+	});
+var _elm_lang$core$Time$subMap = F2(
+	function (f, _p21) {
+		var _p22 = _p21;
+		return A2(
+			_elm_lang$core$Time$Every,
+			_p22._0,
+			function (_p23) {
+				return f(
+					_p22._1(_p23));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Time'] = {pkg: 'elm-lang/core', init: _elm_lang$core$Time$init, onEffects: _elm_lang$core$Time$onEffects, onSelfMsg: _elm_lang$core$Time$onSelfMsg, tag: 'sub', subMap: _elm_lang$core$Time$subMap};
+
+var _elm_lang$animation_frame$Native_AnimationFrame = function()
+{
+
+function create()
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var id = requestAnimationFrame(function() {
+			callback(_elm_lang$core$Native_Scheduler.succeed(Date.now()));
+		});
+
+		return function() {
+			cancelAnimationFrame(id);
+		};
+	});
+}
+
+return {
+	create: create
+};
+
+}();
+
+var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
+var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
+var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
+
+var _elm_lang$animation_frame$AnimationFrame$rAF = _elm_lang$animation_frame$Native_AnimationFrame.create(
+	{ctor: '_Tuple0'});
+var _elm_lang$animation_frame$AnimationFrame$subscription = _elm_lang$core$Native_Platform.leaf('AnimationFrame');
+var _elm_lang$animation_frame$AnimationFrame$State = F3(
+	function (a, b, c) {
+		return {subs: a, request: b, oldTime: c};
+	});
+var _elm_lang$animation_frame$AnimationFrame$init = _elm_lang$core$Task$succeed(
+	A3(
+		_elm_lang$animation_frame$AnimationFrame$State,
+		{ctor: '[]'},
+		_elm_lang$core$Maybe$Nothing,
+		0));
+var _elm_lang$animation_frame$AnimationFrame$onEffects = F3(
+	function (router, subs, _p0) {
+		var _p1 = _p0;
+		var _p5 = _p1.request;
+		var _p4 = _p1.oldTime;
+		var _p2 = {ctor: '_Tuple2', _0: _p5, _1: subs};
+		if (_p2._0.ctor === 'Nothing') {
+			if (_p2._1.ctor === '[]') {
+				return _elm_lang$core$Task$succeed(
+					A3(
+						_elm_lang$animation_frame$AnimationFrame$State,
+						{ctor: '[]'},
+						_elm_lang$core$Maybe$Nothing,
+						_p4));
+			} else {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (pid) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (time) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$animation_frame$AnimationFrame$State,
+										subs,
+										_elm_lang$core$Maybe$Just(pid),
+										time));
+							},
+							_elm_lang$core$Time$now);
+					},
+					_elm_lang$core$Process$spawn(
+						A2(
+							_elm_lang$core$Task$andThen,
+							_elm_lang$core$Platform$sendToSelf(router),
+							_elm_lang$animation_frame$AnimationFrame$rAF)));
+			}
+		} else {
+			if (_p2._1.ctor === '[]') {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (_p3) {
+						return _elm_lang$core$Task$succeed(
+							A3(
+								_elm_lang$animation_frame$AnimationFrame$State,
+								{ctor: '[]'},
+								_elm_lang$core$Maybe$Nothing,
+								_p4));
+					},
+					_elm_lang$core$Process$kill(_p2._0._0));
+			} else {
+				return _elm_lang$core$Task$succeed(
+					A3(_elm_lang$animation_frame$AnimationFrame$State, subs, _p5, _p4));
+			}
+		}
+	});
+var _elm_lang$animation_frame$AnimationFrame$onSelfMsg = F3(
+	function (router, newTime, _p6) {
+		var _p7 = _p6;
+		var _p10 = _p7.subs;
+		var diff = newTime - _p7.oldTime;
+		var send = function (sub) {
+			var _p8 = sub;
+			if (_p8.ctor === 'Time') {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					_p8._0(newTime));
+			} else {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					_p8._0(diff));
+			}
+		};
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (pid) {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (_p9) {
+						return _elm_lang$core$Task$succeed(
+							A3(
+								_elm_lang$animation_frame$AnimationFrame$State,
+								_p10,
+								_elm_lang$core$Maybe$Just(pid),
+								newTime));
+					},
+					_elm_lang$core$Task$sequence(
+						A2(_elm_lang$core$List$map, send, _p10)));
+			},
+			_elm_lang$core$Process$spawn(
+				A2(
+					_elm_lang$core$Task$andThen,
+					_elm_lang$core$Platform$sendToSelf(router),
+					_elm_lang$animation_frame$AnimationFrame$rAF)));
+	});
+var _elm_lang$animation_frame$AnimationFrame$Diff = function (a) {
+	return {ctor: 'Diff', _0: a};
+};
+var _elm_lang$animation_frame$AnimationFrame$diffs = function (tagger) {
+	return _elm_lang$animation_frame$AnimationFrame$subscription(
+		_elm_lang$animation_frame$AnimationFrame$Diff(tagger));
+};
+var _elm_lang$animation_frame$AnimationFrame$Time = function (a) {
+	return {ctor: 'Time', _0: a};
+};
+var _elm_lang$animation_frame$AnimationFrame$times = function (tagger) {
+	return _elm_lang$animation_frame$AnimationFrame$subscription(
+		_elm_lang$animation_frame$AnimationFrame$Time(tagger));
+};
+var _elm_lang$animation_frame$AnimationFrame$subMap = F2(
+	function (func, sub) {
+		var _p11 = sub;
+		if (_p11.ctor === 'Time') {
+			return _elm_lang$animation_frame$AnimationFrame$Time(
+				function (_p12) {
+					return func(
+						_p11._0(_p12));
+				});
+		} else {
+			return _elm_lang$animation_frame$AnimationFrame$Diff(
+				function (_p13) {
+					return func(
+						_p11._0(_p13));
+				});
+		}
+	});
+_elm_lang$core$Native_Platform.effectManagers['AnimationFrame'] = {pkg: 'elm-lang/animation-frame', init: _elm_lang$animation_frame$AnimationFrame$init, onEffects: _elm_lang$animation_frame$AnimationFrame$onEffects, onSelfMsg: _elm_lang$animation_frame$AnimationFrame$onSelfMsg, tag: 'sub', subMap: _elm_lang$animation_frame$AnimationFrame$subMap};
+
+var _elm_lang$dom$Native_Dom = function() {
+
+var fakeNode = {
+	addEventListener: function() {},
+	removeEventListener: function() {}
+};
+
+var onDocument = on(typeof document !== 'undefined' ? document : fakeNode);
+var onWindow = on(typeof window !== 'undefined' ? window : fakeNode);
+
+function on(node)
+{
+	return function(eventName, decoder, toTask)
+	{
+		return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback) {
+
+			function performTask(event)
+			{
+				var result = A2(_elm_lang$core$Json_Decode$decodeValue, decoder, event);
+				if (result.ctor === 'Ok')
+				{
+					_elm_lang$core$Native_Scheduler.rawSpawn(toTask(result._0));
+				}
+			}
+
+			node.addEventListener(eventName, performTask);
+
+			return function()
+			{
+				node.removeEventListener(eventName, performTask);
+			};
+		});
+	};
+}
+
+var rAF = typeof requestAnimationFrame !== 'undefined'
+	? requestAnimationFrame
+	: function(callback) { callback(); };
+
+function withNode(id, doStuff)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		rAF(function()
+		{
+			var node = document.getElementById(id);
+			if (node === null)
+			{
+				callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NotFound', _0: id }));
+				return;
+			}
+			callback(_elm_lang$core$Native_Scheduler.succeed(doStuff(node)));
+		});
+	});
+}
+
+
+// FOCUS
+
+function focus(id)
+{
+	return withNode(id, function(node) {
+		node.focus();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function blur(id)
+{
+	return withNode(id, function(node) {
+		node.blur();
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SCROLLING
+
+function getScrollTop(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollTop;
+	});
+}
+
+function setScrollTop(id, desiredScrollTop)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = desiredScrollTop;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toBottom(id)
+{
+	return withNode(id, function(node) {
+		node.scrollTop = node.scrollHeight;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function getScrollLeft(id)
+{
+	return withNode(id, function(node) {
+		return node.scrollLeft;
+	});
+}
+
+function setScrollLeft(id, desiredScrollLeft)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = desiredScrollLeft;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+function toRight(id)
+{
+	return withNode(id, function(node) {
+		node.scrollLeft = node.scrollWidth;
+		return _elm_lang$core$Native_Utils.Tuple0;
+	});
+}
+
+
+// SIZE
+
+function width(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollWidth;
+			case 'VisibleContent':
+				return node.clientWidth;
+			case 'VisibleContentWithBorders':
+				return node.offsetWidth;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.right - rect.left;
+		}
+	});
+}
+
+function height(options, id)
+{
+	return withNode(id, function(node) {
+		switch (options.ctor)
+		{
+			case 'Content':
+				return node.scrollHeight;
+			case 'VisibleContent':
+				return node.clientHeight;
+			case 'VisibleContentWithBorders':
+				return node.offsetHeight;
+			case 'VisibleContentWithBordersAndMargins':
+				var rect = node.getBoundingClientRect();
+				return rect.bottom - rect.top;
+		}
+	});
+}
+
+return {
+	onDocument: F3(onDocument),
+	onWindow: F3(onWindow),
+
+	focus: focus,
+	blur: blur,
+
+	getScrollTop: getScrollTop,
+	setScrollTop: F2(setScrollTop),
+	getScrollLeft: getScrollLeft,
+	setScrollLeft: F2(setScrollLeft),
+	toBottom: toBottom,
+	toRight: toRight,
+
+	height: F2(height),
+	width: F2(width)
+};
+
+}();
+
+var _elm_lang$dom$Dom_LowLevel$onWindow = _elm_lang$dom$Native_Dom.onWindow;
+var _elm_lang$dom$Dom_LowLevel$onDocument = _elm_lang$dom$Native_Dom.onDocument;
+
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrap;
 var _elm_lang$virtual_dom$VirtualDom_Debug$wrapWithFlags;
 
@@ -8344,6 +9240,189 @@ var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
 var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
 var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
 
+var _elm_lang$mouse$Mouse_ops = _elm_lang$mouse$Mouse_ops || {};
+_elm_lang$mouse$Mouse_ops['&>'] = F2(
+	function (t1, t2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return t2;
+			},
+			t1);
+	});
+var _elm_lang$mouse$Mouse$onSelfMsg = F3(
+	function (router, _p1, state) {
+		var _p2 = _p1;
+		var _p3 = A2(_elm_lang$core$Dict$get, _p2.category, state);
+		if (_p3.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (tagger) {
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					tagger(_p2.position));
+			};
+			return A2(
+				_elm_lang$mouse$Mouse_ops['&>'],
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p3._0.taggers)),
+				_elm_lang$core$Task$succeed(state));
+		}
+	});
+var _elm_lang$mouse$Mouse$init = _elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty);
+var _elm_lang$mouse$Mouse$categorizeHelpHelp = F2(
+	function (value, maybeValues) {
+		var _p4 = maybeValues;
+		if (_p4.ctor === 'Nothing') {
+			return _elm_lang$core$Maybe$Just(
+				{
+					ctor: '::',
+					_0: value,
+					_1: {ctor: '[]'}
+				});
+		} else {
+			return _elm_lang$core$Maybe$Just(
+				{ctor: '::', _0: value, _1: _p4._0});
+		}
+	});
+var _elm_lang$mouse$Mouse$categorizeHelp = F2(
+	function (subs, subDict) {
+		categorizeHelp:
+		while (true) {
+			var _p5 = subs;
+			if (_p5.ctor === '[]') {
+				return subDict;
+			} else {
+				var _v4 = _p5._1,
+					_v5 = A3(
+					_elm_lang$core$Dict$update,
+					_p5._0._0,
+					_elm_lang$mouse$Mouse$categorizeHelpHelp(_p5._0._1),
+					subDict);
+				subs = _v4;
+				subDict = _v5;
+				continue categorizeHelp;
+			}
+		}
+	});
+var _elm_lang$mouse$Mouse$categorize = function (subs) {
+	return A2(_elm_lang$mouse$Mouse$categorizeHelp, subs, _elm_lang$core$Dict$empty);
+};
+var _elm_lang$mouse$Mouse$subscription = _elm_lang$core$Native_Platform.leaf('Mouse');
+var _elm_lang$mouse$Mouse$Position = F2(
+	function (a, b) {
+		return {x: a, y: b};
+	});
+var _elm_lang$mouse$Mouse$position = A3(
+	_elm_lang$core$Json_Decode$map2,
+	_elm_lang$mouse$Mouse$Position,
+	A2(_elm_lang$core$Json_Decode$field, 'pageX', _elm_lang$core$Json_Decode$int),
+	A2(_elm_lang$core$Json_Decode$field, 'pageY', _elm_lang$core$Json_Decode$int));
+var _elm_lang$mouse$Mouse$Watcher = F2(
+	function (a, b) {
+		return {taggers: a, pid: b};
+	});
+var _elm_lang$mouse$Mouse$Msg = F2(
+	function (a, b) {
+		return {category: a, position: b};
+	});
+var _elm_lang$mouse$Mouse$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var rightStep = F3(
+			function (category, taggers, task) {
+				var tracker = A3(
+					_elm_lang$dom$Dom_LowLevel$onDocument,
+					category,
+					_elm_lang$mouse$Mouse$position,
+					function (_p6) {
+						return A2(
+							_elm_lang$core$Platform$sendToSelf,
+							router,
+							A2(_elm_lang$mouse$Mouse$Msg, category, _p6));
+					});
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (state) {
+						return A2(
+							_elm_lang$core$Task$andThen,
+							function (pid) {
+								return _elm_lang$core$Task$succeed(
+									A3(
+										_elm_lang$core$Dict$insert,
+										category,
+										A2(_elm_lang$mouse$Mouse$Watcher, taggers, pid),
+										state));
+							},
+							_elm_lang$core$Process$spawn(tracker));
+					},
+					task);
+			});
+		var bothStep = F4(
+			function (category, _p7, taggers, task) {
+				var _p8 = _p7;
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (state) {
+						return _elm_lang$core$Task$succeed(
+							A3(
+								_elm_lang$core$Dict$insert,
+								category,
+								A2(_elm_lang$mouse$Mouse$Watcher, taggers, _p8.pid),
+								state));
+					},
+					task);
+			});
+		var leftStep = F3(
+			function (category, _p9, task) {
+				var _p10 = _p9;
+				return A2(
+					_elm_lang$mouse$Mouse_ops['&>'],
+					_elm_lang$core$Process$kill(_p10.pid),
+					task);
+			});
+		return A6(
+			_elm_lang$core$Dict$merge,
+			leftStep,
+			bothStep,
+			rightStep,
+			oldState,
+			_elm_lang$mouse$Mouse$categorize(newSubs),
+			_elm_lang$core$Task$succeed(_elm_lang$core$Dict$empty));
+	});
+var _elm_lang$mouse$Mouse$MySub = F2(
+	function (a, b) {
+		return {ctor: 'MySub', _0: a, _1: b};
+	});
+var _elm_lang$mouse$Mouse$clicks = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'click', tagger));
+};
+var _elm_lang$mouse$Mouse$moves = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mousemove', tagger));
+};
+var _elm_lang$mouse$Mouse$downs = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mousedown', tagger));
+};
+var _elm_lang$mouse$Mouse$ups = function (tagger) {
+	return _elm_lang$mouse$Mouse$subscription(
+		A2(_elm_lang$mouse$Mouse$MySub, 'mouseup', tagger));
+};
+var _elm_lang$mouse$Mouse$subMap = F2(
+	function (func, _p11) {
+		var _p12 = _p11;
+		return A2(
+			_elm_lang$mouse$Mouse$MySub,
+			_p12._0,
+			function (_p13) {
+				return func(
+					_p12._1(_p13));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
+
 var _rundis$elm_bootstrap$Bootstrap_General_Internal$screenSizeOption = function (size) {
 	var _p0 = size;
 	switch (_p0.ctor) {
@@ -9814,6 +10893,652 @@ var _rundis$elm_bootstrap$Bootstrap_CDN$stylesheet = A3(
 		}
 	},
 	{ctor: '[]'});
+
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$isToggle = A2(
+	_elm_lang$core$Json_Decode$andThen,
+	function ($class) {
+		return A2(_elm_lang$core$String$contains, 'dropdown-toggle', $class) ? _elm_lang$core$Json_Decode$succeed(true) : _elm_lang$core$Json_Decode$succeed(false);
+	},
+	_debois$elm_dom$DOM$className);
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$toggler = F2(
+	function (path, decoder) {
+		return _elm_lang$core$Json_Decode$oneOf(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$core$Json_Decode$andThen,
+					function (res) {
+						return res ? A2(_elm_lang$core$Json_Decode$at, path, decoder) : _elm_lang$core$Json_Decode$fail('');
+					},
+					A2(_elm_lang$core$Json_Decode$at, path, _rundis$elm_bootstrap$Bootstrap_Dropdown$isToggle)),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Json_Decode$andThen,
+						function (_p0) {
+							return A2(
+								_rundis$elm_bootstrap$Bootstrap_Dropdown$toggler,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									path,
+									{
+										ctor: '::',
+										_0: 'parentElement',
+										_1: {ctor: '[]'}
+									}),
+								decoder);
+						},
+						A2(
+							_elm_lang$core$Json_Decode$at,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								path,
+								{
+									ctor: '::',
+									_0: 'parentElement',
+									_1: {ctor: '[]'}
+								}),
+							_debois$elm_dom$DOM$className)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Json_Decode$fail('No toggler found'),
+						_1: {ctor: '[]'}
+					}
+				}
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$sizeDecoder = A3(
+	_elm_lang$core$Json_Decode$map2,
+	F2(
+		function (v0, v1) {
+			return {ctor: '_Tuple2', _0: v0, _1: v1};
+		}),
+	A2(
+		_rundis$elm_bootstrap$Bootstrap_Dropdown$toggler,
+		{
+			ctor: '::',
+			_0: 'target',
+			_1: {ctor: '[]'}
+		},
+		_debois$elm_dom$DOM$boundingClientRect),
+	A2(
+		_rundis$elm_bootstrap$Bootstrap_Dropdown$toggler,
+		{
+			ctor: '::',
+			_0: 'target',
+			_1: {ctor: '[]'}
+		},
+		_debois$elm_dom$DOM$nextSibling(
+			A2(_debois$elm_dom$DOM$childNode, 0, _debois$elm_dom$DOM$boundingClientRect))));
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$applyModifier = F2(
+	function (option, options) {
+		var _p1 = option;
+		switch (_p1.ctor) {
+			case 'AlignMenuRight':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{hasMenuRight: true});
+			case 'Dropup':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{isDropUp: true});
+			case 'Attrs':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{attributes: _p1._0});
+			case 'DropToDir':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						dropDirection: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			default:
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{menuAttrs: _p1._0});
+		}
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$defaultOptions = {
+	hasMenuRight: false,
+	isDropUp: false,
+	attributes: {ctor: '[]'},
+	dropDirection: _elm_lang$core$Maybe$Nothing,
+	menuAttrs: {ctor: '[]'}
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$toConfig = function (options) {
+	return A3(_elm_lang$core$List$foldl, _rundis$elm_bootstrap$Bootstrap_Dropdown$applyModifier, _rundis$elm_bootstrap$Bootstrap_Dropdown$defaultOptions, options);
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$menuStyle = F2(
+	function (_p2, config) {
+		var _p3 = _p2;
+		var _p6 = _p3._0.toggleSize;
+		var _p5 = _p3._0.menuSize;
+		var px = function (n) {
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(n),
+				'px');
+		};
+		var translate = F3(
+			function (x, y, z) {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'translate3d(',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						px(x),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							',',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								px(y),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									',',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										px(z),
+										')'))))));
+			});
+		var $default = {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'left', _1: '0'},
+				_1: {ctor: '[]'}
+			}
+		};
+		return _elm_lang$html$Html_Attributes$style(
+			function () {
+				var _p4 = {ctor: '_Tuple2', _0: config.isDropUp, _1: config.dropDirection};
+				_v2_3:
+				do {
+					_v2_0:
+					do {
+						if (_p4.ctor === '_Tuple2') {
+							if (_p4._1.ctor === 'Just') {
+								if (_p4._1._0.ctor === 'Dropright') {
+									if (_p4._0 === true) {
+										break _v2_0;
+									} else {
+										return $default;
+									}
+								} else {
+									if (_p4._0 === true) {
+										break _v2_0;
+									} else {
+										return A2(
+											_elm_lang$core$Basics_ops['++'],
+											$default,
+											{
+												ctor: '::',
+												_0: {
+													ctor: '_Tuple2',
+													_0: 'transform',
+													_1: A3(translate, (0 - _p6.width) - _p5.width, 0, 0)
+												},
+												_1: {ctor: '[]'}
+											});
+									}
+								}
+							} else {
+								if (_p4._0 === true) {
+									break _v2_0;
+								} else {
+									break _v2_3;
+								}
+							}
+						} else {
+							break _v2_3;
+						}
+					} while(false);
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						$default,
+						{
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'transform',
+								_1: A3(translate, 0 - _p6.width, 0 - _p5.height, 0)
+							},
+							_1: {ctor: '[]'}
+						});
+				} while(false);
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					$default,
+					{
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'transform',
+							_1: A3(translate, 0 - _p6.width, _p6.height, 0)
+						},
+						_1: {ctor: '[]'}
+					});
+			}());
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$dropDir = function (maybeDir) {
+	var toAttrs = function (dir) {
+		return {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'drop',
+					function () {
+						var _p7 = dir;
+						if (_p7.ctor === 'Dropleft') {
+							return 'left';
+						} else {
+							return 'right';
+						}
+					}())),
+			_1: {ctor: '[]'}
+		};
+	};
+	return A2(
+		_elm_lang$core$Maybe$withDefault,
+		{ctor: '[]'},
+		A2(_elm_lang$core$Maybe$map, toAttrs, maybeDir));
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$StateRec = F3(
+	function (a, b, c) {
+		return {status: a, toggleSize: b, menuSize: c};
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$SplitToggleConfig = F3(
+	function (a, b, c) {
+		return {options: a, togglerOptions: b, children: c};
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$Options = F5(
+	function (a, b, c, d, e) {
+		return {isDropUp: a, hasMenuRight: b, dropDirection: c, attributes: d, menuAttrs: e};
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$State = function (a) {
+	return {ctor: 'State', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$updateStatus = F2(
+	function (status, _p8) {
+		var _p9 = _p8;
+		return _rundis$elm_bootstrap$Bootstrap_Dropdown$State(
+			_elm_lang$core$Native_Utils.update(
+				_p9._0,
+				{status: status}));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$Closed = {ctor: 'Closed'};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$initialState = _rundis$elm_bootstrap$Bootstrap_Dropdown$State(
+	{
+		status: _rundis$elm_bootstrap$Bootstrap_Dropdown$Closed,
+		toggleSize: A4(_debois$elm_dom$DOM$Rectangle, 0, 0, 0, 0),
+		menuSize: A4(_debois$elm_dom$DOM$Rectangle, 0, 0, 0, 0)
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$dropdownAttributes = F2(
+	function (status, config) {
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$classList(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'btn-group', _1: true},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'show',
+								_1: !_elm_lang$core$Native_Utils.eq(status, _rundis$elm_bootstrap$Bootstrap_Dropdown$Closed)
+							},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'dropup', _1: config.isDropUp},
+								_1: {ctor: '[]'}
+							}
+						}
+					}),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_rundis$elm_bootstrap$Bootstrap_Dropdown$dropDir(config.dropDirection),
+				config.attributes));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$dropdownMenu = F3(
+	function (_p10, config, items) {
+		var _p11 = _p10;
+		var wrapperStyle = _elm_lang$core$Native_Utils.eq(_p11._0.status, _rundis$elm_bootstrap$Bootstrap_Dropdown$Closed) ? {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'height', _1: '0'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'position', _1: 'relative'},
+					_1: {ctor: '[]'}
+				}
+			}
+		} : {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'position', _1: 'relative'},
+			_1: {ctor: '[]'}
+		};
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$style(wrapperStyle),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$classList(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'dropdown-menu', _1: true},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'dropdown-menu-right', _1: config.hasMenuRight},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'show', _1: true},
+											_1: {ctor: '[]'}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$menuStyle, _p11, config),
+								_1: {ctor: '[]'}
+							}
+						},
+						config.menuAttrs),
+					A2(
+						_elm_lang$core$List$map,
+						function (_p12) {
+							var _p13 = _p12;
+							return _p13._0;
+						},
+						items)),
+				_1: {ctor: '[]'}
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$dropdown = F2(
+	function (_p15, _p14) {
+		var _p16 = _p15;
+		var _p19 = _p16;
+		var _p17 = _p14;
+		var config = _rundis$elm_bootstrap$Bootstrap_Dropdown$toConfig(_p17.options);
+		var _p18 = _p17.toggleButton;
+		var buttonFn = _p18._0;
+		return A2(
+			_elm_lang$html$Html$div,
+			A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$dropdownAttributes, _p16._0.status, config),
+			{
+				ctor: '::',
+				_0: A2(buttonFn, _p17.toggleMsg, _p19),
+				_1: {
+					ctor: '::',
+					_0: A3(_rundis$elm_bootstrap$Bootstrap_Dropdown$dropdownMenu, _p19, config, _p17.items),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$splitDropdown = F2(
+	function (_p21, _p20) {
+		var _p22 = _p21;
+		var _p25 = _p22;
+		var _p23 = _p20;
+		var config = _rundis$elm_bootstrap$Bootstrap_Dropdown$toConfig(_p23.options);
+		var _p24 = _p23.toggleButton;
+		var buttonsFn = _p24._0;
+		return A2(
+			_elm_lang$html$Html$div,
+			A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$dropdownAttributes, _p22._0.status, config),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(buttonsFn, _p23.toggleMsg, _p25),
+				{
+					ctor: '::',
+					_0: A3(_rundis$elm_bootstrap$Bootstrap_Dropdown$dropdownMenu, _p25, config, _p23.items),
+					_1: {ctor: '[]'}
+				}));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$ListenClicks = {ctor: 'ListenClicks'};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$subscriptions = F2(
+	function (_p26, toMsg) {
+		var _p27 = _p26;
+		var _p31 = _p27;
+		var _p28 = _p27._0.status;
+		switch (_p28.ctor) {
+			case 'Open':
+				return _elm_lang$animation_frame$AnimationFrame$times(
+					function (_p29) {
+						return toMsg(
+							A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$updateStatus, _rundis$elm_bootstrap$Bootstrap_Dropdown$ListenClicks, _p31));
+					});
+			case 'ListenClicks':
+				return _elm_lang$mouse$Mouse$clicks(
+					function (_p30) {
+						return toMsg(
+							A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$updateStatus, _rundis$elm_bootstrap$Bootstrap_Dropdown$Closed, _p31));
+					});
+			default:
+				return _elm_lang$core$Platform_Sub$none;
+		}
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$Open = {ctor: 'Open'};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$nextStatus = function (status) {
+	var _p32 = status;
+	switch (_p32.ctor) {
+		case 'Open':
+			return _rundis$elm_bootstrap$Bootstrap_Dropdown$Closed;
+		case 'ListenClicks':
+			return _rundis$elm_bootstrap$Bootstrap_Dropdown$Closed;
+		default:
+			return _rundis$elm_bootstrap$Bootstrap_Dropdown$Open;
+	}
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$clickHandler = F2(
+	function (toMsg, _p33) {
+		var _p34 = _p33;
+		return A2(
+			_elm_lang$core$Json_Decode$andThen,
+			function (_p35) {
+				var _p36 = _p35;
+				return _elm_lang$core$Json_Decode$succeed(
+					toMsg(
+						_rundis$elm_bootstrap$Bootstrap_Dropdown$State(
+							{
+								status: _rundis$elm_bootstrap$Bootstrap_Dropdown$nextStatus(_p34._0.status),
+								toggleSize: _p36._0,
+								menuSize: _p36._1
+							})));
+			},
+			_rundis$elm_bootstrap$Bootstrap_Dropdown$sizeDecoder);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$togglePrivate = F4(
+	function (buttonOptions, children, toggleMsg, state) {
+		return A2(
+			_elm_lang$html$Html$button,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes(buttonOptions),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('dropdown-toggle'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$type_('button'),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html_Events$on,
+								'click',
+								A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$clickHandler, toggleMsg, state)),
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$splitToggleButtonPrivate = F3(
+	function (_p37, toggleMsg, state) {
+		var _p38 = _p37;
+		return {
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$button,
+				_rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes(_p38.options),
+				_p38.children),
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$button,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_rundis$elm_bootstrap$Bootstrap_Internal_Button$buttonAttributes(_p38.togglerOptions),
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('dropdown-toggle'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('dropdown-toggle-split'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$type_('button'),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html_Events$on,
+											'click',
+											A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$clickHandler, toggleMsg, state)),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}),
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		};
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$toggleOpen = F2(
+	function (toMsg, _p39) {
+		var _p40 = _p39;
+		return toMsg(
+			A2(
+				_rundis$elm_bootstrap$Bootstrap_Dropdown$updateStatus,
+				_rundis$elm_bootstrap$Bootstrap_Dropdown$nextStatus(_p40._0.status),
+				_p40));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$Attrs = function (a) {
+	return {ctor: 'Attrs', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$attrs = function (attrs) {
+	return _rundis$elm_bootstrap$Bootstrap_Dropdown$Attrs(attrs);
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$MenuAttrs = function (a) {
+	return {ctor: 'MenuAttrs', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$menuAttrs = function (attrs) {
+	return _rundis$elm_bootstrap$Bootstrap_Dropdown$MenuAttrs(attrs);
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$DropToDir = function (a) {
+	return {ctor: 'DropToDir', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$AlignMenuRight = {ctor: 'AlignMenuRight'};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$alignMenuRight = _rundis$elm_bootstrap$Bootstrap_Dropdown$AlignMenuRight;
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$Dropup = {ctor: 'Dropup'};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$dropUp = _rundis$elm_bootstrap$Bootstrap_Dropdown$Dropup;
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$Dropright = {ctor: 'Dropright'};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$dropRight = _rundis$elm_bootstrap$Bootstrap_Dropdown$DropToDir(_rundis$elm_bootstrap$Bootstrap_Dropdown$Dropright);
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$Dropleft = {ctor: 'Dropleft'};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$dropLeft = _rundis$elm_bootstrap$Bootstrap_Dropdown$DropToDir(_rundis$elm_bootstrap$Bootstrap_Dropdown$Dropleft);
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownItem = function (a) {
+	return {ctor: 'DropdownItem', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$anchorItem = F2(
+	function (attributes, children) {
+		return _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownItem(
+			A2(
+				_elm_lang$html$Html$a,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('dropdown-item'),
+						_1: {ctor: '[]'}
+					},
+					attributes),
+				children));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$buttonItem = F2(
+	function (attributes, children) {
+		return _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownItem(
+			A2(
+				_elm_lang$html$Html$button,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$type_('button'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('dropdown-item'),
+							_1: {ctor: '[]'}
+						}
+					},
+					attributes),
+				children));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$customItem = function (child) {
+	return _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownItem(child);
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$divider = _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownItem(
+	A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('dropdown-divider'),
+			_1: {ctor: '[]'}
+		},
+		{ctor: '[]'}));
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$header = function (children) {
+	return _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownItem(
+		A2(
+			_elm_lang$html$Html$h6,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('dropdown-header'),
+				_1: {ctor: '[]'}
+			},
+			children));
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownToggle = function (a) {
+	return {ctor: 'DropdownToggle', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$toggle = F2(
+	function (buttonOptions, children) {
+		return _rundis$elm_bootstrap$Bootstrap_Dropdown$DropdownToggle(
+			A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$togglePrivate, buttonOptions, children));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$SplitDropdownToggle = function (a) {
+	return {ctor: 'SplitDropdownToggle', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Dropdown$splitToggle = function (config) {
+	return _rundis$elm_bootstrap$Bootstrap_Dropdown$SplitDropdownToggle(
+		_rundis$elm_bootstrap$Bootstrap_Dropdown$splitToggleButtonPrivate(config));
+};
 
 var _rundis$elm_bootstrap$Bootstrap_Grid_Internal$verticalAlignOption = function (align) {
 	var _p0 = align;
@@ -11398,6 +13123,704 @@ var _rundis$elm_bootstrap$Bootstrap_Grid_Col$attrs = function (attrs) {
 	return _rundis$elm_bootstrap$Bootstrap_Grid_Internal$ColAttrs(attrs);
 };
 
+var _rundis$elm_bootstrap$Bootstrap_Form$renderCol = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_p1._0.elemFn,
+		_rundis$elm_bootstrap$Bootstrap_Grid_Internal$colAttributes(_p1._0.options),
+		_p1._0.children);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$row = F2(
+	function (options, cols) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('form-group'),
+				_1: _rundis$elm_bootstrap$Bootstrap_Grid_Internal$rowAttributes(options)
+			},
+			A2(_elm_lang$core$List$map, _rundis$elm_bootstrap$Bootstrap_Form$renderCol, cols));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$applyModifier = F2(
+	function (modifier, options) {
+		var _p2 = modifier;
+		return _elm_lang$core$Native_Utils.update(
+			options,
+			{
+				attributes: A2(_elm_lang$core$Basics_ops['++'], options.attributes, _p2._0)
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$defaultOptions = {
+	attributes: {ctor: '[]'}
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$toAttributes = function (modifiers) {
+	var options = A3(_elm_lang$core$List$foldl, _rundis$elm_bootstrap$Bootstrap_Form$applyModifier, _rundis$elm_bootstrap$Bootstrap_Form$defaultOptions, modifiers);
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('form-group'),
+			_1: {ctor: '[]'}
+		},
+		options.attributes);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$invalidFeedback = F2(
+	function (attributes, children) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('invalid-feedback'),
+				_1: attributes
+			},
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$validFeedback = F2(
+	function (attributes, children) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('valid-feedback'),
+				_1: attributes
+			},
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$helpInline = F2(
+	function (attributes, children) {
+		return A2(
+			_elm_lang$html$Html$small,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('text-muted'),
+				_1: attributes
+			},
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$help = F2(
+	function (attributes, children) {
+		return A2(
+			_elm_lang$html$Html$small,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('form-text text-muted'),
+				_1: attributes
+			},
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$label = F2(
+	function (attributes, children) {
+		return A2(
+			_elm_lang$html$Html$label,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('form-control-label'),
+				_1: attributes
+			},
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$group = F2(
+	function (options, children) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_rundis$elm_bootstrap$Bootstrap_Form$toAttributes(options),
+			children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$form = F2(
+	function (attributes, children) {
+		return A2(_elm_lang$html$Html$form, attributes, children);
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$formInline = function (attributes) {
+	return _rundis$elm_bootstrap$Bootstrap_Form$form(
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('form-inline'),
+			_1: attributes
+		});
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$Options = function (a) {
+	return {attributes: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$Col = function (a) {
+	return {ctor: 'Col', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$col = F2(
+	function (options, children) {
+		return _rundis$elm_bootstrap$Bootstrap_Form$Col(
+			{elemFn: _elm_lang$html$Html$div, options: options, children: children});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$colLabel = F2(
+	function (options, children) {
+		return _rundis$elm_bootstrap$Bootstrap_Form$Col(
+			{
+				elemFn: _elm_lang$html$Html$label,
+				options: {
+					ctor: '::',
+					_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$attrs(
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('col-form-label'),
+							_1: {ctor: '[]'}
+						}),
+					_1: options
+				},
+				children: children
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form$colLabelSm = function (options) {
+	return _rundis$elm_bootstrap$Bootstrap_Form$colLabel(
+		{
+			ctor: '::',
+			_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$attrs(
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('col-form-label-sm'),
+					_1: {ctor: '[]'}
+				}),
+			_1: options
+		});
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$colLabelLg = function (options) {
+	return _rundis$elm_bootstrap$Bootstrap_Form$colLabel(
+		{
+			ctor: '::',
+			_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$attrs(
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('col-form-label-lg'),
+					_1: {ctor: '[]'}
+				}),
+			_1: options
+		});
+};
+var _rundis$elm_bootstrap$Bootstrap_Form$Attrs = function (a) {
+	return {ctor: 'Attrs', _0: a};
+};
+
+var _rundis$elm_bootstrap$Bootstrap_Form_FormInternal$validationToString = function (validation) {
+	var _p0 = validation;
+	if (_p0.ctor === 'Success') {
+		return 'is-valid';
+	} else {
+		return 'is-invalid';
+	}
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_FormInternal$validationWrapperAttribute = function (validation) {
+	return _elm_lang$html$Html_Attributes$class(
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'has-',
+			_rundis$elm_bootstrap$Bootstrap_Form_FormInternal$validationToString(validation)));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_FormInternal$Danger = {ctor: 'Danger'};
+var _rundis$elm_bootstrap$Bootstrap_Form_FormInternal$Success = {ctor: 'Success'};
+
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$validationAttribute = function (validation) {
+	return _elm_lang$html$Html_Attributes$class(
+		_rundis$elm_bootstrap$Bootstrap_Form_FormInternal$validationToString(validation));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$typeAttribute = function (inputType) {
+	return _elm_lang$html$Html_Attributes$type_(
+		function () {
+			var _p0 = inputType;
+			switch (_p0.ctor) {
+				case 'Text':
+					return 'text';
+				case 'Password':
+					return 'password';
+				case 'DatetimeLocal':
+					return 'datetime-local';
+				case 'Date':
+					return 'date';
+				case 'Month':
+					return 'month';
+				case 'Time':
+					return 'time';
+				case 'Week':
+					return 'week';
+				case 'Number':
+					return 'number';
+				case 'Email':
+					return 'email';
+				case 'Url':
+					return 'url';
+				case 'Search':
+					return 'search';
+				case 'Tel':
+					return 'tel';
+				default:
+					return 'color';
+			}
+		}());
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$sizeAttribute = function (size) {
+	return A2(
+		_elm_lang$core$Maybe$map,
+		function (s) {
+			return _elm_lang$html$Html_Attributes$class(
+				A2(_elm_lang$core$Basics_ops['++'], 'form-control-', s));
+		},
+		_rundis$elm_bootstrap$Bootstrap_General_Internal$screenSizeOption(size));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$applyModifier = F2(
+	function (modifier, options) {
+		var _p1 = modifier;
+		switch (_p1.ctor) {
+			case 'Size':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						size: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'Id':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						id: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'Type':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{tipe: _p1._0});
+			case 'Disabled':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{disabled: _p1._0});
+			case 'Value':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						value: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'DefaultValue':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						defaultValue: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'Placeholder':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						placeholder: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'OnInput':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						onInput: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'Validation':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						validation: _elm_lang$core$Maybe$Just(_p1._0)
+					});
+			case 'Readonly':
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{readonly: _p1._0});
+			default:
+				return _elm_lang$core$Native_Utils.update(
+					options,
+					{
+						attributes: A2(_elm_lang$core$Basics_ops['++'], options.attributes, _p1._0)
+					});
+		}
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Options = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {tipe: a, id: b, size: c, disabled: d, value: e, defaultValue: f, placeholder: g, onInput: h, validation: i, readonly: j, attributes: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Input = function (a) {
+	return {ctor: 'Input', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Attrs = function (a) {
+	return {ctor: 'Attrs', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$attrs = function (attrs) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$Attrs(attrs);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Readonly = function (a) {
+	return {ctor: 'Readonly', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$readonly = function (readonly) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$Readonly(readonly);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Placeholder = function (a) {
+	return {ctor: 'Placeholder', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$placeholder = function (value) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$Placeholder(value);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Validation = function (a) {
+	return {ctor: 'Validation', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$success = _rundis$elm_bootstrap$Bootstrap_Form_Input$Validation(_rundis$elm_bootstrap$Bootstrap_Form_FormInternal$Success);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$danger = _rundis$elm_bootstrap$Bootstrap_Form_Input$Validation(_rundis$elm_bootstrap$Bootstrap_Form_FormInternal$Danger);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$OnInput = function (a) {
+	return {ctor: 'OnInput', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$onInput = function (toMsg) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$OnInput(toMsg);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$DefaultValue = function (a) {
+	return {ctor: 'DefaultValue', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$defaultValue = function (value) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$DefaultValue(value);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Value = function (a) {
+	return {ctor: 'Value', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$value = function (value) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$Value(value);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Disabled = function (a) {
+	return {ctor: 'Disabled', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$disabled = function (disabled) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$Disabled(disabled);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Type = function (a) {
+	return {ctor: 'Type', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$create = F2(
+	function (tipe, options) {
+		return _rundis$elm_bootstrap$Bootstrap_Form_Input$Input(
+			{
+				options: {
+					ctor: '::',
+					_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$Type(tipe),
+					_1: options
+				}
+			});
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Id = function (a) {
+	return {ctor: 'Id', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$id = function (id) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_Input$Id(id);
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Size = function (a) {
+	return {ctor: 'Size', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$small = _rundis$elm_bootstrap$Bootstrap_Form_Input$Size(_rundis$elm_bootstrap$Bootstrap_General_Internal$SM);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$large = _rundis$elm_bootstrap$Bootstrap_Form_Input$Size(_rundis$elm_bootstrap$Bootstrap_General_Internal$LG);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Color = {ctor: 'Color'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Tel = {ctor: 'Tel'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Search = {ctor: 'Search'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Url = {ctor: 'Url'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Email = {ctor: 'Email'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Number = {ctor: 'Number'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Week = {ctor: 'Week'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Time = {ctor: 'Time'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Month = {ctor: 'Month'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Date = {ctor: 'Date'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$DatetimeLocal = {ctor: 'DatetimeLocal'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Password = {ctor: 'Password'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$Text = {ctor: 'Text'};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$defaultOptions = {
+	tipe: _rundis$elm_bootstrap$Bootstrap_Form_Input$Text,
+	id: _elm_lang$core$Maybe$Nothing,
+	size: _elm_lang$core$Maybe$Nothing,
+	disabled: false,
+	value: _elm_lang$core$Maybe$Nothing,
+	defaultValue: _elm_lang$core$Maybe$Nothing,
+	placeholder: _elm_lang$core$Maybe$Nothing,
+	onInput: _elm_lang$core$Maybe$Nothing,
+	validation: _elm_lang$core$Maybe$Nothing,
+	readonly: false,
+	attributes: {ctor: '[]'}
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$toAttributes = function (modifiers) {
+	var options = A3(_elm_lang$core$List$foldl, _rundis$elm_bootstrap$Bootstrap_Form_Input$applyModifier, _rundis$elm_bootstrap$Bootstrap_Form_Input$defaultOptions, modifiers);
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('form-control'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$disabled(options.disabled),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$readonly(options.readonly),
+					_1: {
+						ctor: '::',
+						_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$typeAttribute(options.tipe),
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		},
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(
+				_elm_lang$core$List$filterMap,
+				_elm_lang$core$Basics$identity,
+				{
+					ctor: '::',
+					_0: A2(_elm_lang$core$Maybe$map, _elm_lang$html$Html_Attributes$id, options.id),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$core$Maybe$andThen, _rundis$elm_bootstrap$Bootstrap_Form_Input$sizeAttribute, options.size),
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$core$Maybe$map, _elm_lang$html$Html_Attributes$value, options.value),
+							_1: {
+								ctor: '::',
+								_0: A2(_elm_lang$core$Maybe$map, _elm_lang$html$Html_Attributes$defaultValue, options.defaultValue),
+								_1: {
+									ctor: '::',
+									_0: A2(_elm_lang$core$Maybe$map, _elm_lang$html$Html_Attributes$placeholder, options.placeholder),
+									_1: {
+										ctor: '::',
+										_0: A2(_elm_lang$core$Maybe$map, _elm_lang$html$Html_Events$onInput, options.onInput),
+										_1: {
+											ctor: '::',
+											_0: A2(_elm_lang$core$Maybe$map, _rundis$elm_bootstrap$Bootstrap_Form_Input$validationAttribute, options.validation),
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}),
+			options.attributes));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$view = function (_p2) {
+	var _p3 = _p2;
+	return A2(
+		_elm_lang$html$Html$input,
+		_rundis$elm_bootstrap$Bootstrap_Form_Input$toAttributes(_p3._0.options),
+		{ctor: '[]'});
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$input = F2(
+	function (tipe, options) {
+		return _rundis$elm_bootstrap$Bootstrap_Form_Input$view(
+			A2(_rundis$elm_bootstrap$Bootstrap_Form_Input$create, tipe, options));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$text = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Text);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$password = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Password);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$datetimeLocal = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$DatetimeLocal);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$date = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Date);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$month = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Month);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$time = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Time);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$week = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Week);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$number = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Number);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$email = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Email);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$url = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Url);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$search = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Search);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$tel = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Tel);
+var _rundis$elm_bootstrap$Bootstrap_Form_Input$color = _rundis$elm_bootstrap$Bootstrap_Form_Input$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$Color);
+
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$sizeAttribute = function (size) {
+	return A2(
+		_elm_lang$core$Maybe$map,
+		function (s) {
+			return _elm_lang$html$Html_Attributes$class(
+				A2(_elm_lang$core$Basics_ops['++'], 'input-group-', s));
+		},
+		_rundis$elm_bootstrap$Bootstrap_General_Internal$screenSizeOption(size));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$view = function (_p0) {
+	var _p1 = _p0;
+	var _p7 = _p1._0;
+	var _p2 = _p7.input;
+	var input = _p2._0;
+	return A2(
+		_elm_lang$html$Html$div,
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('input-group'),
+				_1: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				A2(
+					_elm_lang$core$List$filterMap,
+					_elm_lang$core$Basics$identity,
+					{
+						ctor: '::',
+						_0: A2(_elm_lang$core$Maybe$andThen, _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$sizeAttribute, _p7.size),
+						_1: {ctor: '[]'}
+					}),
+				_p7.attributes)),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			A2(
+				_elm_lang$core$List$map,
+				function (_p3) {
+					var _p4 = _p3;
+					return A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('input-group-prepend'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _p4._0,
+							_1: {ctor: '[]'}
+						});
+				},
+				_p7.predecessors),
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				{
+					ctor: '::',
+					_0: input,
+					_1: {ctor: '[]'}
+				},
+				A2(
+					_elm_lang$core$List$map,
+					function (_p5) {
+						var _p6 = _p5;
+						return A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('input-group-append'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _p6._0,
+								_1: {ctor: '[]'}
+							});
+					},
+					_p7.successors))));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Config = function (a) {
+	return {ctor: 'Config', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$config = function (input) {
+	return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Config(
+		{
+			input: input,
+			predecessors: {ctor: '[]'},
+			successors: {ctor: '[]'},
+			size: _elm_lang$core$Maybe$Nothing,
+			attributes: {ctor: '[]'}
+		});
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$predecessors = F2(
+	function (addons, _p8) {
+		var _p9 = _p8;
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Config(
+			_elm_lang$core$Native_Utils.update(
+				_p9._0,
+				{predecessors: addons}));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$successors = F2(
+	function (addons, _p10) {
+		var _p11 = _p10;
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Config(
+			_elm_lang$core$Native_Utils.update(
+				_p11._0,
+				{successors: addons}));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$large = function (_p12) {
+	var _p13 = _p12;
+	return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Config(
+		_elm_lang$core$Native_Utils.update(
+			_p13._0,
+			{
+				size: _elm_lang$core$Maybe$Just(_rundis$elm_bootstrap$Bootstrap_General_Internal$LG)
+			}));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$small = function (_p14) {
+	var _p15 = _p14;
+	return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Config(
+		_elm_lang$core$Native_Utils.update(
+			_p15._0,
+			{
+				size: _elm_lang$core$Maybe$Just(_rundis$elm_bootstrap$Bootstrap_General_Internal$SM)
+			}));
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$attrs = F2(
+	function (attributes, _p16) {
+		var _p17 = _p16;
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Config(
+			_elm_lang$core$Native_Utils.update(
+				_p17._0,
+				{attributes: attributes}));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Input = function (a) {
+	return {ctor: 'Input', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input = F2(
+	function (inputFn, options) {
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Input(
+			inputFn(options));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$text = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$text);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$password = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$password);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$datetimeLocal = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$datetimeLocal);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$date = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$date);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$month = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$month);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$time = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$time);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$week = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$week);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$number = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$number);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$email = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$email);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$url = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$url);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$search = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$search);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$tel = _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$input(_rundis$elm_bootstrap$Bootstrap_Form_Input$tel);
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Addon = function (a) {
+	return {ctor: 'Addon', _0: a};
+};
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$span = F2(
+	function (attributes, children) {
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Addon(
+			A2(
+				_elm_lang$html$Html$span,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('input-group-text'),
+					_1: attributes
+				},
+				children));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$button = F2(
+	function (options, children) {
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Addon(
+			A2(_rundis$elm_bootstrap$Bootstrap_Button$button, options, children));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$dropdown = F2(
+	function (state, config) {
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Addon(
+			A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$dropdown, state, config));
+	});
+var _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$splitDropdown = F2(
+	function (state, config) {
+		return _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$Addon(
+			A2(_rundis$elm_bootstrap$Bootstrap_Dropdown$splitDropdown, state, config));
+	});
+
 var _rundis$elm_bootstrap$Bootstrap_Grid$renderCol = function (column) {
 	var _p0 = column;
 	switch (_p0.ctor) {
@@ -11843,112 +14266,98 @@ var _user$project$ProgrissStore$ProgrissStore = function (a) {
 };
 var _user$project$ProgrissStore$empty = _user$project$ProgrissStore$ProgrissStore(
 	{projects: _elm_lang$core$Dict$empty, actions: _elm_lang$core$Dict$empty, contexts: _elm_lang$core$Dict$empty, notes: _elm_lang$core$Dict$empty});
-var _user$project$ProgrissStore$createAction = F2(
-	function (description, _p15) {
+var _user$project$ProgrissStore$createContext = F2(
+	function (name, _p15) {
 		var _p16 = _p15;
 		var _p17 = _p16._0;
-		var updatedActions = A3(
+		var updatedContexts = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p17.actions),
-			A3(_user$project$ProgrissStore$ActionData, description, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing),
-			_p17.actions);
+			_user$project$ProgrissStore$getNextFreeId(_p17.contexts),
+			_user$project$ProgrissStore$ContextData(name),
+			_p17.contexts);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
 				_p17,
-				{actions: updatedActions}));
-	});
-var _user$project$ProgrissStore$createContext = F2(
-	function (name, _p18) {
-		var _p19 = _p18;
-		var _p20 = _p19._0;
-		var updatedContexts = A3(
-			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p20.contexts),
-			_user$project$ProgrissStore$ContextData(name),
-			_p20.contexts);
-		return _user$project$ProgrissStore$ProgrissStore(
-			_elm_lang$core$Native_Utils.update(
-				_p20,
 				{contexts: updatedContexts}));
 	});
 var _user$project$ProgrissStore$createProject = F2(
-	function (name, _p21) {
-		var _p22 = _p21;
-		var _p23 = _p22._0;
+	function (name, _p18) {
+		var _p19 = _p18;
+		var _p20 = _p19._0;
 		var updatedProjects = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p23.projects),
+			_user$project$ProgrissStore$getNextFreeId(_p20.projects),
 			_user$project$ProgrissStore$ProjectData(name),
-			_p23.projects);
+			_p20.projects);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p23,
+				_p20,
 				{projects: updatedProjects}));
 	});
 var _user$project$ProgrissStore$updateAction = F2(
-	function (action, _p24) {
-		var _p25 = _p24;
-		var _p27 = _p25._0;
-		var _p26 = action.id;
+	function (action, _p21) {
+		var _p22 = _p21;
+		var _p24 = _p22._0;
+		var _p23 = action.id;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p26._0,
+			_p23._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{description: action.description});
 				}),
-			_p27.actions);
+			_p24.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p27,
+				_p24,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$associateActionToContext = F3(
-	function (_p30, _p29, _p28) {
-		var _p31 = _p30;
-		var _p32 = _p29;
-		var _p33 = _p28;
-		var _p34 = _p33._0;
+	function (_p27, _p26, _p25) {
+		var _p28 = _p27;
+		var _p29 = _p26;
+		var _p30 = _p25;
+		var _p31 = _p30._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p31._0,
+			_p28._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{
-							contextId: _elm_lang$core$Maybe$Just(_p32._0)
+							contextId: _elm_lang$core$Maybe$Just(_p29._0)
 						});
 				}),
-			_p34.actions);
+			_p31.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p34,
+				_p31,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$associateActionToProject = F3(
-	function (_p37, _p36, _p35) {
-		var _p38 = _p37;
-		var _p39 = _p36;
-		var _p40 = _p35;
-		var _p41 = _p40._0;
+	function (_p34, _p33, _p32) {
+		var _p35 = _p34;
+		var _p36 = _p33;
+		var _p37 = _p32;
+		var _p38 = _p37._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p38._0,
+			_p35._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{
-							projectId: _elm_lang$core$Maybe$Just(_p39._0)
+							projectId: _elm_lang$core$Maybe$Just(_p36._0)
 						});
 				}),
-			_p41.actions);
+			_p38.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p41,
+				_p38,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$progrissStoreConstructor = F4(
@@ -11985,6 +14394,25 @@ var _user$project$ProgrissStore$decoder = A4(
 var _user$project$ProgrissStore$ActionId = function (a) {
 	return {ctor: 'ActionId', _0: a};
 };
+var _user$project$ProgrissStore$createAction = F2(
+	function (description, _p39) {
+		var _p40 = _p39;
+		var _p41 = _p40._0;
+		var updatedActions = A3(
+			_elm_lang$core$Dict$insert,
+			_user$project$ProgrissStore$getNextFreeId(_p41.actions),
+			A3(_user$project$ProgrissStore$ActionData, description, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing),
+			_p41.actions);
+		return {
+			ctor: '_Tuple2',
+			_0: _user$project$ProgrissStore$ActionId(
+				_user$project$ProgrissStore$getNextFreeId(_p41.actions)),
+			_1: _user$project$ProgrissStore$ProgrissStore(
+				_elm_lang$core$Native_Utils.update(
+					_p41,
+					{actions: updatedActions}))
+		};
+	});
 var _user$project$ProgrissStore$castActionDataToAction = function (_p42) {
 	var _p43 = _p42;
 	return A2(
@@ -12377,6 +14805,14 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		var _p3 = msg;
 		switch (_p3.ctor) {
+			case 'UpdateNewActionDescription':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{newActionDescription: _p3._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'ChangeContext':
 				return {
 					ctor: '_Tuple2',
@@ -12413,24 +14849,41 @@ var _user$project$Main$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					var debug = A2(_elm_lang$core$Debug$log, 'Error', _p4._0);
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{store: _user$project$ProgrissStore$empty}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				}
 			default:
+				var _p5 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, model.store);
+				var actionId = _p5._0;
+				var storeWithNewAction = _p5._1;
+				var updatedStore = function () {
+					var _p6 = model.selectedContext;
+					switch (_p6.ctor) {
+						case 'SpecificContext':
+							return A3(_user$project$ProgrissStore$associateActionToContext, actionId, _p6._0, storeWithNewAction);
+						case 'AllContexts':
+							return storeWithNewAction;
+						default:
+							return storeWithNewAction;
+					}
+				}();
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{
-							store: A2(_user$project$ProgrissStore$createAction, 'Demo Action', model.store)
-						}),
+						{store: updatedStore, newActionDescription: ''}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
 	});
-var _user$project$Main$Model = F2(
-	function (a, b) {
-		return {store: a, selectedContext: b};
+var _user$project$Main$Model = F3(
+	function (a, b, c) {
+		return {store: a, selectedContext: b, newActionDescription: c};
 	});
 var _user$project$Main$AllContexts = {ctor: 'AllContexts'};
 var _user$project$Main$SpecificContext = function (a) {
@@ -12439,10 +14892,13 @@ var _user$project$Main$SpecificContext = function (a) {
 var _user$project$Main$AnywhereContext = {ctor: 'AnywhereContext'};
 var _user$project$Main$initialModel = {
 	ctor: '_Tuple2',
-	_0: {store: _user$project$Main$initialStore, selectedContext: _user$project$Main$AnywhereContext},
+	_0: {store: _user$project$Main$initialStore, selectedContext: _user$project$Main$AnywhereContext, newActionDescription: ''},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
-var _user$project$Main$AddDemoAction = {ctor: 'AddDemoAction'};
+var _user$project$Main$CreateNewAction = {ctor: 'CreateNewAction'};
+var _user$project$Main$UpdateNewActionDescription = function (a) {
+	return {ctor: 'UpdateNewActionDescription', _0: a};
+};
 var _user$project$Main$TriggerLoad = {ctor: 'TriggerLoad'};
 var _user$project$Main$ReceiveStore = function (a) {
 	return {ctor: 'ReceiveStore', _0: a};
@@ -12572,7 +15028,72 @@ var _user$project$Main$view = function (model) {
 								ctor: '::',
 								_0: _user$project$Main$renderActions(
 									A2(_user$project$Main$actionsToRender, model.store, model.selectedContext)),
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$hr,
+										{ctor: '[]'},
+										{ctor: '[]'}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_rundis$elm_bootstrap$Bootstrap_Form$form,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$view(
+													A2(
+														_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$successors,
+														{
+															ctor: '::',
+															_0: A2(
+																_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$button,
+																{
+																	ctor: '::',
+																	_0: _rundis$elm_bootstrap$Bootstrap_Button$secondary,
+																	_1: {
+																		ctor: '::',
+																		_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$CreateNewAction),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Create Action'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														},
+														_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$config(
+															_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$text(
+																{
+																	ctor: '::',
+																	_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$placeholder('Type action description here'),
+																	_1: {
+																		ctor: '::',
+																		_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$attrs(
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$value(model.newActionDescription),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Events$onInput(_user$project$Main$UpdateNewActionDescription),
+																					_1: {ctor: '[]'}
+																				}
+																			}),
+																		_1: {ctor: '[]'}
+																	}
+																})))),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
+								}
 							}),
 						_1: {ctor: '[]'}
 					}
@@ -12589,41 +15110,9 @@ var _user$project$Main$view = function (model) {
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_rundis$elm_bootstrap$Bootstrap_Button$button,
-							{
-								ctor: '::',
-								_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
-								_1: {
-									ctor: '::',
-									_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Save),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab'),
-												_1: {ctor: '[]'}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$i,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('material-icons'),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('save'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
+							_elm_lang$html$Html$hr,
+							{ctor: '[]'},
+							{ctor: '[]'}),
 						_1: {
 							ctor: '::',
 							_0: A2(
@@ -12636,7 +15125,7 @@ var _user$project$Main$view = function (model) {
 										_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$TriggerLoad),
+												_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Save),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab'),
@@ -12657,7 +15146,7 @@ var _user$project$Main$view = function (model) {
 										},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text('restore'),
+											_0: _elm_lang$html$Html$text('save'),
 											_1: {ctor: '[]'}
 										}),
 									_1: {ctor: '[]'}
@@ -12674,7 +15163,7 @@ var _user$project$Main$view = function (model) {
 											_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$AddDemoAction),
+													_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$TriggerLoad),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab'),
@@ -12695,7 +15184,7 @@ var _user$project$Main$view = function (model) {
 											},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html$text('add'),
+												_0: _elm_lang$html$Html$text('restore'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}

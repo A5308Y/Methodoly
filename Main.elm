@@ -4,6 +4,9 @@ import Bootstrap.Button as Button
 import Bootstrap.CDN as CDN
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
+import Bootstrap.Form as Form
+import Bootstrap.Form.Input as Input
+import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as ListGroup
 import Html exposing (..)
@@ -28,6 +31,7 @@ import ProgrissStore as Store
 type alias Model =
     { store : ProgrissStore
     , selectedContext : SelectedContext
+    , newActionDescription : String
     }
 
 
@@ -42,7 +46,8 @@ type Msg
     | Save
     | ReceiveStore String
     | TriggerLoad
-    | AddDemoAction
+    | UpdateNewActionDescription String
+    | CreateNewAction
 
 
 port persistStore : String -> Cmd msg
@@ -91,6 +96,7 @@ initialModel : ( Model, Cmd Msg )
 initialModel =
     ( { store = initialStore
       , selectedContext = AnywhereContext
+      , newActionDescription = ""
       }
     , Cmd.none
     )
@@ -109,6 +115,9 @@ subscriptions model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        UpdateNewActionDescription newActionDescription ->
+            ( { model | newActionDescription = newActionDescription }, Cmd.none )
+
         ChangeContext selectedContext ->
             ( { model | selectedContext = selectedContext }, Cmd.none )
 
@@ -124,14 +133,32 @@ update msg model =
                     ( { model | store = store }, Cmd.none )
 
                 Err message ->
-                    let
-                        debug =
-                            Debug.log "Error" message
-                    in
-                    ( model, Cmd.none )
+                    ( { model | store = Store.empty }, Cmd.none )
 
-        AddDemoAction ->
-            ( { model | store = Store.createAction "Demo Action" model.store }, Cmd.none )
+        CreateNewAction ->
+            let
+                ( actionId, storeWithNewAction ) =
+                    model.store
+                        |> Store.createAction model.newActionDescription
+
+                updatedStore =
+                    case model.selectedContext of
+                        SpecificContext contextId ->
+                            storeWithNewAction
+                                |> Store.associateActionToContext actionId contextId
+
+                        AllContexts ->
+                            storeWithNewAction
+
+                        AnywhereContext ->
+                            storeWithNewAction
+            in
+            ( { model
+                | store = updatedStore
+                , newActionDescription = ""
+              }
+            , Cmd.none
+            )
 
 
 view : Model -> Html Msg
@@ -139,19 +166,37 @@ view model =
     Grid.container []
         [ Grid.row []
             [ Grid.col [] [ renderContextMenu model.store model.selectedContext ]
-            , Grid.col [] [ renderActions (actionsToRender model.store model.selectedContext) ]
+            , Grid.col []
+                [ renderActions (actionsToRender model.store model.selectedContext)
+                , hr [] []
+                , Form.form []
+                    [ InputGroup.config
+                        (InputGroup.text
+                            [ Input.placeholder "Type action description here"
+                            , Input.attrs
+                                [ Html.Attributes.value model.newActionDescription
+                                , Html.Events.onInput UpdateNewActionDescription
+                                ]
+                            ]
+                        )
+                        |> InputGroup.successors
+                            [ InputGroup.button
+                                [ Button.secondary, Button.attrs [ onClick CreateNewAction ] ]
+                                [ text "Create Action" ]
+                            ]
+                        |> InputGroup.view
+                    ]
+                ]
             ]
         , hr [] []
         , projectsCardOverview model.store
+        , hr [] []
         , Button.button
             [ Button.primary, Button.attrs [ onClick Save, Html.Attributes.class "bmd-btn-fab" ] ]
             [ i [ Html.Attributes.class "material-icons" ] [ text "save" ] ]
         , Button.button
             [ Button.primary, Button.attrs [ onClick TriggerLoad, Html.Attributes.class "bmd-btn-fab" ] ]
             [ i [ Html.Attributes.class "material-icons" ] [ text "restore" ] ]
-        , Button.button
-            [ Button.primary, Button.attrs [ onClick AddDemoAction, Html.Attributes.class "bmd-btn-fab" ] ]
-            [ i [ Html.Attributes.class "material-icons" ] [ text "add" ] ]
         ]
 
 
@@ -278,7 +323,6 @@ projectsPerRow =
 -- Click on project card to see project in full width
 -- Tests for interactive elements
 -- Creating contexts in the interface
--- Creating actions in the interface
 -- Creating projects in the interface
 -- Proper interface that shows everything in the graph
 -- DoneState = Done Int (Completed At)| Active | SomedayMaybe Int (Resubmit At) | Deleted Int (Deleted At) for Projects

@@ -108,7 +108,7 @@ empty =
         }
 
 
-createAction : String -> ProgrissStore -> ProgrissStore
+createAction : String -> ProgrissStore -> ( ActionId, ProgrissStore )
 createAction description (ProgrissStore store) =
     let
         updatedActions =
@@ -117,7 +117,9 @@ createAction description (ProgrissStore store) =
                 (ActionData description Nothing Nothing)
                 store.actions
     in
-    ProgrissStore { store | actions = updatedActions }
+    ( ActionId (getNextFreeId store.actions)
+    , ProgrissStore { store | actions = updatedActions }
+    )
 
 
 createContext : String -> ProgrissStore -> ProgrissStore
