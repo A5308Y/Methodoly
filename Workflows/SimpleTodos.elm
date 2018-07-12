@@ -10,8 +10,8 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (href)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (action, href)
+import Html.Events exposing (onSubmit)
 import ProgrissStore as Store exposing (Action, ActionId, ActionState(Done), ProgrissStore, decoder)
 
 
@@ -55,7 +55,7 @@ view store model =
             [ Grid.col []
                 [ renderActions (Store.getAllActions store)
                 , hr [] []
-                , Form.form []
+                , Form.form [ onSubmit CreateNewAction, action "javascript:void(0);" ]
                     [ InputGroup.config
                         (InputGroup.text
                             [ Input.placeholder "Type action description here"
@@ -67,7 +67,7 @@ view store model =
                         )
                         |> InputGroup.successors
                             [ InputGroup.button
-                                [ Button.secondary, Button.attrs [ onClick CreateNewAction ] ]
+                                [ Button.secondary, Button.attrs [] ]
                                 [ text "Create Action" ]
                             ]
                         |> InputGroup.view

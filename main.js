@@ -14676,28 +14676,36 @@ var _user$project$Workflows_GtdActionLists$iconForActionState = function (state)
 		return 'check_box_outline_blank';
 	}
 };
+var _user$project$Workflows_GtdActionLists$buttonColorForActionState = function (state) {
+	var _p2 = state;
+	if (_p2.ctor === 'Done') {
+		return _rundis$elm_bootstrap$Bootstrap_Button$success;
+	} else {
+		return _rundis$elm_bootstrap$Bootstrap_Button$primary;
+	}
+};
 var _user$project$Workflows_GtdActionLists$actionsToRender = F2(
 	function (store, selectedContext) {
-		var _p2 = selectedContext;
-		switch (_p2.ctor) {
+		var _p3 = selectedContext;
+		switch (_p3.ctor) {
 			case 'AllContexts':
 				return _user$project$ProgrissStore$getAllActions(store);
 			case 'AnywhereContext':
 				return _user$project$ProgrissStore$getActionsWithoutContext(store);
 			default:
-				return A2(_user$project$ProgrissStore$getActionsForContext, _p2._0, store);
+				return A2(_user$project$ProgrissStore$getActionsForContext, _p3._0, store);
 		}
 	});
 var _user$project$Workflows_GtdActionLists$update = F3(
 	function (msg, store, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
+		var _p4 = msg;
+		switch (_p4.ctor) {
 			case 'UpdateNewActionDescription':
 				return {
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{newActionDescription: _p3._0}),
+						{newActionDescription: _p4._0}),
 					_1: store,
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
@@ -14706,7 +14714,7 @@ var _user$project$Workflows_GtdActionLists$update = F3(
 					ctor: '_Tuple3',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{selectedContext: _p3._0}),
+						{selectedContext: _p4._0}),
 					_1: store,
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
@@ -14714,18 +14722,18 @@ var _user$project$Workflows_GtdActionLists$update = F3(
 				return {
 					ctor: '_Tuple3',
 					_0: model,
-					_1: A2(_user$project$ProgrissStore$checkOffAction, _p3._0, store),
+					_1: A2(_user$project$ProgrissStore$checkOffAction, _p4._0, store),
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
-				var _p4 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, store);
-				var actionId = _p4._0;
-				var storeWithNewAction = _p4._1;
+				var _p5 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, store);
+				var actionId = _p5._0;
+				var storeWithNewAction = _p5._1;
 				var updatedStore = function () {
-					var _p5 = model.selectedContext;
-					switch (_p5.ctor) {
+					var _p6 = model.selectedContext;
+					switch (_p6.ctor) {
 						case 'SpecificContext':
-							return A3(_user$project$ProgrissStore$associateActionToContext, actionId, _p5._0, storeWithNewAction);
+							return A3(_user$project$ProgrissStore$associateActionToContext, actionId, _p6._0, storeWithNewAction);
 						case 'AllContexts':
 							return storeWithNewAction;
 						default:
@@ -14789,7 +14797,7 @@ var _user$project$Workflows_GtdActionLists$actionCard = function (action) {
 										_rundis$elm_bootstrap$Bootstrap_Button$button,
 										{
 											ctor: '::',
-											_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+											_0: _user$project$Workflows_GtdActionLists$buttonColorForActionState(action.state),
 											_1: {
 												ctor: '::',
 												_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
@@ -14994,7 +15002,15 @@ var _user$project$Workflows_GtdActionLists$view = F2(
 											ctor: '::',
 											_0: A2(
 												_rundis$elm_bootstrap$Bootstrap_Form$form,
-												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onSubmit(_user$project$Workflows_GtdActionLists$CreateNewAction),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$action('javascript:void(0);'),
+														_1: {ctor: '[]'}
+													}
+												},
 												{
 													ctor: '::',
 													_0: _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$view(
@@ -15010,11 +15026,7 @@ var _user$project$Workflows_GtdActionLists$view = F2(
 																		_1: {
 																			ctor: '::',
 																			_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
-																				{
-																					ctor: '::',
-																					_0: _elm_lang$html$Html_Events$onClick(_user$project$Workflows_GtdActionLists$CreateNewAction),
-																					_1: {ctor: '[]'}
-																				}),
+																				{ctor: '[]'}),
 																			_1: {ctor: '[]'}
 																		}
 																	},
@@ -15398,7 +15410,15 @@ var _user$project$Workflows_SimpleTodos$view = F2(
 										ctor: '::',
 										_0: A2(
 											_rundis$elm_bootstrap$Bootstrap_Form$form,
-											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onSubmit(_user$project$Workflows_SimpleTodos$CreateNewAction),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$action('javascript:void(0);'),
+													_1: {ctor: '[]'}
+												}
+											},
 											{
 												ctor: '::',
 												_0: _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$view(
@@ -15414,11 +15434,7 @@ var _user$project$Workflows_SimpleTodos$view = F2(
 																	_1: {
 																		ctor: '::',
 																		_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
-																			{
-																				ctor: '::',
-																				_0: _elm_lang$html$Html_Events$onClick(_user$project$Workflows_SimpleTodos$CreateNewAction),
-																				_1: {ctor: '[]'}
-																			}),
+																			{ctor: '[]'}),
 																		_1: {ctor: '[]'}
 																	}
 																},

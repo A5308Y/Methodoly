@@ -11,7 +11,7 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
 import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (href)
+import Html.Attributes exposing (action, href)
 import Html.Events exposing (onClick)
 import ProgrissStore as Store exposing (Action, ActionId, ActionState(..), Context, ContextId, ProgrissStore)
 
@@ -82,7 +82,7 @@ view store model =
             , Grid.col []
                 [ renderActions (actionsToRender store model.selectedContext)
                 , hr [] []
-                , Form.form []
+                , Form.form [ Html.Events.onSubmit CreateNewAction, action "javascript:void(0);" ]
                     [ InputGroup.config
                         (InputGroup.text
                             [ Input.placeholder "Type action description here"
@@ -94,7 +94,7 @@ view store model =
                         )
                         |> InputGroup.successors
                             [ InputGroup.button
-                                [ Button.secondary, Button.attrs [ onClick CreateNewAction ] ]
+                                [ Button.secondary, Button.attrs [] ]
                                 [ text "Create Action" ]
                             ]
                         |> InputGroup.view
@@ -166,7 +166,7 @@ actionCard action =
                 (Grid.row [ Row.middleXs ]
                     [ Grid.col [ Col.xs2, Col.md1 ]
                         [ Button.button
-                            [ Button.primary
+                            [ buttonColorForActionState action.state
                             , Button.attrs
                                 [ Html.Events.onClick (CheckOffAction action.id)
                                 , Html.Attributes.class "bmd-btn-fab bmd-btn-fab-sm"
@@ -181,6 +181,16 @@ actionCard action =
                 )
             ]
         |> Card.view
+
+
+buttonColorForActionState : ActionState -> Button.Option Msg
+buttonColorForActionState state =
+    case state of
+        Done time ->
+            Button.success
+
+        _ ->
+            Button.primary
 
 
 iconForActionState : ActionState -> String
