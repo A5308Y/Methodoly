@@ -11,27 +11,6 @@
 		    <link rel="stylesheet" href="https://unpkg.com/bootstrap-material-design@4.1.1/dist/css/bootstrap-material-design.min.css" integrity="sha384-wXznGJNEXNG1NFsbm0ugrLFMQPWswR3lds2VeinahP8N0zJw9VWSopbjv2x7WCvX" crossorigin="anonymous">
     </head>
     <body>
-        <script>var app = Elm.Main.fullscreen();</script>
-        <script>
-					const storage = window.localStorage || {
-					  setItem(key, value) {
-					    this[key] = value;
-					  },
-					  getItem(key) {
-					    return this[key];
-					  }
-					};
-			    var storageKey = "progrissStore";
-
-			    app.ports.persistStore.subscribe(function(value) {
-			      localStorage.setItem(storageKey, value);
-			    });
-
-			    app.ports.triggerStoreLoad.subscribe(function() {
-			      if (localStorage.getItem(storageKey) != null) {
-			        app.ports.loadStore.send(localStorage.getItem(storageKey));
-			      };
-			    });
-        </script>
+        <script async src="app.js"></script>
     </body>
 </html>
