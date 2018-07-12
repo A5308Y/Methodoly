@@ -1,0 +1,14 @@
+Compile the app with `elm-make Main.elm --output main.js`
+
+We use fezvrasta.github.io/bootstrap-material-design/docs/4.0 to allow
+a material design look while using elm-bootstrap to have typesafe styling I can
+understand. This means we're not getting to use everything. For example
+condensed list groups are hard because elm-boostrap does not allow a custom
+class for list groups, but that would be necessary for a condensed list group.
+
+To compile the stylesheets run `npm run build:css` in the bootstrap folder and
+copy the resulting file from bootstrap/dist/css to the file imported in
+index.html.
+
+Use material.io/tools/icons to explore icons of the robot font that can be used
+easily in the app.
