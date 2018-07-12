@@ -7,11 +7,13 @@ import Bootstrap.Form as Form
 import Bootstrap.Form.Input as Input
 import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
-import Html exposing (..)
+import Html exposing (Html, div, hr, i, text)
 import Html.Attributes exposing (href)
-import Html.Events exposing (..)
-import ProgrissStore as Store exposing (Action, Context, ContextId, ProgrissStore, Project, ProjectId)
+import Html.Events exposing (onClick)
+import ProgrissStore as Store exposing (Action, ActionId, ActionState(..), Context, ContextId, ProgrissStore)
 
 
 type SelectedContext
@@ -24,6 +26,7 @@ type Msg
     = ChangeContext SelectedContext
     | UpdateNewActionDescription String
     | CreateNewAction
+    | CheckOffAction ActionId
 
 
 type alias Model =
@@ -47,6 +50,9 @@ update msg store model =
 
         ChangeContext selectedContext ->
             ( { model | selectedContext = selectedContext }, store, Cmd.none )
+
+        CheckOffAction actionId ->
+            ( model, Store.checkOffAction actionId store, Cmd.none )
 
         CreateNewAction ->
             let
@@ -72,7 +78,7 @@ view : ProgrissStore -> Model -> Html Msg
 view store model =
     Grid.container []
         [ Grid.row []
-            [ Grid.col [] [ renderContextMenu store model.selectedContext ]
+            [ Grid.col [ Col.xs3 ] [ renderContextMenu store model.selectedContext ]
             , Grid.col []
                 [ renderActions (actionsToRender store model.selectedContext)
                 , hr [] []
@@ -154,6 +160,44 @@ renderActions actions =
 
 actionCard : Action -> Html Msg
 actionCard action =
-    Card.config []
-        |> Card.block [] [ Block.text [] [ text action.description ] ]
+    Card.config (cardConfigForAction action)
+        |> Card.block []
+            [ Block.custom
+                (Grid.row [ Row.middleXs ]
+                    [ Grid.col [ Col.xs2, Col.md1 ]
+                        [ Button.button
+                            [ Button.primary
+                            , Button.attrs
+                                [ Html.Events.onClick (CheckOffAction action.id)
+                                , Html.Attributes.class "bmd-btn-fab bmd-btn-fab-sm"
+                                ]
+                            ]
+                            [ i [ Html.Attributes.class "material-icons" ]
+                                [ text (iconForActionState action.state) ]
+                            ]
+                        ]
+                    , Grid.col [] [ text action.description ]
+                    ]
+                )
+            ]
         |> Card.view
+
+
+iconForActionState : ActionState -> String
+iconForActionState state =
+    case state of
+        Done time ->
+            "done"
+
+        _ ->
+            "check_box_outline_blank"
+
+
+cardConfigForAction : Action -> List (Card.Option msg)
+cardConfigForAction action =
+    case action.state of
+        Done time ->
+            [ Card.light ]
+
+        _ ->
+            []

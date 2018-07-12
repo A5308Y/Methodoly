@@ -1,6 +1,8 @@
 module ProgrissStore
     exposing
         ( Action
+        , ActionId
+        , ActionState(..)
         , Context
         , ContextId
         , ProgrissStore
@@ -8,6 +10,7 @@ module ProgrissStore
         , ProjectId
         , associateActionToContext
         , associateActionToProject
+        , checkOffAction
         , createAction
         , createContext
         , createProject
@@ -31,6 +34,7 @@ import Dict exposing (Dict)
 import Json.Decode exposing (Decoder, float, int, nullable, string)
 import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required)
 import Json.Encode
+import Time exposing (Time)
 
 
 type ProgrissStore
@@ -46,7 +50,7 @@ type alias Store =
 
 
 type alias ActionData =
-    { description : String, contextId : Maybe Int, projectId : Maybe Int }
+    { description : String, contextId : Maybe Int, projectId : Maybe Int, state : ActionState }
 
 
 type alias ProjectData =
@@ -67,7 +71,7 @@ type alias NoteData =
 
 
 type alias Action =
-    { id : ActionId, description : String }
+    { id : ActionId, description : String, state : ActionState }
 
 
 type alias Project =
@@ -84,6 +88,12 @@ type alias Note =
 
 type ActionId
     = ActionId Int
+
+
+type ActionState
+    = Active
+    | Done Time
+    | Deleted Time
 
 
 type ContextId
@@ -114,7 +124,7 @@ createAction description (ProgrissStore store) =
         updatedActions =
             Dict.insert
                 (getNextFreeId store.actions)
-                (ActionData description Nothing Nothing)
+                (ActionData description Nothing Nothing Active)
                 store.actions
     in
     ( ActionId (getNextFreeId store.actions)
@@ -157,10 +167,29 @@ updateAction action (ProgrissStore store) =
                 updatedActions =
                     Dict.update
                         actionId
-                        (Maybe.map (\actionData -> { actionData | description = action.description }))
+                        (Maybe.map
+                            (\actionData ->
+                                { actionData
+                                    | description = action.description
+                                    , state = action.state
+                                }
+                            )
+                        )
                         store.actions
             in
             ProgrissStore { store | actions = updatedActions }
+
+
+checkOffAction : ActionId -> ProgrissStore -> ProgrissStore
+checkOffAction (ActionId actionId) (ProgrissStore store) =
+    let
+        updatedActions =
+            Dict.update
+                actionId
+                (Maybe.map (\actionData -> { actionData | state = Done 0 }))
+                store.actions
+    in
+    ProgrissStore { store | actions = updatedActions }
 
 
 associateActionToContext : ActionId -> ContextId -> ProgrissStore -> ProgrissStore
@@ -261,7 +290,7 @@ getAllProjects (ProgrissStore store) =
 
 castActionDataToAction : ( Int, ActionData ) -> Action
 castActionDataToAction ( id, actionData ) =
-    Action (ActionId id) actionData.description
+    Action (ActionId id) actionData.description actionData.state
 
 
 castProjectDataToProject : ( Int, ProjectData ) -> Project
@@ -305,6 +334,8 @@ actionDecoder =
         |> required "description" string
         |> optional "context_id" (nullable int) Nothing
         |> optional "project_id" (nullable int) Nothing
+        |> optional "finished_at" (nullable float) Nothing
+        |> optional "deleted_at" (nullable float) Nothing
 
 
 noteDecoder : Decoder ( Int, NoteData )
@@ -329,9 +360,23 @@ contextDecoder =
         |> required "name" string
 
 
-actionDataConstructor : Int -> String -> Maybe Int -> Maybe Int -> ( Int, ActionData )
-actionDataConstructor id description maybeContextId maybeProjectId =
-    ( id, ActionData description maybeContextId maybeProjectId )
+actionDataConstructor : Int -> String -> Maybe Int -> Maybe Int -> Maybe Time -> Maybe Time -> ( Int, ActionData )
+actionDataConstructor id description maybeContextId maybeProjectId finishedAt deletedAt =
+    let
+        state =
+            case deletedAt of
+                Nothing ->
+                    case finishedAt of
+                        Nothing ->
+                            Active
+
+                        Just time ->
+                            Done time
+
+                Just time ->
+                    Deleted time
+    in
+    ( id, ActionData description maybeContextId maybeProjectId state )
 
 
 contextDataConstructor : Int -> String -> ( Int, ContextData )
@@ -383,6 +428,22 @@ encodeAction ( id, actionData ) =
 
                 Just projectId ->
                     Json.Encode.int projectId
+          )
+        , ( "deleted_at"
+          , case actionData.state of
+                Deleted time ->
+                    Json.Encode.float time
+
+                _ ->
+                    Json.Encode.null
+          )
+        , ( "finished_at"
+          , case actionData.state of
+                Done time ->
+                    Json.Encode.float time
+
+                _ ->
+                    Json.Encode.null
           )
         ]
 

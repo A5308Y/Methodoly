@@ -5,7 +5,7 @@ import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as ListGroup
-import Html exposing (..)
+import Html exposing (Html, i, li, text, ul)
 import Html.Attributes exposing (href)
 import ListHelper
 import ProgrissStore as Store exposing (ProgrissStore, Project, ProjectId)

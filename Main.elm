@@ -1,22 +1,12 @@
 port module Main exposing (..)
 
 import Bootstrap.Button as Button
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, div, hr, i, text)
+import Html.Attributes exposing (href)
+import Html.Events exposing (onClick)
 import Json.Decode
 import Json.Encode
-import ProgrissStore as Store
-    exposing
-        ( Action
-        , Context
-        , ContextId
-        , ProgrissStore
-        , Project
-        , ProjectId
-        , decoder
-        , empty
-        )
+import ProgrissStore as Store exposing (ProgrissStore)
 import Workflows.GtdActionLists
 import Workflows.ProjectCardOverview
 import Workflows.SimpleTodos
@@ -177,14 +167,3 @@ renderWorkflow model =
                 ProjectCardOverviewMsg
                 (Workflows.ProjectCardOverview.view model.store model.projectCardOverviewModel)
             ]
-
-
-
--- Click on project card to see project in full width
--- Tests for interactive elements
--- Creating contexts in the interface
--- Creating projects in the interface
--- DoneState = Done Int (Completed At)| Active | SomedayMaybe Int (Resubmit At) | Deleted Int (Deleted At) for Projects
--- DoneState = Done Int (Completed At)| Active | Deleted Int (Deleted At) for Actions
--- Store the DoneState in the record. I thought about calculating the state from stored Events int the Graph, but that doesn't seem a good idea, because the data structure allows me to store two DoneAt events for a single Action. What would this mean?
--- Benchmark to see if the store is fast

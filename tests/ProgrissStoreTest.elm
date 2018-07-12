@@ -2,8 +2,8 @@ module ProgrissStoreTest exposing (..)
 
 import Expect exposing (Expectation)
 import Json.Decode
-import ProgrissStore exposing (Action, ProgrissStore)
-import Test exposing (..)
+import ProgrissStore exposing (Action, ActionState(Active, Done), ProgrissStore)
+import Test exposing (Test, describe, test)
 
 
 suite : Test
@@ -19,18 +19,18 @@ suite =
                         , "Call Florist about Mom's favourite flowers"
                         ]
             ]
-        , describe "ProgrissStore.getAllActionsWithoutContext"
+        , describe "ProgrissStore.getActionsWithoutContext"
             [ test "returns all actions in the store" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getAllActionsWithoutContext fixtureStore |> List.map .description)
+                        (ProgrissStore.getActionsWithoutContext fixtureStore |> List.map .description)
                         [ "Call architect about garden" ]
             ]
-        , describe "ProgrissStore.getAllActionsWithoutProject"
+        , describe "ProgrissStore.getActionsWithoutProject"
             [ test "returns all actions in the store" <|
                 \_ ->
                     Expect.equal
-                        (ProgrissStore.getAllActionsWithoutProject fixtureStore |> List.map .description)
+                        (ProgrissStore.getActionsWithoutProject fixtureStore |> List.map .description)
                         [ "Buy cat food" ]
             ]
         , describe "ProgrissStore.getAllContexts"
@@ -70,7 +70,7 @@ suite =
             [ test "returns Nothing if the Action is not associated to a Context" <|
                 \_ ->
                     let
-                        populatedStore =
+                        ( actionId, populatedStore ) =
                             ProgrissStore.empty
                                 |> ProgrissStore.createAction "Call Electrician"
                     in
@@ -106,7 +106,7 @@ suite =
             [ test "returns Nothing if the Action is not associated to a project" <|
                 \_ ->
                     let
-                        populatedStore =
+                        ( actionId, populatedStore ) =
                             ProgrissStore.empty
                                 |> ProgrissStore.createAction "Call Electrician"
                     in
@@ -145,10 +145,15 @@ suite =
         , describe "ProgrissStore.createAction"
             [ test "returns a new store with the newly created action" <|
                 \_ ->
+                    let
+                        ( firstActionId, storeWithOneAction ) =
+                            ProgrissStore.createAction "Call Electrician" ProgrissStore.empty
+
+                        ( secondActionId, storeWithTwoActions ) =
+                            ProgrissStore.createAction "Call Sam" storeWithOneAction
+                    in
                     Expect.equal
-                        (ProgrissStore.empty
-                            |> ProgrissStore.createAction "Call Electrician"
-                            |> ProgrissStore.createAction "Call Sam"
+                        (storeWithTwoActions
                             |> ProgrissStore.getAllActions
                             |> List.map .description
                         )
@@ -158,10 +163,10 @@ suite =
             [ test "returns a new store with the newly associated action" <|
                 \_ ->
                     let
-                        populatedStore =
+                        ( actionId, populatedStore ) =
                             ProgrissStore.empty
-                                |> ProgrissStore.createAction "Call Electrician"
                                 |> ProgrissStore.createContext "Calls"
+                                |> ProgrissStore.createAction "Call Electrician"
 
                         firstAction =
                             List.head (ProgrissStore.getAllActions populatedStore)
@@ -187,10 +192,10 @@ suite =
             [ test "returns a new store with the newly associated action" <|
                 \_ ->
                     let
-                        populatedStore =
+                        ( actionId, populatedStore ) =
                             ProgrissStore.empty
-                                |> ProgrissStore.createAction "Call Electrician"
                                 |> ProgrissStore.createProject "Renovate House"
+                                |> ProgrissStore.createAction "Call Electrician"
 
                         firstAction =
                             List.head (ProgrissStore.getAllActions populatedStore)
@@ -223,7 +228,7 @@ suite =
                         (Maybe.map
                             (\action ->
                                 fixtureStore
-                                    |> ProgrissStore.updateAction (Action action.id "Call architect about possible garden path layouts")
+                                    |> ProgrissStore.updateAction (Action action.id "Call architect about possible garden path layouts" Active)
                                     |> ProgrissStore.getAllActions
                                     |> List.map .description
                             )
@@ -233,6 +238,52 @@ suite =
                             [ "Call architect about possible garden path layouts"
                             , "Buy cat food"
                             , "Call Florist about Mom's favourite flowers"
+                            ]
+                        )
+            , test "returns a new store with the action marked as done, if called with a state of Done" <|
+                \_ ->
+                    let
+                        firstAction =
+                            List.head (ProgrissStore.getAllActions fixtureStore)
+                    in
+                    Expect.equal
+                        (Maybe.map
+                            (\action ->
+                                fixtureStore
+                                    |> ProgrissStore.updateAction (Action action.id "Call architect about garden" (Done 0))
+                                    |> ProgrissStore.getAllActions
+                                    |> List.map (\action -> ( action.description, action.state ))
+                            )
+                            firstAction
+                        )
+                        (Just
+                            [ ( "Call architect about garden", Done 0 )
+                            , ( "Buy cat food", Active )
+                            , ( "Call Florist about Mom's favourite flowers", Active )
+                            ]
+                        )
+            ]
+        , describe "ProgrissStore.checkOffAction"
+            [ test "returns a new store with the action marked as done" <|
+                \_ ->
+                    let
+                        firstAction =
+                            List.head (ProgrissStore.getAllActions fixtureStore)
+                    in
+                    Expect.equal
+                        (Maybe.map
+                            (\action ->
+                                fixtureStore
+                                    |> ProgrissStore.checkOffAction action.id
+                                    |> ProgrissStore.getAllActions
+                                    |> List.map (\action -> ( action.description, action.state ))
+                            )
+                            firstAction
+                        )
+                        (Just
+                            [ ( "Call architect about garden", Done 0 )
+                            , ( "Buy cat food", Active )
+                            , ( "Call Florist about Mom's favourite flowers", Active )
                             ]
                         )
             ]
