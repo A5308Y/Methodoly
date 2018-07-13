@@ -10,7 +10,6 @@ module ProgrissStore
         , ProjectId
         , associateActionToContext
         , associateActionToProject
-        , checkOffAction
         , createAction
         , createContext
         , createProject
@@ -27,6 +26,7 @@ module ProgrissStore
         , getContextForAction
         , getNotesForProject
         , getProjectForAction
+        , toggleActionDone
         , updateAction
         )
 
@@ -180,16 +180,33 @@ updateAction action (ProgrissStore store) =
             ProgrissStore { store | actions = updatedActions }
 
 
-checkOffAction : ActionId -> ProgrissStore -> ProgrissStore
-checkOffAction (ActionId actionId) (ProgrissStore store) =
+toggleActionDone : ActionId -> ProgrissStore -> ProgrissStore
+toggleActionDone (ActionId actionId) (ProgrissStore store) =
     let
         updatedActions =
             Dict.update
                 actionId
-                (Maybe.map (\actionData -> { actionData | state = Done 0 }))
+                (Maybe.map actionsStateAfterToggle)
                 store.actions
     in
     ProgrissStore { store | actions = updatedActions }
+
+
+actionsStateAfterToggle : ActionData -> ActionData
+actionsStateAfterToggle actionData =
+    let
+        updatedState =
+            case actionData.state of
+                Done time ->
+                    Active
+
+                Active ->
+                    Done 0
+
+                Deleted time ->
+                    Deleted time
+    in
+    { actionData | state = updatedState }
 
 
 associateActionToContext : ActionId -> ContextId -> ProgrissStore -> ProgrissStore

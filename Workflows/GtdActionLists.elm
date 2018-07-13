@@ -26,7 +26,7 @@ type Msg
     = ChangeContext SelectedContext
     | UpdateNewActionDescription String
     | CreateNewAction
-    | CheckOffAction ActionId
+    | ToggleActionDone ActionId
 
 
 type alias Model =
@@ -51,8 +51,8 @@ update msg store model =
         ChangeContext selectedContext ->
             ( { model | selectedContext = selectedContext }, store, Cmd.none )
 
-        CheckOffAction actionId ->
-            ( model, Store.checkOffAction actionId store, Cmd.none )
+        ToggleActionDone actionId ->
+            ( model, Store.toggleActionDone actionId store, Cmd.none )
 
         CreateNewAction ->
             let
@@ -168,7 +168,7 @@ actionCard action =
                         [ Button.button
                             [ buttonColorForActionState action.state
                             , Button.attrs
-                                [ Html.Events.onClick (CheckOffAction action.id)
+                                [ Html.Events.onClick (ToggleActionDone action.id)
                                 , Html.Attributes.class "bmd-btn-fab bmd-btn-fab-sm"
                                 ]
                             ]

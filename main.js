@@ -14433,61 +14433,70 @@ var _user$project$ProgrissStore$Deleted = function (a) {
 var _user$project$ProgrissStore$Done = function (a) {
 	return {ctor: 'Done', _0: a};
 };
-var _user$project$ProgrissStore$checkOffAction = F2(
-	function (_p63, _p62) {
-		var _p64 = _p63;
-		var _p65 = _p62;
-		var _p66 = _p65._0;
-		var updatedActions = A3(
-			_elm_lang$core$Dict$update,
-			_p64._0,
-			_elm_lang$core$Maybe$map(
-				function (actionData) {
-					return _elm_lang$core$Native_Utils.update(
-						actionData,
-						{
-							state: _user$project$ProgrissStore$Done(0)
-						});
-				}),
-			_p66.actions);
-		return _user$project$ProgrissStore$ProgrissStore(
-			_elm_lang$core$Native_Utils.update(
-				_p66,
-				{actions: updatedActions}));
-	});
 var _user$project$ProgrissStore$Active = {ctor: 'Active'};
 var _user$project$ProgrissStore$createAction = F2(
-	function (description, _p67) {
-		var _p68 = _p67;
-		var _p69 = _p68._0;
+	function (description, _p62) {
+		var _p63 = _p62;
+		var _p64 = _p63._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p69.actions),
+			_user$project$ProgrissStore$getNextFreeId(_p64.actions),
 			A4(_user$project$ProgrissStore$ActionData, description, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _user$project$ProgrissStore$Active),
-			_p69.actions);
+			_p64.actions);
 		return {
 			ctor: '_Tuple2',
 			_0: _user$project$ProgrissStore$ActionId(
-				_user$project$ProgrissStore$getNextFreeId(_p69.actions)),
+				_user$project$ProgrissStore$getNextFreeId(_p64.actions)),
 			_1: _user$project$ProgrissStore$ProgrissStore(
 				_elm_lang$core$Native_Utils.update(
-					_p69,
+					_p64,
 					{actions: updatedActions}))
 		};
+	});
+var _user$project$ProgrissStore$actionsStateAfterToggle = function (actionData) {
+	var updatedState = function () {
+		var _p65 = actionData.state;
+		switch (_p65.ctor) {
+			case 'Done':
+				return _user$project$ProgrissStore$Active;
+			case 'Active':
+				return _user$project$ProgrissStore$Done(0);
+			default:
+				return _user$project$ProgrissStore$Deleted(_p65._0);
+		}
+	}();
+	return _elm_lang$core$Native_Utils.update(
+		actionData,
+		{state: updatedState});
+};
+var _user$project$ProgrissStore$toggleActionDone = F2(
+	function (_p67, _p66) {
+		var _p68 = _p67;
+		var _p69 = _p66;
+		var _p70 = _p69._0;
+		var updatedActions = A3(
+			_elm_lang$core$Dict$update,
+			_p68._0,
+			_elm_lang$core$Maybe$map(_user$project$ProgrissStore$actionsStateAfterToggle),
+			_p70.actions);
+		return _user$project$ProgrissStore$ProgrissStore(
+			_elm_lang$core$Native_Utils.update(
+				_p70,
+				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$actionDataConstructor = F6(
 	function (id, description, maybeContextId, maybeProjectId, finishedAt, deletedAt) {
 		var state = function () {
-			var _p70 = deletedAt;
-			if (_p70.ctor === 'Nothing') {
-				var _p71 = finishedAt;
-				if (_p71.ctor === 'Nothing') {
+			var _p71 = deletedAt;
+			if (_p71.ctor === 'Nothing') {
+				var _p72 = finishedAt;
+				if (_p72.ctor === 'Nothing') {
 					return _user$project$ProgrissStore$Active;
 				} else {
-					return _user$project$ProgrissStore$Done(_p71._0);
+					return _user$project$ProgrissStore$Done(_p72._0);
 				}
 			} else {
-				return _user$project$ProgrissStore$Deleted(_p70._0);
+				return _user$project$ProgrissStore$Deleted(_p71._0);
 			}
 		}();
 		return {
@@ -14549,18 +14558,18 @@ var _user$project$ProgrissStore$decoder = A4(
 var _user$project$ProgrissStore$ContextId = function (a) {
 	return {ctor: 'ContextId', _0: a};
 };
-var _user$project$ProgrissStore$castContextDataToContext = function (_p72) {
-	var _p73 = _p72;
+var _user$project$ProgrissStore$castContextDataToContext = function (_p73) {
+	var _p74 = _p73;
 	return A2(
 		_user$project$ProgrissStore$Context,
-		_user$project$ProgrissStore$ContextId(_p73._0),
-		_p73._1.name);
+		_user$project$ProgrissStore$ContextId(_p74._0),
+		_p74._1.name);
 };
 var _user$project$ProgrissStore$getContextForAction = F2(
-	function (_p75, _p74) {
-		var _p76 = _p75;
-		var _p77 = _p74;
-		var _p78 = _p77._0;
+	function (_p76, _p75) {
+		var _p77 = _p76;
+		var _p78 = _p75;
+		var _p79 = _p78._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castContextDataToContext,
@@ -14572,37 +14581,37 @@ var _user$project$ProgrissStore$getContextForAction = F2(
 						function (context) {
 							return {ctor: '_Tuple2', _0: contextId, _1: context};
 						},
-						A2(_elm_lang$core$Dict$get, contextId, _p78.contexts));
+						A2(_elm_lang$core$Dict$get, contextId, _p79.contexts));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.contextId;
 					},
-					A2(_elm_lang$core$Dict$get, _p76._0, _p78.actions))));
+					A2(_elm_lang$core$Dict$get, _p77._0, _p79.actions))));
 	});
-var _user$project$ProgrissStore$getAllContexts = function (_p79) {
-	var _p80 = _p79;
+var _user$project$ProgrissStore$getAllContexts = function (_p80) {
+	var _p81 = _p80;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castContextDataToContext,
-		_elm_lang$core$Dict$toList(_p80._0.contexts));
+		_elm_lang$core$Dict$toList(_p81._0.contexts));
 };
 var _user$project$ProgrissStore$ProjectId = function (a) {
 	return {ctor: 'ProjectId', _0: a};
 };
-var _user$project$ProgrissStore$castProjectDataToProject = function (_p81) {
-	var _p82 = _p81;
+var _user$project$ProgrissStore$castProjectDataToProject = function (_p82) {
+	var _p83 = _p82;
 	return A2(
 		_user$project$ProgrissStore$Project,
-		_user$project$ProgrissStore$ProjectId(_p82._0),
-		_p82._1.title);
+		_user$project$ProgrissStore$ProjectId(_p83._0),
+		_p83._1.title);
 };
 var _user$project$ProgrissStore$getProjectForAction = F2(
-	function (_p84, _p83) {
-		var _p85 = _p84;
-		var _p86 = _p83;
-		var _p87 = _p86._0;
+	function (_p85, _p84) {
+		var _p86 = _p85;
+		var _p87 = _p84;
+		var _p88 = _p87._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castProjectDataToProject,
@@ -14614,46 +14623,46 @@ var _user$project$ProgrissStore$getProjectForAction = F2(
 						function (project) {
 							return {ctor: '_Tuple2', _0: projectId, _1: project};
 						},
-						A2(_elm_lang$core$Dict$get, projectId, _p87.projects));
+						A2(_elm_lang$core$Dict$get, projectId, _p88.projects));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.projectId;
 					},
-					A2(_elm_lang$core$Dict$get, _p85._0, _p87.actions))));
+					A2(_elm_lang$core$Dict$get, _p86._0, _p88.actions))));
 	});
-var _user$project$ProgrissStore$getAllProjects = function (_p88) {
-	var _p89 = _p88;
+var _user$project$ProgrissStore$getAllProjects = function (_p89) {
+	var _p90 = _p89;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castProjectDataToProject,
-		_elm_lang$core$Dict$toList(_p89._0.projects));
+		_elm_lang$core$Dict$toList(_p90._0.projects));
 };
 var _user$project$ProgrissStore$NoteId = function (a) {
 	return {ctor: 'NoteId', _0: a};
 };
-var _user$project$ProgrissStore$castNoteDataToNote = function (_p90) {
-	var _p91 = _p90;
+var _user$project$ProgrissStore$castNoteDataToNote = function (_p91) {
+	var _p92 = _p91;
 	return A2(
 		_user$project$ProgrissStore$Note,
-		_user$project$ProgrissStore$NoteId(_p91._0),
-		_p91._1.body);
+		_user$project$ProgrissStore$NoteId(_p92._0),
+		_p92._1.body);
 };
 var _user$project$ProgrissStore$getNotesForProject = F2(
-	function (_p93, _p92) {
-		var _p94 = _p93;
-		var _p95 = _p92;
+	function (_p94, _p93) {
+		var _p95 = _p94;
+		var _p96 = _p93;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castNoteDataToNote,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p96) {
-					var _p97 = _p96;
-					return _elm_lang$core$Native_Utils.eq(_p97._1.projectId, _p94._0);
+				function (_p97) {
+					var _p98 = _p97;
+					return _elm_lang$core$Native_Utils.eq(_p98._1.projectId, _p95._0);
 				},
-				_elm_lang$core$Dict$toList(_p95._0.notes)));
+				_elm_lang$core$Dict$toList(_p96._0.notes)));
 	});
 
 var _user$project$Workflows_GtdActionLists$cardConfigForAction = function (action) {
@@ -14718,11 +14727,11 @@ var _user$project$Workflows_GtdActionLists$update = F3(
 					_1: store,
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'CheckOffAction':
+			case 'ToggleActionDone':
 				return {
 					ctor: '_Tuple3',
 					_0: model,
-					_1: A2(_user$project$ProgrissStore$checkOffAction, _p4._0, store),
+					_1: A2(_user$project$ProgrissStore$toggleActionDone, _p4._0, store),
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -14760,8 +14769,8 @@ var _user$project$Workflows_GtdActionLists$SpecificContext = function (a) {
 };
 var _user$project$Workflows_GtdActionLists$AnywhereContext = {ctor: 'AnywhereContext'};
 var _user$project$Workflows_GtdActionLists$initialModel = {selectedContext: _user$project$Workflows_GtdActionLists$AnywhereContext, newActionDescription: ''};
-var _user$project$Workflows_GtdActionLists$CheckOffAction = function (a) {
-	return {ctor: 'CheckOffAction', _0: a};
+var _user$project$Workflows_GtdActionLists$ToggleActionDone = function (a) {
+	return {ctor: 'ToggleActionDone', _0: a};
 };
 var _user$project$Workflows_GtdActionLists$actionCard = function (action) {
 	return _rundis$elm_bootstrap$Bootstrap_Card$view(
@@ -14804,7 +14813,7 @@ var _user$project$Workflows_GtdActionLists$actionCard = function (action) {
 													{
 														ctor: '::',
 														_0: _elm_lang$html$Html_Events$onClick(
-															_user$project$Workflows_GtdActionLists$CheckOffAction(action.id)),
+															_user$project$Workflows_GtdActionLists$ToggleActionDone(action.id)),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab bmd-btn-fab-sm'),
@@ -15266,7 +15275,7 @@ var _user$project$Workflows_SimpleTodos$update = F3(
 				return {
 					ctor: '_Tuple3',
 					_0: model,
-					_1: A2(_user$project$ProgrissStore$checkOffAction, _p3._0, store),
+					_1: A2(_user$project$ProgrissStore$toggleActionDone, _p3._0, store),
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
 		}
@@ -15275,8 +15284,8 @@ var _user$project$Workflows_SimpleTodos$initialModel = {newActionDescription: ''
 var _user$project$Workflows_SimpleTodos$Model = function (a) {
 	return {newActionDescription: a};
 };
-var _user$project$Workflows_SimpleTodos$CheckOffAction = function (a) {
-	return {ctor: 'CheckOffAction', _0: a};
+var _user$project$Workflows_SimpleTodos$ToggleActionDone = function (a) {
+	return {ctor: 'ToggleActionDone', _0: a};
 };
 var _user$project$Workflows_SimpleTodos$actionCard = function (action) {
 	return _rundis$elm_bootstrap$Bootstrap_Card$view(
@@ -15319,7 +15328,7 @@ var _user$project$Workflows_SimpleTodos$actionCard = function (action) {
 													{
 														ctor: '::',
 														_0: _elm_lang$html$Html_Events$onClick(
-															_user$project$Workflows_SimpleTodos$CheckOffAction(action.id)),
+															_user$project$Workflows_SimpleTodos$ToggleActionDone(action.id)),
 														_1: {
 															ctor: '::',
 															_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab bmd-btn-fab-sm'),

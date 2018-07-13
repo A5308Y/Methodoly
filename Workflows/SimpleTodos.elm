@@ -18,7 +18,7 @@ import ProgrissStore as Store exposing (Action, ActionId, ActionState(Done), Pro
 type Msg
     = UpdateNewActionDescription String
     | CreateNewAction
-    | CheckOffAction ActionId
+    | ToggleActionDone ActionId
 
 
 type alias Model =
@@ -44,8 +44,8 @@ update msg store model =
             in
             ( { model | newActionDescription = "" }, updatedStore, Cmd.none )
 
-        CheckOffAction actionId ->
-            ( model, Store.checkOffAction actionId store, Cmd.none )
+        ToggleActionDone actionId ->
+            ( model, Store.toggleActionDone actionId store, Cmd.none )
 
 
 view : ProgrissStore -> Model -> Html Msg
@@ -92,7 +92,7 @@ actionCard action =
                         [ Button.button
                             [ buttonColorForActionState action.state
                             , Button.attrs
-                                [ Html.Events.onClick (CheckOffAction action.id)
+                                [ Html.Events.onClick (ToggleActionDone action.id)
                                 , Html.Attributes.class "bmd-btn-fab bmd-btn-fab-sm"
                                 ]
                             ]
