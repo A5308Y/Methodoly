@@ -258,6 +258,21 @@ associateActionToProject (ActionId actionId) (ProjectId projectId) (ProgrissStor
     ProgrissStore { store | actions = updatedActions }
 
 
+updateSettingsForWorkflow : WorkflowSettings -> ProgrissStore -> ProgrissStore
+updateSettingsForWorkflow workflowSettings (ProgrissStore store) =
+    let
+        settings =
+            store.settings
+    in
+    case workflowSettings of
+        ProjectOverviewSettingsItem projectOverviewSettings ->
+            let
+                updatedSettings =
+                    { settings | projectOverviewSettings = projectOverviewSettings }
+            in
+            ProgrissStore { store | settings = updatedSettings }
+
+
 
 -- Retrieving data from the store
 

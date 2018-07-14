@@ -46,10 +46,7 @@ view store model =
             Store.getAllProjects store
 
         groupedProjects =
-            ListHelper.groupsOf
-                workflowSettings.projectsPerRow
-                allProjects
-                []
+            ListHelper.groupsOf workflowSettings.projectsPerRow allProjects []
     in
     Grid.container []
         (List.map (\projectGroup -> Card.deck (List.map (projectCard store) projectGroup)) groupedProjects)
