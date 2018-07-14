@@ -1,4 +1,4 @@
-module Workflows.ProjectCardOverview exposing (Model, Msg, initialModel, update, view)
+module Workflows.ProjectOverview exposing (Model, Msg, initialModel, update, view)
 
 import Bootstrap.Button as Button
 import Bootstrap.Card as Card
@@ -8,7 +8,14 @@ import Bootstrap.ListGroup as ListGroup
 import Html exposing (Html, i, li, text, ul)
 import Html.Attributes exposing (href)
 import ListHelper
-import ProgrissStore as Store exposing (ProgrissStore, Project, ProjectId)
+import ProgrissStore as Store
+    exposing
+        ( ProgrissStore
+        , Project
+        , ProjectId
+        , WorkflowSettings(..)
+        , WorkflowSettingsQuery(..)
+        )
 
 
 type Msg
@@ -32,11 +39,17 @@ update msg store model =
 view : ProgrissStore -> Model -> Html Msg
 view store model =
     let
+        (ProjectOverviewSettingsItem workflowSettings) =
+            Store.getSettingsForWorkflow ProjectOverviewSettingsQuery store
+
         allProjects =
             Store.getAllProjects store
 
         groupedProjects =
-            ListHelper.groupsOf projectsPerRow allProjects []
+            ListHelper.groupsOf
+                workflowSettings.projectsPerRow
+                allProjects
+                []
     in
     Grid.container []
         (List.map (\projectGroup -> Card.deck (List.map (projectCard store) projectGroup)) groupedProjects)
@@ -66,13 +79,7 @@ projectCardActionList projectId store =
 
 projectCardNoteList : ProjectId -> ProgrissStore -> Html Msg
 projectCardNoteList projectId store =
-    ul []
-        (List.map
+    ul [] <|
+        List.map
             (\note -> li [] [ text note.body ])
             (Store.getNotesForProject projectId store)
-        )
-
-
-projectsPerRow : Int
-projectsPerRow =
-    3

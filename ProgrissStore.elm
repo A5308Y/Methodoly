@@ -8,6 +8,8 @@ module ProgrissStore
         , ProgrissStore
         , Project
         , ProjectId
+        , WorkflowSettings(..)
+        , WorkflowSettingsQuery(..)
         , associateActionToContext
         , associateActionToProject
         , createAction
@@ -26,6 +28,7 @@ module ProgrissStore
         , getContextForAction
         , getNotesForProject
         , getProjectForAction
+        , getSettingsForWorkflow
         , toggleActionDone
         , updateAction
         )
@@ -46,11 +49,32 @@ type alias Store =
     , actions : Dict Int ActionData
     , contexts : Dict Int ContextData
     , notes : Dict Int NoteData
+    , settings : Settings
     }
 
 
+type WorkflowSettingsQuery
+    = ProjectOverviewSettingsQuery
+
+
+type WorkflowSettings
+    = ProjectOverviewSettingsItem ProjectOverviewSettings
+
+
+type alias Settings =
+    { projectOverviewSettings : ProjectOverviewSettings }
+
+
+type alias ProjectOverviewSettings =
+    { projectsPerRow : Int }
+
+
 type alias ActionData =
-    { description : String, contextId : Maybe Int, projectId : Maybe Int, state : ActionState }
+    { description : String
+    , contextId : Maybe Int
+    , projectId : Maybe Int
+    , state : ActionState
+    }
 
 
 type alias ProjectData =
@@ -115,6 +139,7 @@ empty =
         , actions = Dict.empty
         , contexts = Dict.empty
         , notes = Dict.empty
+        , settings = { projectOverviewSettings = { projectsPerRow = 3 } }
         }
 
 
@@ -233,6 +258,10 @@ associateActionToProject (ActionId actionId) (ProjectId projectId) (ProgrissStor
     ProgrissStore { store | actions = updatedActions }
 
 
+
+-- Retrieving data from the store
+
+
 getAllActions : ProgrissStore -> List Action
 getAllActions (ProgrissStore store) =
     store.actions
@@ -305,6 +334,13 @@ getAllProjects (ProgrissStore store) =
         |> List.map castProjectDataToProject
 
 
+getSettingsForWorkflow : WorkflowSettingsQuery -> ProgrissStore -> WorkflowSettings
+getSettingsForWorkflow query (ProgrissStore store) =
+    case query of
+        ProjectOverviewSettingsQuery ->
+            ProjectOverviewSettingsItem store.settings.projectOverviewSettings
+
+
 castActionDataToAction : ( Int, ActionData ) -> Action
 castActionDataToAction ( id, actionData ) =
     Action (ActionId id) actionData.description actionData.state
@@ -325,6 +361,10 @@ castNoteDataToNote ( id, noteData ) =
     Note (NoteId id) noteData.body
 
 
+
+-- Decoding
+
+
 decoder : Decoder ProgrissStore
 decoder =
     decode progrissStoreConstructor
@@ -341,6 +381,7 @@ progrissStoreConstructor actions contexts projects notes =
         , contexts = Dict.fromList contexts
         , projects = Dict.fromList projects
         , notes = Dict.fromList notes
+        , settings = { projectOverviewSettings = { projectsPerRow = 3 } }
         }
 
 
@@ -412,7 +453,7 @@ noteDataConstructor id content projectId =
 
 
 
--- Encoder
+-- Encoding
 
 
 encoder : ProgrissStore -> Json.Decode.Value

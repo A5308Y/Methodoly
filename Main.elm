@@ -8,21 +8,21 @@ import Json.Decode
 import Json.Encode
 import ProgrissStore as Store exposing (ProgrissStore)
 import Workflows.GtdActionLists
-import Workflows.ProjectCardOverview
+import Workflows.ProjectOverview
 import Workflows.SimpleTodos
 
 
 type alias Model =
     { store : ProgrissStore
     , gtdActionListsModel : Workflows.GtdActionLists.Model
-    , projectCardOverviewModel : Workflows.ProjectCardOverview.Model
+    , projectCardOverviewModel : Workflows.ProjectOverview.Model
     , simpleTodosModel : Workflows.SimpleTodos.Model
     }
 
 
 type Msg
     = GtdActionListsMsg Workflows.GtdActionLists.Msg
-    | ProjectCardOverviewMsg Workflows.ProjectCardOverview.Msg
+    | ProjectOverviewMsg Workflows.ProjectOverview.Msg
     | SimpleTodosMsg Workflows.SimpleTodos.Msg
     | Save
     | ReceiveStore String
@@ -75,7 +75,7 @@ initialModel : ( Model, Cmd Msg )
 initialModel =
     ( { store = initialStore
       , gtdActionListsModel = Workflows.GtdActionLists.initialModel
-      , projectCardOverviewModel = Workflows.ProjectCardOverview.initialModel
+      , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
       , simpleTodosModel = Workflows.SimpleTodos.initialModel
       }
     , Cmd.none
@@ -118,13 +118,13 @@ update msg model =
             , Cmd.map GtdActionListsMsg cmd
             )
 
-        ProjectCardOverviewMsg msg ->
+        ProjectOverviewMsg msg ->
             let
                 ( projectCardOverviewModel, store, cmd ) =
-                    Workflows.ProjectCardOverview.update msg model.store model.projectCardOverviewModel
+                    Workflows.ProjectOverview.update msg model.store model.projectCardOverviewModel
             in
             ( { model | store = store, projectCardOverviewModel = projectCardOverviewModel }
-            , Cmd.map ProjectCardOverviewMsg cmd
+            , Cmd.map ProjectOverviewMsg cmd
             )
 
         SimpleTodosMsg msg ->
@@ -164,6 +164,6 @@ renderWorkflow model =
                 (Workflows.GtdActionLists.view model.store model.gtdActionListsModel)
             , hr [] []
             , Html.map
-                ProjectCardOverviewMsg
-                (Workflows.ProjectCardOverview.view model.store model.projectCardOverviewModel)
+                ProjectOverviewMsg
+                (Workflows.ProjectOverview.view model.store model.projectCardOverviewModel)
             ]
