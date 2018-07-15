@@ -14350,6 +14350,20 @@ var _user$project$ProgrissStore$associateActionToProject = F3(
 				_p40,
 				{actions: updatedActions}));
 	});
+var _user$project$ProgrissStore$updateSettingsForWorkflow = F2(
+	function (workflowSettings, _p41) {
+		var _p42 = _p41;
+		var _p44 = _p42._0;
+		var settings = _p44.settings;
+		var _p43 = workflowSettings;
+		var updatedSettings = _elm_lang$core$Native_Utils.update(
+			settings,
+			{projectOverviewSettings: _p43._0});
+		return _user$project$ProgrissStore$ProgrissStore(
+			_elm_lang$core$Native_Utils.update(
+				_p44,
+				{settings: updatedSettings}));
+	});
 var _user$project$ProgrissStore$progrissStoreConstructor = F4(
 	function (actions, contexts, projects, notes) {
 		return _user$project$ProgrissStore$ProgrissStore(
@@ -14368,32 +14382,32 @@ var _user$project$ProgrissStore$ProjectOverviewSettingsItem = function (a) {
 	return {ctor: 'ProjectOverviewSettingsItem', _0: a};
 };
 var _user$project$ProgrissStore$getSettingsForWorkflow = F2(
-	function (query, _p41) {
-		var _p42 = _p41;
-		var _p43 = query;
-		return _user$project$ProgrissStore$ProjectOverviewSettingsItem(_p42._0.settings.projectOverviewSettings);
+	function (query, _p45) {
+		var _p46 = _p45;
+		var _p47 = query;
+		return _user$project$ProgrissStore$ProjectOverviewSettingsItem(_p46._0.settings.projectOverviewSettings);
 	});
 var _user$project$ProgrissStore$ActionId = function (a) {
 	return {ctor: 'ActionId', _0: a};
 };
-var _user$project$ProgrissStore$castActionDataToAction = function (_p44) {
-	var _p45 = _p44;
-	var _p46 = _p45._1;
+var _user$project$ProgrissStore$castActionDataToAction = function (_p48) {
+	var _p49 = _p48;
+	var _p50 = _p49._1;
 	return A3(
 		_user$project$ProgrissStore$Action,
-		_user$project$ProgrissStore$ActionId(_p45._0),
-		_p46.description,
-		_p46.state);
+		_user$project$ProgrissStore$ActionId(_p49._0),
+		_p50.description,
+		_p50.state);
 };
-var _user$project$ProgrissStore$getAllActions = function (_p47) {
-	var _p48 = _p47;
+var _user$project$ProgrissStore$getAllActions = function (_p51) {
+	var _p52 = _p51;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
-		_elm_lang$core$Dict$toList(_p48._0.actions));
+		_elm_lang$core$Dict$toList(_p52._0.actions));
 };
-var _user$project$ProgrissStore$getActionsWithoutContext = function (_p49) {
-	var _p50 = _p49;
+var _user$project$ProgrissStore$getActionsWithoutContext = function (_p53) {
+	var _p54 = _p53;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
@@ -14404,10 +14418,10 @@ var _user$project$ProgrissStore$getActionsWithoutContext = function (_p49) {
 					function (id, actionData) {
 						return _elm_lang$core$Native_Utils.eq(actionData.contextId, _elm_lang$core$Maybe$Nothing);
 					}),
-				_p50._0.actions)));
+				_p54._0.actions)));
 };
-var _user$project$ProgrissStore$getActionsWithoutProject = function (_p51) {
-	var _p52 = _p51;
+var _user$project$ProgrissStore$getActionsWithoutProject = function (_p55) {
+	var _p56 = _p55;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
@@ -14418,41 +14432,41 @@ var _user$project$ProgrissStore$getActionsWithoutProject = function (_p51) {
 					function (id, actionData) {
 						return _elm_lang$core$Native_Utils.eq(actionData.projectId, _elm_lang$core$Maybe$Nothing);
 					}),
-				_p52._0.actions)));
+				_p56._0.actions)));
 };
 var _user$project$ProgrissStore$getActionsForContext = F2(
-	function (_p54, _p53) {
-		var _p55 = _p54;
-		var _p56 = _p53;
+	function (_p58, _p57) {
+		var _p59 = _p58;
+		var _p60 = _p57;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castActionDataToAction,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p57) {
-					var _p58 = _p57;
+				function (_p61) {
+					var _p62 = _p61;
 					return _elm_lang$core$Native_Utils.eq(
-						_p58._1.contextId,
-						_elm_lang$core$Maybe$Just(_p55._0));
+						_p62._1.contextId,
+						_elm_lang$core$Maybe$Just(_p59._0));
 				},
-				_elm_lang$core$Dict$toList(_p56._0.actions)));
+				_elm_lang$core$Dict$toList(_p60._0.actions)));
 	});
 var _user$project$ProgrissStore$getActionsForProject = F2(
-	function (_p60, _p59) {
-		var _p61 = _p60;
-		var _p62 = _p59;
+	function (_p64, _p63) {
+		var _p65 = _p64;
+		var _p66 = _p63;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castActionDataToAction,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p63) {
-					var _p64 = _p63;
+				function (_p67) {
+					var _p68 = _p67;
 					return _elm_lang$core$Native_Utils.eq(
-						_p64._1.projectId,
-						_elm_lang$core$Maybe$Just(_p61._0));
+						_p68._1.projectId,
+						_elm_lang$core$Maybe$Just(_p65._0));
 				},
-				_elm_lang$core$Dict$toList(_p62._0.actions)));
+				_elm_lang$core$Dict$toList(_p66._0.actions)));
 	});
 var _user$project$ProgrissStore$Deleted = function (a) {
 	return {ctor: 'Deleted', _0: a};
@@ -14462,34 +14476,34 @@ var _user$project$ProgrissStore$Done = function (a) {
 };
 var _user$project$ProgrissStore$Active = {ctor: 'Active'};
 var _user$project$ProgrissStore$createAction = F2(
-	function (description, _p65) {
-		var _p66 = _p65;
-		var _p67 = _p66._0;
+	function (description, _p69) {
+		var _p70 = _p69;
+		var _p71 = _p70._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p67.actions),
+			_user$project$ProgrissStore$getNextFreeId(_p71.actions),
 			A4(_user$project$ProgrissStore$ActionData, description, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _user$project$ProgrissStore$Active),
-			_p67.actions);
+			_p71.actions);
 		return {
 			ctor: '_Tuple2',
 			_0: _user$project$ProgrissStore$ActionId(
-				_user$project$ProgrissStore$getNextFreeId(_p67.actions)),
+				_user$project$ProgrissStore$getNextFreeId(_p71.actions)),
 			_1: _user$project$ProgrissStore$ProgrissStore(
 				_elm_lang$core$Native_Utils.update(
-					_p67,
+					_p71,
 					{actions: updatedActions}))
 		};
 	});
 var _user$project$ProgrissStore$actionsStateAfterToggle = function (actionData) {
 	var updatedState = function () {
-		var _p68 = actionData.state;
-		switch (_p68.ctor) {
+		var _p72 = actionData.state;
+		switch (_p72.ctor) {
 			case 'Done':
 				return _user$project$ProgrissStore$Active;
 			case 'Active':
 				return _user$project$ProgrissStore$Done(0);
 			default:
-				return _user$project$ProgrissStore$Deleted(_p68._0);
+				return _user$project$ProgrissStore$Deleted(_p72._0);
 		}
 	}();
 	return _elm_lang$core$Native_Utils.update(
@@ -14497,33 +14511,33 @@ var _user$project$ProgrissStore$actionsStateAfterToggle = function (actionData) 
 		{state: updatedState});
 };
 var _user$project$ProgrissStore$toggleActionDone = F2(
-	function (_p70, _p69) {
-		var _p71 = _p70;
-		var _p72 = _p69;
-		var _p73 = _p72._0;
+	function (_p74, _p73) {
+		var _p75 = _p74;
+		var _p76 = _p73;
+		var _p77 = _p76._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p71._0,
+			_p75._0,
 			_elm_lang$core$Maybe$map(_user$project$ProgrissStore$actionsStateAfterToggle),
-			_p73.actions);
+			_p77.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p73,
+				_p77,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$actionDataConstructor = F6(
 	function (id, description, maybeContextId, maybeProjectId, finishedAt, deletedAt) {
 		var state = function () {
-			var _p74 = deletedAt;
-			if (_p74.ctor === 'Nothing') {
-				var _p75 = finishedAt;
-				if (_p75.ctor === 'Nothing') {
+			var _p78 = deletedAt;
+			if (_p78.ctor === 'Nothing') {
+				var _p79 = finishedAt;
+				if (_p79.ctor === 'Nothing') {
 					return _user$project$ProgrissStore$Active;
 				} else {
-					return _user$project$ProgrissStore$Done(_p75._0);
+					return _user$project$ProgrissStore$Done(_p79._0);
 				}
 			} else {
-				return _user$project$ProgrissStore$Deleted(_p74._0);
+				return _user$project$ProgrissStore$Deleted(_p78._0);
 			}
 		}();
 		return {
@@ -14585,18 +14599,18 @@ var _user$project$ProgrissStore$decoder = A4(
 var _user$project$ProgrissStore$ContextId = function (a) {
 	return {ctor: 'ContextId', _0: a};
 };
-var _user$project$ProgrissStore$castContextDataToContext = function (_p76) {
-	var _p77 = _p76;
+var _user$project$ProgrissStore$castContextDataToContext = function (_p80) {
+	var _p81 = _p80;
 	return A2(
 		_user$project$ProgrissStore$Context,
-		_user$project$ProgrissStore$ContextId(_p77._0),
-		_p77._1.name);
+		_user$project$ProgrissStore$ContextId(_p81._0),
+		_p81._1.name);
 };
 var _user$project$ProgrissStore$getContextForAction = F2(
-	function (_p79, _p78) {
-		var _p80 = _p79;
-		var _p81 = _p78;
-		var _p82 = _p81._0;
+	function (_p83, _p82) {
+		var _p84 = _p83;
+		var _p85 = _p82;
+		var _p86 = _p85._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castContextDataToContext,
@@ -14608,37 +14622,37 @@ var _user$project$ProgrissStore$getContextForAction = F2(
 						function (context) {
 							return {ctor: '_Tuple2', _0: contextId, _1: context};
 						},
-						A2(_elm_lang$core$Dict$get, contextId, _p82.contexts));
+						A2(_elm_lang$core$Dict$get, contextId, _p86.contexts));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.contextId;
 					},
-					A2(_elm_lang$core$Dict$get, _p80._0, _p82.actions))));
+					A2(_elm_lang$core$Dict$get, _p84._0, _p86.actions))));
 	});
-var _user$project$ProgrissStore$getAllContexts = function (_p83) {
-	var _p84 = _p83;
+var _user$project$ProgrissStore$getAllContexts = function (_p87) {
+	var _p88 = _p87;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castContextDataToContext,
-		_elm_lang$core$Dict$toList(_p84._0.contexts));
+		_elm_lang$core$Dict$toList(_p88._0.contexts));
 };
 var _user$project$ProgrissStore$ProjectId = function (a) {
 	return {ctor: 'ProjectId', _0: a};
 };
-var _user$project$ProgrissStore$castProjectDataToProject = function (_p85) {
-	var _p86 = _p85;
+var _user$project$ProgrissStore$castProjectDataToProject = function (_p89) {
+	var _p90 = _p89;
 	return A2(
 		_user$project$ProgrissStore$Project,
-		_user$project$ProgrissStore$ProjectId(_p86._0),
-		_p86._1.title);
+		_user$project$ProgrissStore$ProjectId(_p90._0),
+		_p90._1.title);
 };
 var _user$project$ProgrissStore$getProjectForAction = F2(
-	function (_p88, _p87) {
-		var _p89 = _p88;
-		var _p90 = _p87;
-		var _p91 = _p90._0;
+	function (_p92, _p91) {
+		var _p93 = _p92;
+		var _p94 = _p91;
+		var _p95 = _p94._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castProjectDataToProject,
@@ -14650,46 +14664,46 @@ var _user$project$ProgrissStore$getProjectForAction = F2(
 						function (project) {
 							return {ctor: '_Tuple2', _0: projectId, _1: project};
 						},
-						A2(_elm_lang$core$Dict$get, projectId, _p91.projects));
+						A2(_elm_lang$core$Dict$get, projectId, _p95.projects));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.projectId;
 					},
-					A2(_elm_lang$core$Dict$get, _p89._0, _p91.actions))));
+					A2(_elm_lang$core$Dict$get, _p93._0, _p95.actions))));
 	});
-var _user$project$ProgrissStore$getAllProjects = function (_p92) {
-	var _p93 = _p92;
+var _user$project$ProgrissStore$getAllProjects = function (_p96) {
+	var _p97 = _p96;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castProjectDataToProject,
-		_elm_lang$core$Dict$toList(_p93._0.projects));
+		_elm_lang$core$Dict$toList(_p97._0.projects));
 };
 var _user$project$ProgrissStore$NoteId = function (a) {
 	return {ctor: 'NoteId', _0: a};
 };
-var _user$project$ProgrissStore$castNoteDataToNote = function (_p94) {
-	var _p95 = _p94;
+var _user$project$ProgrissStore$castNoteDataToNote = function (_p98) {
+	var _p99 = _p98;
 	return A2(
 		_user$project$ProgrissStore$Note,
-		_user$project$ProgrissStore$NoteId(_p95._0),
-		_p95._1.body);
+		_user$project$ProgrissStore$NoteId(_p99._0),
+		_p99._1.body);
 };
 var _user$project$ProgrissStore$getNotesForProject = F2(
-	function (_p97, _p96) {
-		var _p98 = _p97;
-		var _p99 = _p96;
+	function (_p101, _p100) {
+		var _p102 = _p101;
+		var _p103 = _p100;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castNoteDataToNote,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p100) {
-					var _p101 = _p100;
-					return _elm_lang$core$Native_Utils.eq(_p101._1.projectId, _p98._0);
+				function (_p104) {
+					var _p105 = _p104;
+					return _elm_lang$core$Native_Utils.eq(_p105._1.projectId, _p102._0);
 				},
-				_elm_lang$core$Dict$toList(_p99._0.notes)));
+				_elm_lang$core$Dict$toList(_p103._0.notes)));
 	});
 
 var _user$project$Workflows_GtdActionLists$cardConfigForAction = function (action) {
@@ -15011,7 +15025,7 @@ var _user$project$Workflows_GtdActionLists$view = F2(
 							_rundis$elm_bootstrap$Bootstrap_Grid$col,
 							{
 								ctor: '::',
-								_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$xs3,
+								_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$md3,
 								_1: {ctor: '[]'}
 							},
 							{
@@ -15023,7 +15037,11 @@ var _user$project$Workflows_GtdActionLists$view = F2(
 							ctor: '::',
 							_0: A2(
 								_rundis$elm_bootstrap$Bootstrap_Grid$col,
-								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$md9,
+									_1: {ctor: '[]'}
+								},
 								{
 									ctor: '::',
 									_0: _user$project$Workflows_GtdActionLists$renderActions(

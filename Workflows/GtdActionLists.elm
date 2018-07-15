@@ -78,8 +78,8 @@ view : ProgrissStore -> Model -> Html Msg
 view store model =
     Grid.container []
         [ Grid.row []
-            [ Grid.col [ Col.xs3 ] [ renderContextMenu store model.selectedContext ]
-            , Grid.col []
+            [ Grid.col [ Col.md3 ] [ renderContextMenu store model.selectedContext ]
+            , Grid.col [ Col.md9 ]
                 [ renderActions (actionsToRender store model.selectedContext)
                 , hr [] []
                 , Form.form [ Html.Events.onSubmit CreateNewAction, action "javascript:void(0);" ]
