@@ -1,6 +1,7 @@
 port module Main exposing (..)
 
 import Bootstrap.Button as Button
+import Bootstrap.Navbar as Navbar
 import Html exposing (Html, div, hr, i, text)
 import Html.Attributes exposing (href)
 import Html.Events exposing (onClick)
@@ -12,18 +13,41 @@ import Workflows.ProjectOverview
 import Workflows.SimpleTodos
 
 
+navbar : Model -> Html Msg
+navbar model =
+    Navbar.config NavbarMsg
+        |> Navbar.withAnimation
+        |> Navbar.collapseExtraLarge
+        |> Navbar.items
+            [ Navbar.itemLink [ href "#", onClick (SelectWorkflow SimpleTodosWorkflow) ] [ text "Simple" ]
+            , Navbar.itemLink [ href "#", onClick (SelectWorkflow GtdActionListsWorkflow) ] [ text "GTD" ]
+            , Navbar.itemLink [ href "#", onClick (SelectWorkflow ProjectOverviewWorkflow) ] [ text "Projects" ]
+            ]
+        |> Navbar.view model.navbarState
+
+
 type alias Model =
     { store : ProgrissStore
     , gtdActionListsModel : Workflows.GtdActionLists.Model
     , projectCardOverviewModel : Workflows.ProjectOverview.Model
     , simpleTodosModel : Workflows.SimpleTodos.Model
+    , navbarState : Navbar.State
+    , selectedWorkflow : SelectableWorkflow
     }
+
+
+type SelectableWorkflow
+    = SimpleTodosWorkflow
+    | GtdActionListsWorkflow
+    | ProjectOverviewWorkflow
 
 
 type Msg
     = GtdActionListsMsg Workflows.GtdActionLists.Msg
     | ProjectOverviewMsg Workflows.ProjectOverview.Msg
     | SimpleTodosMsg Workflows.SimpleTodos.Msg
+    | NavbarMsg Navbar.State
+    | SelectWorkflow SelectableWorkflow
     | Save
     | ReceiveStore String
     | TriggerLoad
@@ -73,12 +97,18 @@ initialStore =
 
 initialModel : ( Model, Cmd Msg )
 initialModel =
+    let
+        ( navbarState, navbarCmd ) =
+            Navbar.initialState NavbarMsg
+    in
     ( { store = initialStore
       , gtdActionListsModel = Workflows.GtdActionLists.initialModel
       , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
       , simpleTodosModel = Workflows.SimpleTodos.initialModel
+      , navbarState = navbarState
+      , selectedWorkflow = SimpleTodosWorkflow
       }
-    , Cmd.none
+    , navbarCmd
     )
 
 
@@ -89,7 +119,10 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    loadStore ReceiveStore
+    Sub.batch
+        [ loadStore ReceiveStore
+        , Navbar.subscriptions model.navbarState NavbarMsg
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -136,11 +169,21 @@ update msg model =
             , Cmd.map SimpleTodosMsg cmd
             )
 
+        NavbarMsg state ->
+            ( { model | navbarState = state }, Cmd.none )
+
+        SelectWorkflow selectedWorkflow ->
+            ( { model | selectedWorkflow = selectedWorkflow }, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
     div []
-        [ renderWorkflow model
+        [ if List.length (Store.getAllActions model.store) >= 10 then
+            navbar model
+          else
+            text ""
+        , renderWorkflow model
         , hr [] []
         , div []
             [ Button.button
@@ -155,15 +198,16 @@ view model =
 
 renderWorkflow : Model -> Html Msg
 renderWorkflow model =
-    if List.length (Store.getAllActions model.store) < 10 then
-        Html.map SimpleTodosMsg (Workflows.SimpleTodos.view model.store model.simpleTodosModel)
-    else
-        div []
-            [ Html.map
+    case model.selectedWorkflow of
+        SimpleTodosWorkflow ->
+            Html.map SimpleTodosMsg (Workflows.SimpleTodos.view model.store model.simpleTodosModel)
+
+        GtdActionListsWorkflow ->
+            Html.map
                 GtdActionListsMsg
                 (Workflows.GtdActionLists.view model.store model.gtdActionListsModel)
-            , hr [] []
-            , Html.map
+
+        ProjectOverviewWorkflow ->
+            Html.map
                 ProjectOverviewMsg
                 (Workflows.ProjectOverview.view model.store model.projectCardOverviewModel)
-            ]
