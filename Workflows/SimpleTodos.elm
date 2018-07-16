@@ -17,17 +17,19 @@ import ProgrissStore as Store exposing (Action, ActionId, ActionState(Done), Pro
 
 type Msg
     = UpdateNewActionDescription String
+    | UpdateActionDescription Action String
     | CreateNewAction
     | ToggleActionDone ActionId
+    | ToggleEditAction (Maybe ActionId)
 
 
 type alias Model =
-    { newActionDescription : String }
+    { newActionDescription : String, editing : Maybe ActionId }
 
 
 initialModel : Model
 initialModel =
-    { newActionDescription = "" }
+    { newActionDescription = "", editing = Nothing }
 
 
 update : Msg -> ProgrissStore -> Model -> ( Model, ProgrissStore, Cmd Msg )
@@ -35,6 +37,13 @@ update msg store model =
     case msg of
         UpdateNewActionDescription newActionDescription ->
             ( { model | newActionDescription = newActionDescription }, store, Cmd.none )
+
+        UpdateActionDescription action description ->
+            let
+                updatedStore =
+                    Store.updateAction { action | description = description } store
+            in
+            ( model, updatedStore, Cmd.none )
 
         CreateNewAction ->
             let
@@ -46,13 +55,16 @@ update msg store model =
         ToggleActionDone actionId ->
             ( model, Store.toggleActionDone actionId store, Cmd.none )
 
+        ToggleEditAction maybeActionId ->
+            ( { model | editing = maybeActionId }, store, Cmd.none )
+
 
 view : ProgrissStore -> Model -> Html Msg
 view store model =
     Grid.container []
         [ Grid.row []
             [ Grid.col []
-                [ renderActions (Store.getAllActions store)
+                [ renderActions model.editing (Store.getAllActions store)
                 , hr [] []
                 , Form.form [ onSubmit CreateNewAction, action "javascript:void(0);" ]
                     [ InputGroup.config
@@ -79,13 +91,13 @@ view store model =
         ]
 
 
-renderActions : List Action -> Html Msg
-renderActions actions =
-    div [] (List.map (\action -> actionCard action) actions)
+renderActions : Maybe ActionId -> List Action -> Html Msg
+renderActions editing actions =
+    div [] (List.map (\action -> actionCard editing action) actions)
 
 
-actionCard : Action -> Html Msg
-actionCard action =
+actionCard : Maybe ActionId -> Action -> Html Msg
+actionCard editing action =
     Card.config (cardConfigForAction action)
         |> Card.block []
             [ Block.custom
@@ -102,7 +114,29 @@ actionCard action =
                                 [ text (iconForActionState action.state) ]
                             ]
                         ]
-                    , Grid.col [] [ text action.description ]
+                    , if editing == Just action.id then
+                        Grid.col
+                            []
+                            [ Form.form
+                                [ Html.Attributes.style [ ( "margin-bottom", "0" ) ]
+                                , Html.Attributes.action "javascript:void(0);"
+                                , Html.Events.onSubmit (ToggleEditAction Nothing)
+                                ]
+                                [ InputGroup.config
+                                    (InputGroup.text
+                                        [ Input.small
+                                        , Input.attrs [ Html.Events.onInput (UpdateActionDescription action), Html.Attributes.defaultValue action.description ]
+                                        ]
+                                    )
+                                    |> InputGroup.successors
+                                        [ InputGroup.button [ Button.success ] [ text "Save" ] ]
+                                    |> InputGroup.view
+                                ]
+                            ]
+                      else
+                        Grid.col
+                            [ Col.attrs [ Html.Events.onClick (ToggleEditAction (Just action.id)) ] ]
+                            [ text action.description ]
                     ]
                 )
             ]

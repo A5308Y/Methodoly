@@ -6547,172 +6547,6 @@ var _elm_lang$animation_frame$AnimationFrame$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['AnimationFrame'] = {pkg: 'elm-lang/animation-frame', init: _elm_lang$animation_frame$AnimationFrame$init, onEffects: _elm_lang$animation_frame$AnimationFrame$onEffects, onSelfMsg: _elm_lang$animation_frame$AnimationFrame$onSelfMsg, tag: 'sub', subMap: _elm_lang$animation_frame$AnimationFrame$subMap};
 
-var _elm_lang$core$Color$fmod = F2(
-	function (f, n) {
-		var integer = _elm_lang$core$Basics$floor(f);
-		return (_elm_lang$core$Basics$toFloat(
-			A2(_elm_lang$core$Basics_ops['%'], integer, n)) + f) - _elm_lang$core$Basics$toFloat(integer);
-	});
-var _elm_lang$core$Color$rgbToHsl = F3(
-	function (red, green, blue) {
-		var b = _elm_lang$core$Basics$toFloat(blue) / 255;
-		var g = _elm_lang$core$Basics$toFloat(green) / 255;
-		var r = _elm_lang$core$Basics$toFloat(red) / 255;
-		var cMax = A2(
-			_elm_lang$core$Basics$max,
-			A2(_elm_lang$core$Basics$max, r, g),
-			b);
-		var cMin = A2(
-			_elm_lang$core$Basics$min,
-			A2(_elm_lang$core$Basics$min, r, g),
-			b);
-		var c = cMax - cMin;
-		var lightness = (cMax + cMin) / 2;
-		var saturation = _elm_lang$core$Native_Utils.eq(lightness, 0) ? 0 : (c / (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)));
-		var hue = _elm_lang$core$Basics$degrees(60) * (_elm_lang$core$Native_Utils.eq(cMax, r) ? A2(_elm_lang$core$Color$fmod, (g - b) / c, 6) : (_elm_lang$core$Native_Utils.eq(cMax, g) ? (((b - r) / c) + 2) : (((r - g) / c) + 4)));
-		return {ctor: '_Tuple3', _0: hue, _1: saturation, _2: lightness};
-	});
-var _elm_lang$core$Color$hslToRgb = F3(
-	function (hue, saturation, lightness) {
-		var normHue = hue / _elm_lang$core$Basics$degrees(60);
-		var chroma = (1 - _elm_lang$core$Basics$abs((2 * lightness) - 1)) * saturation;
-		var x = chroma * (1 - _elm_lang$core$Basics$abs(
-			A2(_elm_lang$core$Color$fmod, normHue, 2) - 1));
-		var _p0 = (_elm_lang$core$Native_Utils.cmp(normHue, 0) < 0) ? {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 1) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: x, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 2) < 0) ? {ctor: '_Tuple3', _0: x, _1: chroma, _2: 0} : ((_elm_lang$core$Native_Utils.cmp(normHue, 3) < 0) ? {ctor: '_Tuple3', _0: 0, _1: chroma, _2: x} : ((_elm_lang$core$Native_Utils.cmp(normHue, 4) < 0) ? {ctor: '_Tuple3', _0: 0, _1: x, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(normHue, 5) < 0) ? {ctor: '_Tuple3', _0: x, _1: 0, _2: chroma} : ((_elm_lang$core$Native_Utils.cmp(normHue, 6) < 0) ? {ctor: '_Tuple3', _0: chroma, _1: 0, _2: x} : {ctor: '_Tuple3', _0: 0, _1: 0, _2: 0}))))));
-		var r = _p0._0;
-		var g = _p0._1;
-		var b = _p0._2;
-		var m = lightness - (chroma / 2);
-		return {ctor: '_Tuple3', _0: r + m, _1: g + m, _2: b + m};
-	});
-var _elm_lang$core$Color$toRgb = function (color) {
-	var _p1 = color;
-	if (_p1.ctor === 'RGBA') {
-		return {red: _p1._0, green: _p1._1, blue: _p1._2, alpha: _p1._3};
-	} else {
-		var _p2 = A3(_elm_lang$core$Color$hslToRgb, _p1._0, _p1._1, _p1._2);
-		var r = _p2._0;
-		var g = _p2._1;
-		var b = _p2._2;
-		return {
-			red: _elm_lang$core$Basics$round(255 * r),
-			green: _elm_lang$core$Basics$round(255 * g),
-			blue: _elm_lang$core$Basics$round(255 * b),
-			alpha: _p1._3
-		};
-	}
-};
-var _elm_lang$core$Color$toHsl = function (color) {
-	var _p3 = color;
-	if (_p3.ctor === 'HSLA') {
-		return {hue: _p3._0, saturation: _p3._1, lightness: _p3._2, alpha: _p3._3};
-	} else {
-		var _p4 = A3(_elm_lang$core$Color$rgbToHsl, _p3._0, _p3._1, _p3._2);
-		var h = _p4._0;
-		var s = _p4._1;
-		var l = _p4._2;
-		return {hue: h, saturation: s, lightness: l, alpha: _p3._3};
-	}
-};
-var _elm_lang$core$Color$HSLA = F4(
-	function (a, b, c, d) {
-		return {ctor: 'HSLA', _0: a, _1: b, _2: c, _3: d};
-	});
-var _elm_lang$core$Color$hsla = F4(
-	function (hue, saturation, lightness, alpha) {
-		return A4(
-			_elm_lang$core$Color$HSLA,
-			hue - _elm_lang$core$Basics$turns(
-				_elm_lang$core$Basics$toFloat(
-					_elm_lang$core$Basics$floor(hue / (2 * _elm_lang$core$Basics$pi)))),
-			saturation,
-			lightness,
-			alpha);
-	});
-var _elm_lang$core$Color$hsl = F3(
-	function (hue, saturation, lightness) {
-		return A4(_elm_lang$core$Color$hsla, hue, saturation, lightness, 1);
-	});
-var _elm_lang$core$Color$complement = function (color) {
-	var _p5 = color;
-	if (_p5.ctor === 'HSLA') {
-		return A4(
-			_elm_lang$core$Color$hsla,
-			_p5._0 + _elm_lang$core$Basics$degrees(180),
-			_p5._1,
-			_p5._2,
-			_p5._3);
-	} else {
-		var _p6 = A3(_elm_lang$core$Color$rgbToHsl, _p5._0, _p5._1, _p5._2);
-		var h = _p6._0;
-		var s = _p6._1;
-		var l = _p6._2;
-		return A4(
-			_elm_lang$core$Color$hsla,
-			h + _elm_lang$core$Basics$degrees(180),
-			s,
-			l,
-			_p5._3);
-	}
-};
-var _elm_lang$core$Color$grayscale = function (p) {
-	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
-};
-var _elm_lang$core$Color$greyscale = function (p) {
-	return A4(_elm_lang$core$Color$HSLA, 0, 0, 1 - p, 1);
-};
-var _elm_lang$core$Color$RGBA = F4(
-	function (a, b, c, d) {
-		return {ctor: 'RGBA', _0: a, _1: b, _2: c, _3: d};
-	});
-var _elm_lang$core$Color$rgba = _elm_lang$core$Color$RGBA;
-var _elm_lang$core$Color$rgb = F3(
-	function (r, g, b) {
-		return A4(_elm_lang$core$Color$RGBA, r, g, b, 1);
-	});
-var _elm_lang$core$Color$lightRed = A4(_elm_lang$core$Color$RGBA, 239, 41, 41, 1);
-var _elm_lang$core$Color$red = A4(_elm_lang$core$Color$RGBA, 204, 0, 0, 1);
-var _elm_lang$core$Color$darkRed = A4(_elm_lang$core$Color$RGBA, 164, 0, 0, 1);
-var _elm_lang$core$Color$lightOrange = A4(_elm_lang$core$Color$RGBA, 252, 175, 62, 1);
-var _elm_lang$core$Color$orange = A4(_elm_lang$core$Color$RGBA, 245, 121, 0, 1);
-var _elm_lang$core$Color$darkOrange = A4(_elm_lang$core$Color$RGBA, 206, 92, 0, 1);
-var _elm_lang$core$Color$lightYellow = A4(_elm_lang$core$Color$RGBA, 255, 233, 79, 1);
-var _elm_lang$core$Color$yellow = A4(_elm_lang$core$Color$RGBA, 237, 212, 0, 1);
-var _elm_lang$core$Color$darkYellow = A4(_elm_lang$core$Color$RGBA, 196, 160, 0, 1);
-var _elm_lang$core$Color$lightGreen = A4(_elm_lang$core$Color$RGBA, 138, 226, 52, 1);
-var _elm_lang$core$Color$green = A4(_elm_lang$core$Color$RGBA, 115, 210, 22, 1);
-var _elm_lang$core$Color$darkGreen = A4(_elm_lang$core$Color$RGBA, 78, 154, 6, 1);
-var _elm_lang$core$Color$lightBlue = A4(_elm_lang$core$Color$RGBA, 114, 159, 207, 1);
-var _elm_lang$core$Color$blue = A4(_elm_lang$core$Color$RGBA, 52, 101, 164, 1);
-var _elm_lang$core$Color$darkBlue = A4(_elm_lang$core$Color$RGBA, 32, 74, 135, 1);
-var _elm_lang$core$Color$lightPurple = A4(_elm_lang$core$Color$RGBA, 173, 127, 168, 1);
-var _elm_lang$core$Color$purple = A4(_elm_lang$core$Color$RGBA, 117, 80, 123, 1);
-var _elm_lang$core$Color$darkPurple = A4(_elm_lang$core$Color$RGBA, 92, 53, 102, 1);
-var _elm_lang$core$Color$lightBrown = A4(_elm_lang$core$Color$RGBA, 233, 185, 110, 1);
-var _elm_lang$core$Color$brown = A4(_elm_lang$core$Color$RGBA, 193, 125, 17, 1);
-var _elm_lang$core$Color$darkBrown = A4(_elm_lang$core$Color$RGBA, 143, 89, 2, 1);
-var _elm_lang$core$Color$black = A4(_elm_lang$core$Color$RGBA, 0, 0, 0, 1);
-var _elm_lang$core$Color$white = A4(_elm_lang$core$Color$RGBA, 255, 255, 255, 1);
-var _elm_lang$core$Color$lightGrey = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
-var _elm_lang$core$Color$grey = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
-var _elm_lang$core$Color$darkGrey = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
-var _elm_lang$core$Color$lightGray = A4(_elm_lang$core$Color$RGBA, 238, 238, 236, 1);
-var _elm_lang$core$Color$gray = A4(_elm_lang$core$Color$RGBA, 211, 215, 207, 1);
-var _elm_lang$core$Color$darkGray = A4(_elm_lang$core$Color$RGBA, 186, 189, 182, 1);
-var _elm_lang$core$Color$lightCharcoal = A4(_elm_lang$core$Color$RGBA, 136, 138, 133, 1);
-var _elm_lang$core$Color$charcoal = A4(_elm_lang$core$Color$RGBA, 85, 87, 83, 1);
-var _elm_lang$core$Color$darkCharcoal = A4(_elm_lang$core$Color$RGBA, 46, 52, 54, 1);
-var _elm_lang$core$Color$Radial = F5(
-	function (a, b, c, d, e) {
-		return {ctor: 'Radial', _0: a, _1: b, _2: c, _3: d, _4: e};
-	});
-var _elm_lang$core$Color$radial = _elm_lang$core$Color$Radial;
-var _elm_lang$core$Color$Linear = F3(
-	function (a, b, c) {
-		return {ctor: 'Linear', _0: a, _1: b, _2: c};
-	});
-var _elm_lang$core$Color$linear = _elm_lang$core$Color$Linear;
-
 var _elm_lang$dom$Native_Dom = function() {
 
 var fakeNode = {
@@ -9588,128 +9422,6 @@ var _elm_lang$mouse$Mouse$subMap = F2(
 			});
 	});
 _elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
-
-var _elm_lang$window$Native_Window = function()
-{
-
-var size = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)	{
-	callback(_elm_lang$core$Native_Scheduler.succeed({
-		width: window.innerWidth,
-		height: window.innerHeight
-	}));
-});
-
-return {
-	size: size
-};
-
-}();
-var _elm_lang$window$Window_ops = _elm_lang$window$Window_ops || {};
-_elm_lang$window$Window_ops['&>'] = F2(
-	function (task1, task2) {
-		return A2(
-			_elm_lang$core$Task$andThen,
-			function (_p0) {
-				return task2;
-			},
-			task1);
-	});
-var _elm_lang$window$Window$onSelfMsg = F3(
-	function (router, dimensions, state) {
-		var _p1 = state;
-		if (_p1.ctor === 'Nothing') {
-			return _elm_lang$core$Task$succeed(state);
-		} else {
-			var send = function (_p2) {
-				var _p3 = _p2;
-				return A2(
-					_elm_lang$core$Platform$sendToApp,
-					router,
-					_p3._0(dimensions));
-			};
-			return A2(
-				_elm_lang$window$Window_ops['&>'],
-				_elm_lang$core$Task$sequence(
-					A2(_elm_lang$core$List$map, send, _p1._0.subs)),
-				_elm_lang$core$Task$succeed(state));
-		}
-	});
-var _elm_lang$window$Window$init = _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
-var _elm_lang$window$Window$size = _elm_lang$window$Native_Window.size;
-var _elm_lang$window$Window$width = A2(
-	_elm_lang$core$Task$map,
-	function (_) {
-		return _.width;
-	},
-	_elm_lang$window$Window$size);
-var _elm_lang$window$Window$height = A2(
-	_elm_lang$core$Task$map,
-	function (_) {
-		return _.height;
-	},
-	_elm_lang$window$Window$size);
-var _elm_lang$window$Window$onEffects = F3(
-	function (router, newSubs, oldState) {
-		var _p4 = {ctor: '_Tuple2', _0: oldState, _1: newSubs};
-		if (_p4._0.ctor === 'Nothing') {
-			if (_p4._1.ctor === '[]') {
-				return _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
-			} else {
-				return A2(
-					_elm_lang$core$Task$andThen,
-					function (pid) {
-						return _elm_lang$core$Task$succeed(
-							_elm_lang$core$Maybe$Just(
-								{subs: newSubs, pid: pid}));
-					},
-					_elm_lang$core$Process$spawn(
-						A3(
-							_elm_lang$dom$Dom_LowLevel$onWindow,
-							'resize',
-							_elm_lang$core$Json_Decode$succeed(
-								{ctor: '_Tuple0'}),
-							function (_p5) {
-								return A2(
-									_elm_lang$core$Task$andThen,
-									_elm_lang$core$Platform$sendToSelf(router),
-									_elm_lang$window$Window$size);
-							})));
-			}
-		} else {
-			if (_p4._1.ctor === '[]') {
-				return A2(
-					_elm_lang$window$Window_ops['&>'],
-					_elm_lang$core$Process$kill(_p4._0._0.pid),
-					_elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing));
-			} else {
-				return _elm_lang$core$Task$succeed(
-					_elm_lang$core$Maybe$Just(
-						{subs: newSubs, pid: _p4._0._0.pid}));
-			}
-		}
-	});
-var _elm_lang$window$Window$subscription = _elm_lang$core$Native_Platform.leaf('Window');
-var _elm_lang$window$Window$Size = F2(
-	function (a, b) {
-		return {width: a, height: b};
-	});
-var _elm_lang$window$Window$MySub = function (a) {
-	return {ctor: 'MySub', _0: a};
-};
-var _elm_lang$window$Window$resizes = function (tagger) {
-	return _elm_lang$window$Window$subscription(
-		_elm_lang$window$Window$MySub(tagger));
-};
-var _elm_lang$window$Window$subMap = F2(
-	function (func, _p6) {
-		var _p7 = _p6;
-		return _elm_lang$window$Window$MySub(
-			function (_p8) {
-				return func(
-					_p7._0(_p8));
-			});
-	});
-_elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
 
 var _rundis$elm_bootstrap$Bootstrap_General_Internal$screenSizeOption = function (size) {
 	var _p0 = size;
@@ -14193,1429 +13905,6 @@ var _rundis$elm_bootstrap$Bootstrap_Grid$col = F2(
 			{options: options, children: children});
 	});
 
-var _rundis$elm_bootstrap$Bootstrap_Navbar$toRGBString = function (color) {
-	var _p0 = _elm_lang$core$Color$toRgb(color);
-	var red = _p0.red;
-	var green = _p0.green;
-	var blue = _p0.blue;
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		'RGB(',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			_elm_lang$core$Basics$toString(red),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				',',
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(green),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						',',
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							_elm_lang$core$Basics$toString(blue),
-							')'))))));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$backgroundColorOption = function (bgClass) {
-	var _p1 = bgClass;
-	switch (_p1.ctor) {
-		case 'Roled':
-			return A2(_rundis$elm_bootstrap$Bootstrap_Internal_Role$toClass, 'bg', _p1._0);
-		case 'Custom':
-			return _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'background-color',
-						_1: _rundis$elm_bootstrap$Bootstrap_Navbar$toRGBString(_p1._0)
-					},
-					_1: {ctor: '[]'}
-				});
-		default:
-			return _elm_lang$html$Html_Attributes$class(_p1._0);
-	}
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$linkModifierClass = function (modifier) {
-	return _elm_lang$html$Html_Attributes$class(
-		function () {
-			var _p2 = modifier;
-			if (_p2.ctor === 'Dark') {
-				return 'navbar-dark';
-			} else {
-				return 'navbar-light';
-			}
-		}());
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$schemeAttributes = function (_p3) {
-	var _p4 = _p3;
-	return {
-		ctor: '::',
-		_0: _rundis$elm_bootstrap$Bootstrap_Navbar$linkModifierClass(_p4.modifier),
-		_1: {
-			ctor: '::',
-			_0: _rundis$elm_bootstrap$Bootstrap_Navbar$backgroundColorOption(_p4.bgColor),
-			_1: {ctor: '[]'}
-		}
-	};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$fixOption = function (fix) {
-	var _p5 = fix;
-	if (_p5.ctor === 'Top') {
-		return 'fixed-top';
-	} else {
-		return 'fixed-bottom';
-	}
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$expandOption = function (size) {
-	var toClass = function (sz) {
-		return _elm_lang$html$Html_Attributes$class(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				'navbar-expand',
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					'',
-					A2(
-						_elm_lang$core$Maybe$map,
-						function (s) {
-							return A2(_elm_lang$core$Basics_ops['++'], '-', s);
-						},
-						_rundis$elm_bootstrap$Bootstrap_General_Internal$screenSizeOption(sz)))));
-	};
-	var _p6 = size;
-	switch (_p6.ctor) {
-		case 'XS':
-			return {
-				ctor: '::',
-				_0: toClass(_rundis$elm_bootstrap$Bootstrap_General_Internal$SM),
-				_1: {ctor: '[]'}
-			};
-		case 'SM':
-			return {
-				ctor: '::',
-				_0: toClass(_rundis$elm_bootstrap$Bootstrap_General_Internal$MD),
-				_1: {ctor: '[]'}
-			};
-		case 'MD':
-			return {
-				ctor: '::',
-				_0: toClass(_rundis$elm_bootstrap$Bootstrap_General_Internal$LG),
-				_1: {ctor: '[]'}
-			};
-		case 'LG':
-			return {
-				ctor: '::',
-				_0: toClass(_rundis$elm_bootstrap$Bootstrap_General_Internal$XL),
-				_1: {ctor: '[]'}
-			};
-		default:
-			return {ctor: '[]'};
-	}
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$navbarAttributes = function (options) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$classList(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'navbar', _1: true},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'container', _1: options.isContainer},
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		},
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			_rundis$elm_bootstrap$Bootstrap_Navbar$expandOption(options.toggleAt),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				function () {
-					var _p7 = options.scheme;
-					if (_p7.ctor === 'Just') {
-						return _rundis$elm_bootstrap$Bootstrap_Navbar$schemeAttributes(_p7._0);
-					} else {
-						return {ctor: '[]'};
-					}
-				}(),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					function () {
-						var _p8 = options.fix;
-						if (_p8.ctor === 'Just') {
-							return {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class(
-									_rundis$elm_bootstrap$Bootstrap_Navbar$fixOption(_p8._0)),
-								_1: {ctor: '[]'}
-							};
-						} else {
-							return {ctor: '[]'};
-						}
-					}(),
-					options.attributes))));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$renderCustom = function (items) {
-	return A2(
-		_elm_lang$core$List$map,
-		function (_p9) {
-			var _p10 = _p9;
-			return _p10._0;
-		},
-		items);
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$renderItemLink = function (_p11) {
-	var _p12 = _p11;
-	return A2(
-		_elm_lang$html$Html$li,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('nav-item'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$a,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('nav-link'),
-						_1: {ctor: '[]'}
-					},
-					_p12.attributes),
-				_p12.children),
-			_1: {ctor: '[]'}
-		});
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$maybeBrand = function (brand) {
-	var _p13 = brand;
-	if (_p13.ctor === 'Just') {
-		return {
-			ctor: '::',
-			_0: _p13._0._0,
-			_1: {ctor: '[]'}
-		};
-	} else {
-		return {ctor: '[]'};
-	}
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$transitionStyle = function (maybeHeight) {
-	var pixelHeight = A2(
-		_elm_lang$core$Maybe$withDefault,
-		'0',
-		A2(
-			_elm_lang$core$Maybe$map,
-			function (v) {
-				return A2(
-					_elm_lang$core$Basics_ops['++'],
-					_elm_lang$core$Basics$toString(v),
-					'px');
-			},
-			maybeHeight));
-	return _elm_lang$html$Html_Attributes$style(
-		{
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'position', _1: 'relative'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'height', _1: pixelHeight},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: '-webkit-transition-timing-function', _1: 'ease'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: '-o-transition-timing-function', _1: 'ease'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'transition-timing-function', _1: 'ease'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: '-webkit-transition-duration', _1: '0.35s'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: '-o-transition-duration', _1: '0.35s'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'transition-duration', _1: '0.35s'},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: '-webkit-transition-property', _1: 'height'},
-													_1: {
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: '-o-transition-property', _1: 'height'},
-														_1: {
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'transition-property', _1: 'height'},
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		});
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$toScreenSize = function (_p14) {
-	var _p15 = _p14;
-	var _p16 = _p15.width;
-	return (_elm_lang$core$Native_Utils.cmp(_p16, 576) < 1) ? _rundis$elm_bootstrap$Bootstrap_General_Internal$XS : ((_elm_lang$core$Native_Utils.cmp(_p16, 768) < 1) ? _rundis$elm_bootstrap$Bootstrap_General_Internal$SM : ((_elm_lang$core$Native_Utils.cmp(_p16, 992) < 1) ? _rundis$elm_bootstrap$Bootstrap_General_Internal$MD : ((_elm_lang$core$Native_Utils.cmp(_p16, 1200) < 1) ? _rundis$elm_bootstrap$Bootstrap_General_Internal$LG : _rundis$elm_bootstrap$Bootstrap_General_Internal$XL)));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$sizeToComparable = function (size) {
-	var _p17 = size;
-	switch (_p17.ctor) {
-		case 'XS':
-			return 1;
-		case 'SM':
-			return 2;
-		case 'MD':
-			return 3;
-		case 'LG':
-			return 4;
-		default:
-			return 5;
-	}
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$shouldHideMenu = F2(
-	function (_p19, _p18) {
-		var _p20 = _p19;
-		var _p21 = _p18;
-		var winMedia = function () {
-			var _p22 = _p20._0.windowSize;
-			if (_p22.ctor === 'Just') {
-				return _rundis$elm_bootstrap$Bootstrap_Navbar$toScreenSize(_p22._0);
-			} else {
-				return _rundis$elm_bootstrap$Bootstrap_General_Internal$XS;
-			}
-		}();
-		return _elm_lang$core$Native_Utils.cmp(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$sizeToComparable(winMedia),
-			_rundis$elm_bootstrap$Bootstrap_Navbar$sizeToComparable(_p21._0.options.toggleAt)) > 0;
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$menuWrapperAttributes = F2(
-	function (_p24, _p23) {
-		var _p25 = _p24;
-		var _p31 = _p25;
-		var _p26 = _p23;
-		var _p30 = _p26._0.withAnimation;
-		var _p29 = _p26;
-		var display = function () {
-			var _p27 = _p25._0.height;
-			if (_p27.ctor === 'Nothing') {
-				return ((!_p30) || A2(_rundis$elm_bootstrap$Bootstrap_Navbar$shouldHideMenu, _p31, _p29)) ? 'flex' : 'block';
-			} else {
-				return 'flex';
-			}
-		}();
-		var styleBlock = {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
-		};
-		var _p28 = _p25._0.visibility;
-		switch (_p28.ctor) {
-			case 'Hidden':
-				return {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'display', _1: display},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-								_1: {ctor: '[]'}
-							}
-						}),
-					_1: {ctor: '[]'}
-				};
-			case 'StartDown':
-				return styleBlock;
-			case 'AnimatingDown':
-				return styleBlock;
-			case 'AnimatingUp':
-				return styleBlock;
-			case 'StartUp':
-				return styleBlock;
-			default:
-				return ((!_p30) || A2(_rundis$elm_bootstrap$Bootstrap_Navbar$shouldHideMenu, _p31, _p29)) ? {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('collapse navbar-collapse show'),
-					_1: {ctor: '[]'}
-				} : {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				};
-		}
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$heightDecoder = function () {
-	var resToDec = function (res) {
-		var _p32 = res;
-		if (_p32.ctor === 'Ok') {
-			return _elm_lang$core$Json_Decode$succeed(_p32._0);
-		} else {
-			return _elm_lang$core$Json_Decode$fail(_p32._0);
-		}
-	};
-	var fromNavDec = _elm_lang$core$Json_Decode$oneOf(
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$core$Json_Decode$at,
-				{
-					ctor: '::',
-					_0: 'childNodes',
-					_1: {
-						ctor: '::',
-						_0: '2',
-						_1: {
-							ctor: '::',
-							_0: 'childNodes',
-							_1: {
-								ctor: '::',
-								_0: '0',
-								_1: {
-									ctor: '::',
-									_0: 'offsetHeight',
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				},
-				_elm_lang$core$Json_Decode$float),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$core$Json_Decode$at,
-					{
-						ctor: '::',
-						_0: 'childNodes',
-						_1: {
-							ctor: '::',
-							_0: '1',
-							_1: {
-								ctor: '::',
-								_0: 'childNodes',
-								_1: {
-									ctor: '::',
-									_0: '0',
-									_1: {
-										ctor: '::',
-										_0: 'offsetHeight',
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					},
-					_elm_lang$core$Json_Decode$float),
-				_1: {ctor: '[]'}
-			}
-		});
-	var fromButtonDec = _debois$elm_dom$DOM$parentElement(fromNavDec);
-	var tagDecoder = A3(
-		_elm_lang$core$Json_Decode$map2,
-		F2(
-			function (tag, val) {
-				return {ctor: '_Tuple2', _0: tag, _1: val};
-			}),
-		A2(_elm_lang$core$Json_Decode$field, 'tagName', _elm_lang$core$Json_Decode$string),
-		_elm_lang$core$Json_Decode$value);
-	return A2(
-		_elm_lang$core$Json_Decode$andThen,
-		function (_p33) {
-			var _p34 = _p33;
-			var _p36 = _p34._1;
-			var _p35 = _p34._0;
-			switch (_p35) {
-				case 'NAV':
-					return resToDec(
-						A2(_elm_lang$core$Json_Decode$decodeValue, fromNavDec, _p36));
-				case 'BUTTON':
-					return resToDec(
-						A2(_elm_lang$core$Json_Decode$decodeValue, fromButtonDec, _p36));
-				default:
-					return _elm_lang$core$Json_Decode$succeed(0);
-			}
-		},
-		_debois$elm_dom$DOM$target(
-			_debois$elm_dom$DOM$parentElement(tagDecoder)));
-}();
-var _rundis$elm_bootstrap$Bootstrap_Navbar$VisibilityState = F4(
-	function (a, b, c, d) {
-		return {visibility: a, height: b, windowSize: c, dropdowns: d};
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$ConfigRec = F6(
-	function (a, b, c, d, e, f) {
-		return {options: a, toMsg: b, withAnimation: c, brand: d, items: e, customItems: f};
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Options = F5(
-	function (a, b, c, d, e) {
-		return {fix: a, isContainer: b, scheme: c, toggleAt: d, attributes: e};
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Scheme = F2(
-	function (a, b) {
-		return {modifier: a, bgColor: b};
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$State = function (a) {
-	return {ctor: 'State', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$mapState = F2(
-	function (mapper, _p37) {
-		var _p38 = _p37;
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$State(
-			mapper(_p38._0));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$initWindowSize = F2(
-	function (toMsg, state) {
-		return A2(
-			_elm_lang$core$Task$perform,
-			function (size) {
-				return toMsg(
-					A2(
-						_rundis$elm_bootstrap$Bootstrap_Navbar$mapState,
-						function (s) {
-							return _elm_lang$core$Native_Utils.update(
-								s,
-								{
-									windowSize: _elm_lang$core$Maybe$Just(size)
-								});
-						},
-						state));
-			},
-			_elm_lang$window$Window$size);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Shown = {ctor: 'Shown'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$AnimatingUp = {ctor: 'AnimatingUp'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$StartUp = {ctor: 'StartUp'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$AnimatingDown = {ctor: 'AnimatingDown'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$StartDown = {ctor: 'StartDown'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Hidden = {ctor: 'Hidden'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$initialState = function (toMsg) {
-	var state = _rundis$elm_bootstrap$Bootstrap_Navbar$State(
-		{visibility: _rundis$elm_bootstrap$Bootstrap_Navbar$Hidden, height: _elm_lang$core$Maybe$Nothing, windowSize: _elm_lang$core$Maybe$Nothing, dropdowns: _elm_lang$core$Dict$empty});
-	return {
-		ctor: '_Tuple2',
-		_0: state,
-		_1: A2(_rundis$elm_bootstrap$Bootstrap_Navbar$initWindowSize, toMsg, state)
-	};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$visibilityTransition = F2(
-	function (withAnimation, visibility) {
-		var _p39 = {ctor: '_Tuple2', _0: withAnimation, _1: visibility};
-		_v23_8:
-		do {
-			if (_p39.ctor === '_Tuple2') {
-				if (_p39._0 === true) {
-					switch (_p39._1.ctor) {
-						case 'Hidden':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$StartDown;
-						case 'StartDown':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$AnimatingDown;
-						case 'AnimatingDown':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$Shown;
-						case 'Shown':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$StartUp;
-						case 'StartUp':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$AnimatingUp;
-						default:
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$Hidden;
-					}
-				} else {
-					switch (_p39._1.ctor) {
-						case 'Hidden':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$Shown;
-						case 'Shown':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$Hidden;
-						default:
-							break _v23_8;
-					}
-				}
-			} else {
-				break _v23_8;
-			}
-		} while(false);
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$Hidden;
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$toggleHandler = F2(
-	function (_p41, _p40) {
-		var _p42 = _p41;
-		var _p43 = _p40;
-		var updState = function (h) {
-			return A2(
-				_rundis$elm_bootstrap$Bootstrap_Navbar$mapState,
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						s,
-						{
-							height: _elm_lang$core$Maybe$Just(h),
-							visibility: A2(_rundis$elm_bootstrap$Bootstrap_Navbar$visibilityTransition, _p43._0.withAnimation, s.visibility)
-						});
-				},
-				_p42);
-		};
-		return A2(
-			_elm_lang$html$Html_Events$on,
-			'click',
-			A2(
-				_elm_lang$core$Json_Decode$andThen,
-				function (v) {
-					return _elm_lang$core$Json_Decode$succeed(
-						_p43._0.toMsg(
-							(_elm_lang$core$Native_Utils.cmp(v, 0) > 0) ? updState(v) : updState(
-								A2(_elm_lang$core$Maybe$withDefault, 0, _p42._0.height))));
-				},
-				_rundis$elm_bootstrap$Bootstrap_Navbar$heightDecoder));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$transitionHandler = F2(
-	function (state, _p44) {
-		var _p45 = _p44;
-		return _elm_lang$core$Json_Decode$succeed(
-			_p45._0.toMsg(
-				A2(
-					_rundis$elm_bootstrap$Bootstrap_Navbar$mapState,
-					function (s) {
-						return _elm_lang$core$Native_Utils.update(
-							s,
-							{
-								visibility: A2(_rundis$elm_bootstrap$Bootstrap_Navbar$visibilityTransition, _p45._0.withAnimation, s.visibility)
-							});
-					},
-					state)));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$menuAttributes = F2(
-	function (_p47, _p46) {
-		var _p48 = _p47;
-		var _p54 = _p48;
-		var _p53 = _p48._0.height;
-		var _p49 = _p46;
-		var _p52 = _p49;
-		var defaults = {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('collapse navbar-collapse'),
-			_1: {ctor: '[]'}
-		};
-		var _p50 = _p48._0.visibility;
-		switch (_p50.ctor) {
-			case 'Hidden':
-				var _p51 = _p53;
-				if (_p51.ctor === 'Nothing') {
-					return ((!_p49._0.withAnimation) || A2(_rundis$elm_bootstrap$Bootstrap_Navbar$shouldHideMenu, _p54, _p52)) ? defaults : {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$style(
-							{
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'height', _1: '0'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}),
-						_1: {ctor: '[]'}
-					};
-				} else {
-					return defaults;
-				}
-			case 'StartDown':
-				return {
-					ctor: '::',
-					_0: _rundis$elm_bootstrap$Bootstrap_Navbar$transitionStyle(_elm_lang$core$Maybe$Nothing),
-					_1: {ctor: '[]'}
-				};
-			case 'AnimatingDown':
-				return {
-					ctor: '::',
-					_0: _rundis$elm_bootstrap$Bootstrap_Navbar$transitionStyle(_p53),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html_Events$on,
-							'transitionend',
-							A2(_rundis$elm_bootstrap$Bootstrap_Navbar$transitionHandler, _p54, _p52)),
-						_1: {ctor: '[]'}
-					}
-				};
-			case 'AnimatingUp':
-				return {
-					ctor: '::',
-					_0: _rundis$elm_bootstrap$Bootstrap_Navbar$transitionStyle(_elm_lang$core$Maybe$Nothing),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html_Events$on,
-							'transitionend',
-							A2(_rundis$elm_bootstrap$Bootstrap_Navbar$transitionHandler, _p54, _p52)),
-						_1: {ctor: '[]'}
-					}
-				};
-			case 'StartUp':
-				return {
-					ctor: '::',
-					_0: _rundis$elm_bootstrap$Bootstrap_Navbar$transitionStyle(_p53),
-					_1: {ctor: '[]'}
-				};
-			default:
-				return A2(
-					_elm_lang$core$Basics_ops['++'],
-					defaults,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('show'),
-						_1: {ctor: '[]'}
-					});
-		}
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Closed = {ctor: 'Closed'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$getOrInitDropdownStatus = F2(
-	function (id, _p55) {
-		var _p56 = _p55;
-		return A2(
-			_elm_lang$core$Maybe$withDefault,
-			_rundis$elm_bootstrap$Bootstrap_Navbar$Closed,
-			A2(_elm_lang$core$Dict$get, id, _p56._0.dropdowns));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$ListenClicks = {ctor: 'ListenClicks'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Open = {ctor: 'Open'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$dropdownSubscriptions = F2(
-	function (_p57, toMsg) {
-		var _p58 = _p57;
-		var _p65 = _p58._0.dropdowns;
-		var needsSub = function (s) {
-			return A2(
-				_elm_lang$core$List$any,
-				function (_p59) {
-					var _p60 = _p59;
-					return _elm_lang$core$Native_Utils.eq(_p60._1, s);
-				},
-				_elm_lang$core$Dict$toList(_p65));
-		};
-		var updDropdowns = A2(
-			_elm_lang$core$Dict$map,
-			F2(
-				function (_p61, status) {
-					var _p62 = status;
-					switch (_p62.ctor) {
-						case 'Open':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$ListenClicks;
-						case 'ListenClicks':
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$Closed;
-						default:
-							return _rundis$elm_bootstrap$Bootstrap_Navbar$Closed;
-					}
-				}),
-			_p65);
-		var updState = A2(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$mapState,
-			function (s) {
-				return _elm_lang$core$Native_Utils.update(
-					s,
-					{dropdowns: updDropdowns});
-			},
-			_p58);
-		return _elm_lang$core$Platform_Sub$batch(
-			{
-				ctor: '::',
-				_0: needsSub(_rundis$elm_bootstrap$Bootstrap_Navbar$Open) ? _elm_lang$animation_frame$AnimationFrame$times(
-					function (_p63) {
-						return toMsg(updState);
-					}) : _elm_lang$core$Platform_Sub$none,
-				_1: {
-					ctor: '::',
-					_0: needsSub(_rundis$elm_bootstrap$Bootstrap_Navbar$ListenClicks) ? _elm_lang$mouse$Mouse$clicks(
-						function (_p64) {
-							return toMsg(updState);
-						}) : _elm_lang$core$Platform_Sub$none,
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$subscriptions = F2(
-	function (_p66, toMsg) {
-		var _p67 = _p66;
-		var _p71 = _p67;
-		var updState = function (v) {
-			return A2(
-				_rundis$elm_bootstrap$Bootstrap_Navbar$mapState,
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						s,
-						{visibility: v});
-				},
-				_p71);
-		};
-		return _elm_lang$core$Platform_Sub$batch(
-			{
-				ctor: '::',
-				_0: function () {
-					var _p68 = _p67._0.visibility;
-					switch (_p68.ctor) {
-						case 'StartDown':
-							return _elm_lang$animation_frame$AnimationFrame$times(
-								function (_p69) {
-									return toMsg(
-										updState(_rundis$elm_bootstrap$Bootstrap_Navbar$AnimatingDown));
-								});
-						case 'StartUp':
-							return _elm_lang$animation_frame$AnimationFrame$times(
-								function (_p70) {
-									return toMsg(
-										updState(_rundis$elm_bootstrap$Bootstrap_Navbar$AnimatingUp));
-								});
-						default:
-							return _elm_lang$core$Platform_Sub$none;
-					}
-				}(),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$window$Window$resizes(
-						function (size) {
-							return toMsg(
-								A2(
-									_rundis$elm_bootstrap$Bootstrap_Navbar$mapState,
-									function (s) {
-										return _elm_lang$core$Native_Utils.update(
-											s,
-											{
-												windowSize: _elm_lang$core$Maybe$Just(size)
-											});
-									},
-									_p71));
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(_rundis$elm_bootstrap$Bootstrap_Navbar$dropdownSubscriptions, _p71, toMsg),
-						_1: {ctor: '[]'}
-					}
-				}
-			});
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$toggleOpen = F3(
-	function (state, id, _p72) {
-		var _p73 = _p72;
-		var currStatus = A2(_rundis$elm_bootstrap$Bootstrap_Navbar$getOrInitDropdownStatus, id, state);
-		var newStatus = function () {
-			var _p74 = currStatus;
-			switch (_p74.ctor) {
-				case 'Open':
-					return _rundis$elm_bootstrap$Bootstrap_Navbar$Closed;
-				case 'ListenClicks':
-					return _rundis$elm_bootstrap$Bootstrap_Navbar$Closed;
-				default:
-					return _rundis$elm_bootstrap$Bootstrap_Navbar$Open;
-			}
-		}();
-		return _p73._0.toMsg(
-			A2(
-				_rundis$elm_bootstrap$Bootstrap_Navbar$mapState,
-				function (s) {
-					return _elm_lang$core$Native_Utils.update(
-						s,
-						{
-							dropdowns: A3(_elm_lang$core$Dict$insert, id, newStatus, s.dropdowns)
-						});
-				},
-				state));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$renderDropdownToggle = F4(
-	function (state, id, config, _p75) {
-		var _p76 = _p75;
-		return A2(
-			_elm_lang$html$Html$a,
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('nav-link dropdown-toggle'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href('#'),
-						_1: {
-							ctor: '::',
-							_0: A3(
-								_elm_lang$html$Html_Events$onWithOptions,
-								'click',
-								{stopPropagation: false, preventDefault: true},
-								_elm_lang$core$Json_Decode$succeed(
-									A3(_rundis$elm_bootstrap$Bootstrap_Navbar$toggleOpen, state, id, config))),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				_p76._0.attributes),
-			_p76._0.children);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$renderDropdown = F3(
-	function (state, _p78, _p77) {
-		var _p79 = _p78;
-		var _p80 = _p77;
-		var _p84 = _p80._0.id;
-		var isShown = !_elm_lang$core$Native_Utils.eq(
-			A2(_rundis$elm_bootstrap$Bootstrap_Navbar$getOrInitDropdownStatus, _p84, state),
-			_rundis$elm_bootstrap$Bootstrap_Navbar$Closed);
-		var needsDropup = A2(
-			_elm_lang$core$Maybe$withDefault,
-			false,
-			A2(
-				_elm_lang$core$Maybe$map,
-				function (fix) {
-					var _p81 = fix;
-					if (_p81.ctor === 'Bottom') {
-						return true;
-					} else {
-						return false;
-					}
-				},
-				_p79._0.options.fix));
-		return A2(
-			_elm_lang$html$Html$li,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$classList(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'nav-item', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'dropdown', _1: true},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'shown', _1: isShown},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'dropup', _1: needsDropup},
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}),
-				_1: {ctor: '[]'}
-			},
-			{
-				ctor: '::',
-				_0: A4(_rundis$elm_bootstrap$Bootstrap_Navbar$renderDropdownToggle, state, _p84, _p79, _p80._0.toggle),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$classList(
-								{
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'dropdown-menu', _1: true},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'show', _1: isShown},
-										_1: {ctor: '[]'}
-									}
-								}),
-							_1: {ctor: '[]'}
-						},
-						A2(
-							_elm_lang$core$List$map,
-							function (_p82) {
-								var _p83 = _p82;
-								return _p83._0;
-							},
-							_p80._0.items)),
-					_1: {ctor: '[]'}
-				}
-			});
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$renderNav = F3(
-	function (state, config, navItems) {
-		return A2(
-			_elm_lang$html$Html$ul,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('navbar-nav mr-auto'),
-				_1: {ctor: '[]'}
-			},
-			A2(
-				_elm_lang$core$List$map,
-				function (item) {
-					var _p85 = item;
-					if (_p85.ctor === 'Item') {
-						return _rundis$elm_bootstrap$Bootstrap_Navbar$renderItemLink(_p85._0);
-					} else {
-						return A3(_rundis$elm_bootstrap$Bootstrap_Navbar$renderDropdown, state, config, _p85._0);
-					}
-				},
-				navItems));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$view = F2(
-	function (state, _p86) {
-		var _p87 = _p86;
-		var _p90 = _p87;
-		var _p89 = _p87._0.brand;
-		return A2(
-			_elm_lang$html$Html$nav,
-			_rundis$elm_bootstrap$Bootstrap_Navbar$navbarAttributes(_p87._0.options),
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_rundis$elm_bootstrap$Bootstrap_Navbar$maybeBrand(_p89),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$button,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class(
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										'navbar-toggler',
-										A2(
-											_elm_lang$core$Maybe$withDefault,
-											'',
-											A2(
-												_elm_lang$core$Maybe$map,
-												function (_p88) {
-													return ' navbar-toggler-right';
-												},
-												_p89)))),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_('button'),
-									_1: {
-										ctor: '::',
-										_0: A2(_rundis$elm_bootstrap$Bootstrap_Navbar$toggleHandler, state, _p90),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$span,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('navbar-toggler-icon'),
-										_1: {ctor: '[]'}
-									},
-									{ctor: '[]'}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							A2(_rundis$elm_bootstrap$Bootstrap_Navbar$menuAttributes, state, _p90),
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$div,
-									A2(_rundis$elm_bootstrap$Bootstrap_Navbar$menuWrapperAttributes, state, _p90),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										{
-											ctor: '::',
-											_0: A3(_rundis$elm_bootstrap$Bootstrap_Navbar$renderNav, state, _p90, _p87._0.items),
-											_1: {ctor: '[]'}
-										},
-										_rundis$elm_bootstrap$Bootstrap_Navbar$renderCustom(_p87._0.customItems))),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					})));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Config = function (a) {
-	return {ctor: 'Config', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$updateConfig = F2(
-	function (mapper, _p91) {
-		var _p92 = _p91;
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$Config(
-			mapper(_p92._0));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$withAnimation = function (config) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$updateConfig,
-		function (conf) {
-			return _elm_lang$core$Native_Utils.update(
-				conf,
-				{withAnimation: true});
-		},
-		config);
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$items = F2(
-	function (items, config) {
-		return A2(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$updateConfig,
-			function (conf) {
-				return _elm_lang$core$Native_Utils.update(
-					conf,
-					{items: items});
-			},
-			config);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$customItems = F2(
-	function (items, config) {
-		return A2(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$updateConfig,
-			function (conf) {
-				return _elm_lang$core$Native_Utils.update(
-					conf,
-					{customItems: items});
-			},
-			config);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$updateOptions = F2(
-	function (mapper, _p93) {
-		var _p94 = _p93;
-		var _p95 = _p94._0;
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$Config(
-			_elm_lang$core$Native_Utils.update(
-				_p95,
-				{
-					options: mapper(_p95.options)
-				}));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$container = function (config) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$updateOptions,
-		function (opts) {
-			return _elm_lang$core$Native_Utils.update(
-				opts,
-				{isContainer: true});
-		},
-		config);
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$scheme = F3(
-	function (modifier, bgColor, config) {
-		return A2(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$updateOptions,
-			function (opt) {
-				return _elm_lang$core$Native_Utils.update(
-					opt,
-					{
-						scheme: _elm_lang$core$Maybe$Just(
-							{modifier: modifier, bgColor: bgColor})
-					});
-			},
-			config);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$toggleAt = F2(
-	function (size, config) {
-		return A2(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$updateOptions,
-			function (opt) {
-				return _elm_lang$core$Native_Utils.update(
-					opt,
-					{toggleAt: size});
-			},
-			config);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$collapseSmall = _rundis$elm_bootstrap$Bootstrap_Navbar$toggleAt(_rundis$elm_bootstrap$Bootstrap_General_Internal$SM);
-var _rundis$elm_bootstrap$Bootstrap_Navbar$collapseMedium = _rundis$elm_bootstrap$Bootstrap_Navbar$toggleAt(_rundis$elm_bootstrap$Bootstrap_General_Internal$MD);
-var _rundis$elm_bootstrap$Bootstrap_Navbar$collapseLarge = _rundis$elm_bootstrap$Bootstrap_Navbar$toggleAt(_rundis$elm_bootstrap$Bootstrap_General_Internal$LG);
-var _rundis$elm_bootstrap$Bootstrap_Navbar$collapseExtraLarge = _rundis$elm_bootstrap$Bootstrap_Navbar$toggleAt(_rundis$elm_bootstrap$Bootstrap_General_Internal$XL);
-var _rundis$elm_bootstrap$Bootstrap_Navbar$attrs = F2(
-	function (attrs, config) {
-		return A2(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$updateOptions,
-			function (opt) {
-				return _elm_lang$core$Native_Utils.update(
-					opt,
-					{
-						attributes: A2(_elm_lang$core$Basics_ops['++'], opt.attributes, attrs)
-					});
-			},
-			config);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Bottom = {ctor: 'Bottom'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$fixBottom = function (config) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$updateOptions,
-		function (opts) {
-			return _elm_lang$core$Native_Utils.update(
-				opts,
-				{
-					fix: _elm_lang$core$Maybe$Just(_rundis$elm_bootstrap$Bootstrap_Navbar$Bottom)
-				});
-		},
-		config);
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Top = {ctor: 'Top'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$fixTop = function (config) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$updateOptions,
-		function (opts) {
-			return _elm_lang$core$Native_Utils.update(
-				opts,
-				{
-					fix: _elm_lang$core$Maybe$Just(_rundis$elm_bootstrap$Bootstrap_Navbar$Top)
-				});
-		},
-		config);
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Light = {ctor: 'Light'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Dark = {ctor: 'Dark'};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Class = function (a) {
-	return {ctor: 'Class', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$darkCustomClass = function (classString) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Class(classString));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$lightCustomClass = function (classString) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Light,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Class(classString));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Custom = function (a) {
-	return {ctor: 'Custom', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$darkCustom = function (color) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Custom(color));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$lightCustom = function (color) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Light,
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Custom(color));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Roled = function (a) {
-	return {ctor: 'Roled', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$config = function (toMsg) {
-	return _rundis$elm_bootstrap$Bootstrap_Navbar$Config(
-		{
-			toMsg: toMsg,
-			withAnimation: false,
-			brand: _elm_lang$core$Maybe$Nothing,
-			items: {ctor: '[]'},
-			customItems: {ctor: '[]'},
-			options: {
-				fix: _elm_lang$core$Maybe$Nothing,
-				isContainer: false,
-				scheme: _elm_lang$core$Maybe$Just(
-					{
-						modifier: _rundis$elm_bootstrap$Bootstrap_Navbar$Light,
-						bgColor: _rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Light)
-					}),
-				toggleAt: _rundis$elm_bootstrap$Bootstrap_General_Internal$XS,
-				attributes: {ctor: '[]'}
-			}
-		});
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$light = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Light,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Light));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$dark = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Dark));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$primary = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Primary));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$secondary = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Secondary));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$success = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Success));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$info = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Info));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$warning = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Warning));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$danger = A2(
-	_rundis$elm_bootstrap$Bootstrap_Navbar$scheme,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Dark,
-	_rundis$elm_bootstrap$Bootstrap_Navbar$Roled(_rundis$elm_bootstrap$Bootstrap_Internal_Role$Danger));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$NavDropdown = function (a) {
-	return {ctor: 'NavDropdown', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Item = function (a) {
-	return {ctor: 'Item', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$itemLink = F2(
-	function (attributes, children) {
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$Item(
-			{attributes: attributes, children: children});
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$itemLinkActive = function (attributes) {
-	return _rundis$elm_bootstrap$Bootstrap_Navbar$itemLink(
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('active'),
-			_1: attributes
-		});
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$CustomItem = function (a) {
-	return {ctor: 'CustomItem', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$textItem = F2(
-	function (attributes, children) {
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$CustomItem(
-			A2(
-				_elm_lang$html$Html$span,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('navbar-text'),
-					_1: attributes
-				},
-				children));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$formItem = F2(
-	function (attributes, children) {
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$CustomItem(
-			A2(
-				_elm_lang$html$Html$form,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('form-inline'),
-					_1: attributes
-				},
-				children));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$customItem = function (elem) {
-	return _rundis$elm_bootstrap$Bootstrap_Navbar$CustomItem(elem);
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Brand = function (a) {
-	return {ctor: 'Brand', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$brand = F3(
-	function (attributes, children, config) {
-		return A2(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$updateConfig,
-			function (conf) {
-				return _elm_lang$core$Native_Utils.update(
-					conf,
-					{
-						brand: _elm_lang$core$Maybe$Just(
-							_rundis$elm_bootstrap$Bootstrap_Navbar$Brand(
-								A2(
-									_elm_lang$html$Html$a,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										{
-											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$class('navbar-brand'),
-											_1: {ctor: '[]'}
-										},
-										attributes),
-									children)))
-					});
-			},
-			config);
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$Dropdown = function (a) {
-	return {ctor: 'Dropdown', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$dropdown = function (config) {
-	return _rundis$elm_bootstrap$Bootstrap_Navbar$NavDropdown(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$Dropdown(config));
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$DropdownToggle = function (a) {
-	return {ctor: 'DropdownToggle', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$dropdownToggle = F2(
-	function (attributes, children) {
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$DropdownToggle(
-			{attributes: attributes, children: children});
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$DropdownItem = function (a) {
-	return {ctor: 'DropdownItem', _0: a};
-};
-var _rundis$elm_bootstrap$Bootstrap_Navbar$dropdownItem = F2(
-	function (attributes, children) {
-		return _rundis$elm_bootstrap$Bootstrap_Navbar$DropdownItem(
-			A2(
-				_elm_lang$html$Html$a,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('dropdown-item'),
-						_1: {ctor: '[]'}
-					},
-					attributes),
-				children));
-	});
-var _rundis$elm_bootstrap$Bootstrap_Navbar$dropdownDivider = _rundis$elm_bootstrap$Bootstrap_Navbar$DropdownItem(
-	A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('dropdown-divider'),
-			_1: {ctor: '[]'}
-		},
-		{ctor: '[]'}));
-var _rundis$elm_bootstrap$Bootstrap_Navbar$dropdownHeader = function (children) {
-	return _rundis$elm_bootstrap$Bootstrap_Navbar$DropdownItem(
-		A2(
-			_elm_lang$html$Html$h6,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('dropdown-header'),
-				_1: {ctor: '[]'}
-			},
-			children));
-};
-
 var _user$project$ListHelper$groupsOf = F3(
 	function (size, elementsLeftToGroup, groupedElements) {
 		groupsOf:
@@ -17063,6 +15352,14 @@ var _user$project$Workflows_SimpleTodos$update = F3(
 					_1: store,
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'UpdateActionDescription':
+				var updatedStore = A2(
+					_user$project$ProgrissStore$updateAction,
+					_elm_lang$core$Native_Utils.update(
+						_p3._0,
+						{description: _p3._1}),
+					store);
+				return {ctor: '_Tuple3', _0: model, _1: updatedStore, _2: _elm_lang$core$Platform_Cmd$none};
 			case 'CreateNewAction':
 				var _p4 = A2(_user$project$ProgrissStore$createAction, model.newActionDescription, store);
 				var actionId = _p4._0;
@@ -17075,122 +15372,225 @@ var _user$project$Workflows_SimpleTodos$update = F3(
 					_1: updatedStore,
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'ToggleActionDone':
 				return {
 					ctor: '_Tuple3',
 					_0: model,
 					_1: A2(_user$project$ProgrissStore$toggleActionDone, _p3._0, store),
 					_2: _elm_lang$core$Platform_Cmd$none
 				};
+			default:
+				return {
+					ctor: '_Tuple3',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{editing: _p3._0}),
+					_1: store,
+					_2: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
-var _user$project$Workflows_SimpleTodos$initialModel = {newActionDescription: ''};
-var _user$project$Workflows_SimpleTodos$Model = function (a) {
-	return {newActionDescription: a};
+var _user$project$Workflows_SimpleTodos$initialModel = {newActionDescription: '', editing: _elm_lang$core$Maybe$Nothing};
+var _user$project$Workflows_SimpleTodos$Model = F2(
+	function (a, b) {
+		return {newActionDescription: a, editing: b};
+	});
+var _user$project$Workflows_SimpleTodos$ToggleEditAction = function (a) {
+	return {ctor: 'ToggleEditAction', _0: a};
 };
 var _user$project$Workflows_SimpleTodos$ToggleActionDone = function (a) {
 	return {ctor: 'ToggleActionDone', _0: a};
 };
-var _user$project$Workflows_SimpleTodos$actionCard = function (action) {
-	return _rundis$elm_bootstrap$Bootstrap_Card$view(
-		A3(
-			_rundis$elm_bootstrap$Bootstrap_Card$block,
-			{ctor: '[]'},
-			{
-				ctor: '::',
-				_0: _rundis$elm_bootstrap$Bootstrap_Card_Block$custom(
-					A2(
-						_rundis$elm_bootstrap$Bootstrap_Grid$row,
-						{
-							ctor: '::',
-							_0: _rundis$elm_bootstrap$Bootstrap_Grid_Row$middleXs,
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_rundis$elm_bootstrap$Bootstrap_Grid$col,
-								{
-									ctor: '::',
-									_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$xs2,
-									_1: {
-										ctor: '::',
-										_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$md1,
-										_1: {ctor: '[]'}
-									}
-								},
-								{
-									ctor: '::',
-									_0: A2(
-										_rundis$elm_bootstrap$Bootstrap_Button$button,
-										{
-											ctor: '::',
-											_0: _user$project$Workflows_SimpleTodos$buttonColorForActionState(action.state),
-											_1: {
-												ctor: '::',
-												_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(
-															_user$project$Workflows_SimpleTodos$ToggleActionDone(action.id)),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab bmd-btn-fab-sm'),
-															_1: {ctor: '[]'}
-														}
-													}),
-												_1: {ctor: '[]'}
-											}
-										},
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$html$Html$i,
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$class('material-icons'),
-													_1: {ctor: '[]'}
-												},
-												{
-													ctor: '::',
-													_0: _elm_lang$html$Html$text(
-														_user$project$Workflows_SimpleTodos$iconForActionState(action.state)),
-													_1: {ctor: '[]'}
-												}),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
+var _user$project$Workflows_SimpleTodos$CreateNewAction = {ctor: 'CreateNewAction'};
+var _user$project$Workflows_SimpleTodos$UpdateActionDescription = F2(
+	function (a, b) {
+		return {ctor: 'UpdateActionDescription', _0: a, _1: b};
+	});
+var _user$project$Workflows_SimpleTodos$actionCard = F2(
+	function (editing, action) {
+		return _rundis$elm_bootstrap$Bootstrap_Card$view(
+			A3(
+				_rundis$elm_bootstrap$Bootstrap_Card$block,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _rundis$elm_bootstrap$Bootstrap_Card_Block$custom(
+						A2(
+							_rundis$elm_bootstrap$Bootstrap_Grid$row,
+							{
+								ctor: '::',
+								_0: _rundis$elm_bootstrap$Bootstrap_Grid_Row$middleXs,
+								_1: {ctor: '[]'}
+							},
+							{
 								ctor: '::',
 								_0: A2(
 									_rundis$elm_bootstrap$Bootstrap_Grid$col,
-									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text(action.description),
+										_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$xs2,
+										_1: {
+											ctor: '::',
+											_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$md1,
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_rundis$elm_bootstrap$Bootstrap_Button$button,
+											{
+												ctor: '::',
+												_0: _user$project$Workflows_SimpleTodos$buttonColorForActionState(action.state),
+												_1: {
+													ctor: '::',
+													_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onClick(
+																_user$project$Workflows_SimpleTodos$ToggleActionDone(action.id)),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$class('bmd-btn-fab bmd-btn-fab-sm'),
+																_1: {ctor: '[]'}
+															}
+														}),
+													_1: {ctor: '[]'}
+												}
+											},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$i,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$class('material-icons'),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text(
+															_user$project$Workflows_SimpleTodos$iconForActionState(action.state)),
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}),
 										_1: {ctor: '[]'}
 									}),
-								_1: {ctor: '[]'}
-							}
-						})),
-				_1: {ctor: '[]'}
-			},
-			_rundis$elm_bootstrap$Bootstrap_Card$config(
-				_user$project$Workflows_SimpleTodos$cardConfigForAction(action))));
-};
-var _user$project$Workflows_SimpleTodos$renderActions = function (actions) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$List$map,
-			function (action) {
-				return _user$project$Workflows_SimpleTodos$actionCard(action);
-			},
-			actions));
-};
-var _user$project$Workflows_SimpleTodos$CreateNewAction = {ctor: 'CreateNewAction'};
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$core$Native_Utils.eq(
+										editing,
+										_elm_lang$core$Maybe$Just(action.id)) ? A2(
+										_rundis$elm_bootstrap$Bootstrap_Grid$col,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: A2(
+												_rundis$elm_bootstrap$Bootstrap_Form$form,
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$style(
+														{
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '0'},
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$action('javascript:void(0);'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Events$onSubmit(
+																_user$project$Workflows_SimpleTodos$ToggleEditAction(_elm_lang$core$Maybe$Nothing)),
+															_1: {ctor: '[]'}
+														}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _rundis$elm_bootstrap$Bootstrap_Form_InputGroup$view(
+														A2(
+															_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$successors,
+															{
+																ctor: '::',
+																_0: A2(
+																	_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$button,
+																	{
+																		ctor: '::',
+																		_0: _rundis$elm_bootstrap$Bootstrap_Button$success,
+																		_1: {ctor: '[]'}
+																	},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('Save'),
+																		_1: {ctor: '[]'}
+																	}),
+																_1: {ctor: '[]'}
+															},
+															_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$config(
+																_rundis$elm_bootstrap$Bootstrap_Form_InputGroup$text(
+																	{
+																		ctor: '::',
+																		_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$small,
+																		_1: {
+																			ctor: '::',
+																			_0: _rundis$elm_bootstrap$Bootstrap_Form_Input$attrs(
+																				{
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Events$onInput(
+																						_user$project$Workflows_SimpleTodos$UpdateActionDescription(action)),
+																					_1: {
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Attributes$defaultValue(action.description),
+																						_1: {ctor: '[]'}
+																					}
+																				}),
+																			_1: {ctor: '[]'}
+																		}
+																	})))),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}) : A2(
+										_rundis$elm_bootstrap$Bootstrap_Grid$col,
+										{
+											ctor: '::',
+											_0: _rundis$elm_bootstrap$Bootstrap_Grid_Col$attrs(
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_user$project$Workflows_SimpleTodos$ToggleEditAction(
+															_elm_lang$core$Maybe$Just(action.id))),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(action.description),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							})),
+					_1: {ctor: '[]'}
+				},
+				_rundis$elm_bootstrap$Bootstrap_Card$config(
+					_user$project$Workflows_SimpleTodos$cardConfigForAction(action))));
+	});
+var _user$project$Workflows_SimpleTodos$renderActions = F2(
+	function (editing, actions) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
+			A2(
+				_elm_lang$core$List$map,
+				function (action) {
+					return A2(_user$project$Workflows_SimpleTodos$actionCard, editing, action);
+				},
+				actions));
+	});
 var _user$project$Workflows_SimpleTodos$UpdateNewActionDescription = function (a) {
 	return {ctor: 'UpdateNewActionDescription', _0: a};
 };
@@ -17211,7 +15611,9 @@ var _user$project$Workflows_SimpleTodos$view = F2(
 							{ctor: '[]'},
 							{
 								ctor: '::',
-								_0: _user$project$Workflows_SimpleTodos$renderActions(
+								_0: A2(
+									_user$project$Workflows_SimpleTodos$renderActions,
+									model.editing,
 									_user$project$ProgrissStore$getAllActions(store)),
 								_1: {
 									ctor: '::',
@@ -17315,13 +15717,18 @@ var _user$project$Main$triggerStoreLoad = _elm_lang$core$Native_Platform.outgoin
 	function (v) {
 		return null;
 	});
-var _user$project$Main$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {store: a, gtdActionListsModel: b, projectCardOverviewModel: c, simpleTodosModel: d, navbarState: e, selectedWorkflow: f, drawerVisible: g};
+var _user$project$Main$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {store: a, gtdActionListsModel: b, projectCardOverviewModel: c, simpleTodosModel: d, selectedWorkflow: e, workflowMenuVisible: f};
 	});
 var _user$project$Main$ProjectOverviewWorkflow = {ctor: 'ProjectOverviewWorkflow'};
 var _user$project$Main$GtdActionListsWorkflow = {ctor: 'GtdActionListsWorkflow'};
 var _user$project$Main$SimpleTodosWorkflow = {ctor: 'SimpleTodosWorkflow'};
+var _user$project$Main$initialModel = {
+	ctor: '_Tuple2',
+	_0: {store: _user$project$Main$initialStore, gtdActionListsModel: _user$project$Workflows_GtdActionLists$initialModel, projectCardOverviewModel: _user$project$Workflows_ProjectOverview$initialModel, simpleTodosModel: _user$project$Workflows_SimpleTodos$initialModel, selectedWorkflow: _user$project$Main$SimpleTodosWorkflow, workflowMenuVisible: false},
+	_1: _elm_lang$core$Platform_Cmd$none
+};
 var _user$project$Main$ToggleDrawer = function (a) {
 	return {ctor: 'ToggleDrawer', _0: a};
 };
@@ -17329,57 +15736,12 @@ var _user$project$Main$TriggerLoad = {ctor: 'TriggerLoad'};
 var _user$project$Main$ReceiveStore = function (a) {
 	return {ctor: 'ReceiveStore', _0: a};
 };
+var _user$project$Main$subscriptions = function (model) {
+	return _user$project$Main$loadStore(_user$project$Main$ReceiveStore);
+};
 var _user$project$Main$Save = {ctor: 'Save'};
 var _user$project$Main$SelectWorkflow = function (a) {
 	return {ctor: 'SelectWorkflow', _0: a};
-};
-var _user$project$Main$NavbarMsg = function (a) {
-	return {ctor: 'NavbarMsg', _0: a};
-};
-var _user$project$Main$navbar = function (model) {
-	return A2(
-		_rundis$elm_bootstrap$Bootstrap_Navbar$view,
-		model.navbarState,
-		A3(
-			_rundis$elm_bootstrap$Bootstrap_Navbar$brand,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$href('#'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_user$project$Main$ToggleDrawer(!model.drawerVisible)),
-					_1: {ctor: '[]'}
-				}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('...'),
-				_1: {ctor: '[]'}
-			},
-			_rundis$elm_bootstrap$Bootstrap_Navbar$config(_user$project$Main$NavbarMsg)));
-};
-var _user$project$Main$initialModel = function () {
-	var _p1 = _rundis$elm_bootstrap$Bootstrap_Navbar$initialState(_user$project$Main$NavbarMsg);
-	var navbarState = _p1._0;
-	var navbarCmd = _p1._1;
-	return {
-		ctor: '_Tuple2',
-		_0: {store: _user$project$Main$initialStore, gtdActionListsModel: _user$project$Workflows_GtdActionLists$initialModel, projectCardOverviewModel: _user$project$Workflows_ProjectOverview$initialModel, simpleTodosModel: _user$project$Workflows_SimpleTodos$initialModel, navbarState: navbarState, selectedWorkflow: _user$project$Main$SimpleTodosWorkflow, drawerVisible: false},
-		_1: navbarCmd
-	};
-}();
-var _user$project$Main$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$batch(
-		{
-			ctor: '::',
-			_0: _user$project$Main$loadStore(_user$project$Main$ReceiveStore),
-			_1: {
-				ctor: '::',
-				_0: A2(_rundis$elm_bootstrap$Bootstrap_Navbar$subscriptions, model.navbarState, _user$project$Main$NavbarMsg),
-				_1: {ctor: '[]'}
-			}
-		});
 };
 var _user$project$Main$SimpleTodosMsg = function (a) {
 	return {ctor: 'SimpleTodosMsg', _0: a};
@@ -17392,14 +15754,14 @@ var _user$project$Main$GtdActionListsMsg = function (a) {
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p2 = msg;
-		switch (_p2.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'Save':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{drawerVisible: false}),
+						{workflowMenuVisible: false}),
 					_1: _user$project$Main$persistStore(
 						A2(
 							_elm_lang$core$Json_Encode$encode,
@@ -17411,18 +15773,18 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{drawerVisible: false}),
+						{workflowMenuVisible: false}),
 					_1: _user$project$Main$triggerStoreLoad(
 						{ctor: '_Tuple0'})
 				};
 			case 'ReceiveStore':
-				var _p3 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, _p2._0);
-				if (_p3.ctor === 'Ok') {
+				var _p2 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, _p1._0);
+				if (_p2.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{store: _p3._0}),
+							{store: _p2._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -17435,10 +15797,10 @@ var _user$project$Main$update = F2(
 					};
 				}
 			case 'GtdActionListsMsg':
-				var _p4 = A3(_user$project$Workflows_GtdActionLists$update, _p2._0, model.store, model.gtdActionListsModel);
-				var gtdActionListsModel = _p4._0;
-				var store = _p4._1;
-				var cmd = _p4._2;
+				var _p3 = A3(_user$project$Workflows_GtdActionLists$update, _p1._0, model.store, model.gtdActionListsModel);
+				var gtdActionListsModel = _p3._0;
+				var store = _p3._1;
+				var cmd = _p3._2;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17447,10 +15809,10 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$GtdActionListsMsg, cmd)
 				};
 			case 'ProjectOverviewMsg':
-				var _p5 = A3(_user$project$Workflows_ProjectOverview$update, _p2._0, model.store, model.projectCardOverviewModel);
-				var projectCardOverviewModel = _p5._0;
-				var store = _p5._1;
-				var cmd = _p5._2;
+				var _p4 = A3(_user$project$Workflows_ProjectOverview$update, _p1._0, model.store, model.projectCardOverviewModel);
+				var projectCardOverviewModel = _p4._0;
+				var store = _p4._1;
+				var cmd = _p4._2;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17459,10 +15821,10 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectOverviewMsg, cmd)
 				};
 			case 'SimpleTodosMsg':
-				var _p6 = A3(_user$project$Workflows_SimpleTodos$update, _p2._0, model.store, model.simpleTodosModel);
-				var simpleTodosModel = _p6._0;
-				var store = _p6._1;
-				var cmd = _p6._2;
+				var _p5 = A3(_user$project$Workflows_SimpleTodos$update, _p1._0, model.store, model.simpleTodosModel);
+				var simpleTodosModel = _p5._0;
+				var store = _p5._1;
+				var cmd = _p5._2;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17470,20 +15832,12 @@ var _user$project$Main$update = F2(
 						{store: store, simpleTodosModel: simpleTodosModel}),
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SimpleTodosMsg, cmd)
 				};
-			case 'NavbarMsg':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{navbarState: _p2._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
 			case 'SelectWorkflow':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{selectedWorkflow: _p2._0, drawerVisible: false}),
+						{selectedWorkflow: _p1._0, workflowMenuVisible: false}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -17491,7 +15845,7 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{drawerVisible: _p2._0}),
+						{workflowMenuVisible: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
@@ -17513,7 +15867,7 @@ var _user$project$Main$workflowMenu = function (model) {
 							_0: {ctor: '_Tuple2', _0: 'bmd-drawer-overlay', _1: true},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'bmd-drawer-in', _1: model.drawerVisible},
+								_0: {ctor: '_Tuple2', _0: 'bmd-drawer-in', _1: model.workflowMenuVisible},
 								_1: {ctor: '[]'}
 							}
 						}
@@ -17561,7 +15915,7 @@ var _user$project$Main$workflowMenu = function (model) {
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onClick(
-												_user$project$Main$ToggleDrawer(!model.drawerVisible)),
+												_user$project$Main$ToggleDrawer(!model.workflowMenuVisible)),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -17585,8 +15939,8 @@ var _user$project$Main$workflowMenu = function (model) {
 							_1: {
 								ctor: '::',
 								_0: function () {
-									var _p7 = model.selectedWorkflow;
-									if (_p7.ctor === 'GtdActionListsWorkflow') {
+									var _p6 = model.selectedWorkflow;
+									if (_p6.ctor === 'GtdActionListsWorkflow') {
 										return A2(
 											_elm_lang$html$Html$map,
 											_user$project$Main$GtdActionListsMsg,
@@ -17775,8 +16129,8 @@ var _user$project$Main$workflowMenu = function (model) {
 		});
 };
 var _user$project$Main$renderWorkflow = function (model) {
-	var _p8 = model.selectedWorkflow;
-	switch (_p8.ctor) {
+	var _p7 = model.selectedWorkflow;
+	switch (_p7.ctor) {
 		case 'SimpleTodosWorkflow':
 			return A2(
 				_elm_lang$html$Html$map,
