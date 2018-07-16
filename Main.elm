@@ -1,7 +1,5 @@
 port module Main exposing (..)
 
-import Bootstrap.Button as Button
-import Bootstrap.Navbar as Navbar
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -18,7 +16,6 @@ type alias Model =
     , gtdActionListsModel : Workflows.GtdActionLists.Model
     , projectCardOverviewModel : Workflows.ProjectOverview.Model
     , simpleTodosModel : Workflows.SimpleTodos.Model
-    , navbarState : Navbar.State
     , selectedWorkflow : SelectableWorkflow
     , workflowMenuVisible : Bool
     }
@@ -34,7 +31,6 @@ type Msg
     = GtdActionListsMsg Workflows.GtdActionLists.Msg
     | ProjectOverviewMsg Workflows.ProjectOverview.Msg
     | SimpleTodosMsg Workflows.SimpleTodos.Msg
-    | NavbarMsg Navbar.State
     | SelectWorkflow SelectableWorkflow
     | Save
     | ReceiveStore String
@@ -109,10 +105,7 @@ main =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Sub.batch
-        [ loadStore ReceiveStore
-        , Navbar.subscriptions model.navbarState NavbarMsg
-        ]
+    loadStore ReceiveStore
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -160,9 +153,6 @@ update msg model =
             ( { model | store = store, simpleTodosModel = simpleTodosModel }
             , Cmd.map SimpleTodosMsg cmd
             )
-
-        NavbarMsg state ->
-            ( { model | navbarState = state }, Cmd.none )
 
         SelectWorkflow selectedWorkflow ->
             ( { model
