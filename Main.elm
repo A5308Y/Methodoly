@@ -20,7 +20,7 @@ type alias Model =
     , simpleTodosModel : Workflows.SimpleTodos.Model
     , navbarState : Navbar.State
     , selectedWorkflow : SelectableWorkflow
-    , drawerVisible : Bool
+    , workflowMenuVisible : Bool
     }
 
 
@@ -91,7 +91,7 @@ initialModel =
       , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
       , simpleTodosModel = Workflows.SimpleTodos.initialModel
       , selectedWorkflow = SimpleTodosWorkflow
-      , drawerVisible = False
+      , workflowMenuVisible = False
       }
     , Cmd.none
     )
@@ -119,12 +119,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Save ->
-            ( { model | drawerVisible = False }
+            ( { model | workflowMenuVisible = False }
             , persistStore (Json.Encode.encode 2 (Store.encoder model.store))
             )
 
         TriggerLoad ->
-            ( { model | drawerVisible = False }, triggerStoreLoad () )
+            ( { model | workflowMenuVisible = False }, triggerStoreLoad () )
 
         ReceiveStore value ->
             case Json.Decode.decodeString Store.decoder value of
@@ -165,12 +165,15 @@ update msg model =
             ( { model | navbarState = state }, Cmd.none )
 
         SelectWorkflow selectedWorkflow ->
-            ( { model | selectedWorkflow = selectedWorkflow, drawerVisible = False }
+            ( { model
+                | selectedWorkflow = selectedWorkflow
+                , workflowMenuVisible = False
+              }
             , Cmd.none
             )
 
         ToggleDrawer newState ->
-            ( { model | drawerVisible = newState }, Cmd.none )
+            ( { model | workflowMenuVisible = newState }, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -185,13 +188,13 @@ workflowMenu model =
             [ ( "bmd-layout-container", True )
             , ( "bmd-drawer-f-l", True )
             , ( "bmd-drawer-overlay", True )
-            , ( "bmd-drawer-in", model.drawerVisible )
+            , ( "bmd-drawer-in", model.workflowMenuVisible )
             ]
         , style [ ( "position", "static" ) ]
         ]
         [ header [ class "bmd-layout-header" ]
             [ div [ class "navbar navbar-light bg-faded" ]
-                [ a [ href "#", class "btn", onClick (ToggleDrawer (not model.drawerVisible)) ]
+                [ a [ href "#", class "btn", onClick (ToggleDrawer (not model.workflowMenuVisible)) ]
                     [ i [ class "material-icons" ] [ text "menu" ] ]
                 , case model.selectedWorkflow of
                     GtdActionListsWorkflow ->
