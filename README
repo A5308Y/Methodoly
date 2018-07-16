@@ -11,7 +11,7 @@ Adjust bootstrap settings (like colors) by editing bootstrap/scss/_custom.scss.
 
 To compile the stylesheets run `npm run build:css` in the bootstrap folder and
 copy the resulting file from bootstrap/dist/css to the file imported in
-index.html.
+index.html. If you didn't before you will have to run `npm install`.
 
 Use material.io/tools/icons to explore icons of the robot font that can be used
 easily in the app.

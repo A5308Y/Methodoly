@@ -2,8 +2,8 @@ port module Main exposing (..)
 
 import Bootstrap.Button as Button
 import Bootstrap.Navbar as Navbar
-import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (href)
+import Html exposing (..)
+import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Json.Decode
 import Json.Encode
@@ -13,19 +13,6 @@ import Workflows.ProjectOverview
 import Workflows.SimpleTodos
 
 
-navbar : Model -> Html Msg
-navbar model =
-    Navbar.config NavbarMsg
-        |> Navbar.withAnimation
-        |> Navbar.collapseExtraLarge
-        |> Navbar.items
-            [ Navbar.itemLink [ href "#", onClick (SelectWorkflow SimpleTodosWorkflow) ] [ text "Simple" ]
-            , Navbar.itemLink [ href "#", onClick (SelectWorkflow GtdActionListsWorkflow) ] [ text "GTD" ]
-            , Navbar.itemLink [ href "#", onClick (SelectWorkflow ProjectOverviewWorkflow) ] [ text "Projects" ]
-            ]
-        |> Navbar.view model.navbarState
-
-
 type alias Model =
     { store : ProgrissStore
     , gtdActionListsModel : Workflows.GtdActionLists.Model
@@ -33,6 +20,7 @@ type alias Model =
     , simpleTodosModel : Workflows.SimpleTodos.Model
     , navbarState : Navbar.State
     , selectedWorkflow : SelectableWorkflow
+    , drawerVisible : Bool
     }
 
 
@@ -51,6 +39,7 @@ type Msg
     | Save
     | ReceiveStore String
     | TriggerLoad
+    | ToggleDrawer Bool
 
 
 port persistStore : String -> Cmd msg
@@ -97,24 +86,25 @@ initialStore =
 
 initialModel : ( Model, Cmd Msg )
 initialModel =
-    let
-        ( navbarState, navbarCmd ) =
-            Navbar.initialState NavbarMsg
-    in
     ( { store = initialStore
       , gtdActionListsModel = Workflows.GtdActionLists.initialModel
       , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
       , simpleTodosModel = Workflows.SimpleTodos.initialModel
-      , navbarState = navbarState
       , selectedWorkflow = SimpleTodosWorkflow
+      , drawerVisible = False
       }
-    , navbarCmd
+    , Cmd.none
     )
 
 
 main : Program Never Model Msg
 main =
-    Html.program { init = initialModel, view = view, update = update, subscriptions = subscriptions }
+    Html.program
+        { init = initialModel
+        , view = view
+        , update = update
+        , subscriptions = subscriptions
+        }
 
 
 subscriptions : Model -> Sub Msg
@@ -129,10 +119,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Save ->
-            ( model, persistStore (Json.Encode.encode 2 (Store.encoder model.store)) )
+            ( { model | drawerVisible = False }
+            , persistStore (Json.Encode.encode 2 (Store.encoder model.store))
+            )
 
         TriggerLoad ->
-            ( model, triggerStoreLoad () )
+            ( { model | drawerVisible = False }, triggerStoreLoad () )
 
         ReceiveStore value ->
             case Json.Decode.decodeString Store.decoder value of
@@ -173,25 +165,58 @@ update msg model =
             ( { model | navbarState = state }, Cmd.none )
 
         SelectWorkflow selectedWorkflow ->
-            ( { model | selectedWorkflow = selectedWorkflow }, Cmd.none )
+            ( { model | selectedWorkflow = selectedWorkflow, drawerVisible = False }
+            , Cmd.none
+            )
+
+        ToggleDrawer newState ->
+            ( { model | drawerVisible = newState }, Cmd.none )
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ if List.length (Store.getAllActions model.store) >= 10 then
-            navbar model
-          else
-            text ""
-        , renderWorkflow model
-        , hr [] []
-        , div []
-            [ Button.button
-                [ Button.primary, Button.attrs [ onClick Save, Html.Attributes.class "bmd-btn-fab" ] ]
-                [ i [ Html.Attributes.class "material-icons" ] [ text "save" ] ]
-            , Button.button
-                [ Button.primary, Button.attrs [ onClick TriggerLoad, Html.Attributes.class "bmd-btn-fab" ] ]
-                [ i [ Html.Attributes.class "material-icons" ] [ text "restore" ] ]
+    div [] [ workflowMenu model, renderWorkflow model ]
+
+
+workflowMenu : Model -> Html Msg
+workflowMenu model =
+    div
+        [ classList
+            [ ( "bmd-layout-container", True )
+            , ( "bmd-drawer-f-l", True )
+            , ( "bmd-drawer-overlay", True )
+            , ( "bmd-drawer-in", model.drawerVisible )
+            ]
+        , style [ ( "position", "static" ) ]
+        ]
+        [ header [ class "bmd-layout-header" ]
+            [ div [ class "navbar navbar-light bg-faded" ]
+                [ a [ href "#", class "btn", onClick (ToggleDrawer (not model.drawerVisible)) ]
+                    [ i [ class "material-icons" ] [ text "menu" ] ]
+                , case model.selectedWorkflow of
+                    GtdActionListsWorkflow ->
+                        Workflows.GtdActionLists.navbarContent model.store model.gtdActionListsModel
+                            |> Html.map GtdActionListsMsg
+
+                    _ ->
+                        text ""
+                ]
+            ]
+        , div
+            [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
+            [ header [] [ a [ class "navbar-brand" ] [ text "Title" ] ]
+            , ul [ class "list-group" ]
+                [ a [ href "#", class "list-group-item", onClick (SelectWorkflow SimpleTodosWorkflow) ]
+                    [ text "Simple" ]
+                , a [ href "#", class "list-group-item", onClick (SelectWorkflow GtdActionListsWorkflow) ]
+                    [ text "GTD" ]
+                , a [ href "#", class "list-group-item", onClick (SelectWorkflow ProjectOverviewWorkflow) ]
+                    [ text "Projects" ]
+                , a [ href "#", class "list-group-item", onClick Save ]
+                    [ text "Save" ]
+                , a [ href "#", class "list-group-item", onClick TriggerLoad ]
+                    [ text "Load" ]
+                ]
             ]
         ]
 

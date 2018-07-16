@@ -25,6 +25,7 @@ module ProgrissStore
         , getAllActions
         , getAllContexts
         , getAllProjects
+        , getContext
         , getContextForAction
         , getNotesForProject
         , getProjectForAction
@@ -305,6 +306,13 @@ getActionsForContext (ContextId contextId) (ProgrissStore store) =
     Dict.toList store.actions
         |> List.filter (\( id, actionData ) -> actionData.contextId == Just contextId)
         |> List.map castActionDataToAction
+
+
+getContext : ContextId -> ProgrissStore -> Maybe Context
+getContext (ContextId contextId) (ProgrissStore store) =
+    Dict.get contextId store.contexts
+        |> Maybe.map (\contextData -> ( contextId, contextData ))
+        |> Maybe.map castContextDataToContext
 
 
 getActionsForProject : ProjectId -> ProgrissStore -> List Action

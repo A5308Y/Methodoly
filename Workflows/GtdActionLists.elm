@@ -1,4 +1,4 @@
-module Workflows.GtdActionLists exposing (Model, Msg, initialModel, update, view)
+module Workflows.GtdActionLists exposing (Model, Msg, initialModel, navbarContent, update, view)
 
 import Bootstrap.Button as Button
 import Bootstrap.Card as Card
@@ -11,7 +11,7 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Bootstrap.ListGroup as ListGroup
 import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (action, href)
+import Html.Attributes exposing (action, class, href)
 import Html.Events exposing (onClick)
 import ProgrissStore as Store exposing (Action, ActionId, ActionState(..), Context, ContextId, ProgrissStore)
 
@@ -27,11 +27,13 @@ type Msg
     | UpdateNewActionDescription String
     | CreateNewAction
     | ToggleActionDone ActionId
+    | ToggleContextMenu Bool
 
 
 type alias Model =
     { selectedContext : SelectedContext
     , newActionDescription : String
+    , contextMenuVisible : Bool
     }
 
 
@@ -39,6 +41,7 @@ initialModel : Model
 initialModel =
     { selectedContext = AnywhereContext
     , newActionDescription = ""
+    , contextMenuVisible = False
     }
 
 
@@ -49,10 +52,13 @@ update msg store model =
             ( { model | newActionDescription = newActionDescription }, store, Cmd.none )
 
         ChangeContext selectedContext ->
-            ( { model | selectedContext = selectedContext }, store, Cmd.none )
+            ( { model | selectedContext = selectedContext, contextMenuVisible = False }, store, Cmd.none )
 
         ToggleActionDone actionId ->
             ( model, Store.toggleActionDone actionId store, Cmd.none )
+
+        ToggleContextMenu state ->
+            ( { model | contextMenuVisible = state }, store, Cmd.none )
 
         CreateNewAction ->
             let
@@ -76,32 +82,34 @@ update msg store model =
 
 view : ProgrissStore -> Model -> Html Msg
 view store model =
-    Grid.container []
-        [ Grid.row []
-            [ Grid.col [ Col.md3 ] [ renderContextMenu store model.selectedContext ]
-            , Grid.col [ Col.md9 ]
-                [ renderActions (actionsToRender store model.selectedContext)
-                , hr [] []
-                , Form.form [ Html.Events.onSubmit CreateNewAction, action "javascript:void(0);" ]
-                    [ InputGroup.config
-                        (InputGroup.text
-                            [ Input.placeholder "Type action description here"
-                            , Input.attrs
-                                [ Html.Attributes.value model.newActionDescription
-                                , Html.Events.onInput UpdateNewActionDescription
-                                ]
+    if model.contextMenuVisible then
+        Grid.container []
+            [ renderContextMenu store model.selectedContext ]
+    else
+        Grid.container []
+            [ renderActions (actionsToRender store model.selectedContext)
+            , hr [] []
+            , Form.form [ Html.Events.onSubmit CreateNewAction, action "javascript:void(0);" ]
+                [ InputGroup.config
+                    (InputGroup.text
+                        [ Input.placeholder "Type action description here"
+                        , Input.attrs
+                            [ Html.Attributes.value model.newActionDescription
+                            , Html.Events.onInput UpdateNewActionDescription
                             ]
-                        )
-                        |> InputGroup.successors
-                            [ InputGroup.button
-                                [ Button.secondary, Button.attrs [] ]
-                                [ text "Create Action" ]
+                        ]
+                    )
+                    |> InputGroup.successors
+                        [ InputGroup.button
+                            [ Button.success
+                            , Button.disabled (String.isEmpty model.newActionDescription)
+                            , Button.attrs []
                             ]
-                        |> InputGroup.view
-                    ]
+                            [ text "Create Action" ]
+                        ]
+                    |> InputGroup.view
                 ]
             ]
-        ]
 
 
 renderContextMenu : ProgrissStore -> SelectedContext -> Html Msg
@@ -211,3 +219,27 @@ cardConfigForAction action =
 
         _ ->
             []
+
+
+navbarContent : ProgrissStore -> Model -> Html Msg
+navbarContent store model =
+    Html.button
+        [ class "btn btn-outline-primary"
+        , onClick (ToggleContextMenu (not model.contextMenuVisible))
+        ]
+        [ text (contextName store model.selectedContext) ]
+
+
+contextName : ProgrissStore -> SelectedContext -> String
+contextName store selectedContext =
+    case selectedContext of
+        AllContexts ->
+            "All"
+
+        AnywhereContext ->
+            "Anywhere"
+
+        SpecificContext contextId ->
+            Store.getContext contextId store
+                |> Maybe.map .name
+                |> Maybe.withDefault ""

@@ -22,8 +22,7 @@ type Msg
 
 
 type alias Model =
-    { newActionDescription : String
-    }
+    { newActionDescription : String }
 
 
 initialModel : Model
@@ -67,7 +66,10 @@ view store model =
                         )
                         |> InputGroup.successors
                             [ InputGroup.button
-                                [ Button.secondary, Button.attrs [] ]
+                                [ Button.success
+                                , Button.disabled (String.isEmpty model.newActionDescription)
+                                , Button.attrs []
+                                ]
                                 [ text "Create Action" ]
                             ]
                         |> InputGroup.view
