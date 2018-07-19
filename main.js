@@ -13927,6 +13927,32 @@ var _user$project$ListHelper$groupsOf = F3(
 		}
 	});
 
+var _user$project$SettingsStore$getSettingsForProjectOverview = function (_p0) {
+	var _p1 = _p0;
+	return _p1._0.projectOverviewSettings;
+};
+var _user$project$SettingsStore$Store = function (a) {
+	return {projectOverviewSettings: a};
+};
+var _user$project$SettingsStore$ProjectOverviewSettings = function (a) {
+	return {projectsPerRow: a};
+};
+var _user$project$SettingsStore$SettingsStore = function (a) {
+	return {ctor: 'SettingsStore', _0: a};
+};
+var _user$project$SettingsStore$updateSettingsForProjectOverview = F2(
+	function (projectOverviewSettings, _p2) {
+		var _p3 = _p2;
+		return _user$project$SettingsStore$SettingsStore(
+			_elm_lang$core$Native_Utils.update(
+				_p3._0,
+				{projectOverviewSettings: projectOverviewSettings}));
+	});
+var _user$project$SettingsStore$initialStore = _user$project$SettingsStore$SettingsStore(
+	{
+		projectOverviewSettings: {projectsPerRow: 3}
+	});
+
 var _user$project$ProgrissStore$encodeNote = function (_p0) {
 	var _p1 = _p0;
 	var _p2 = _p1._1;
@@ -14135,6 +14161,10 @@ var _user$project$ProgrissStore$encoder = function (_p14) {
 			}
 		});
 };
+var _user$project$ProgrissStore$getAllSettings = function (_p17) {
+	var _p18 = _p17;
+	return _p18._0.settings;
+};
 var _user$project$ProgrissStore$getNextFreeId = function (dictionary) {
 	return A2(
 		F2(
@@ -14152,12 +14182,6 @@ var _user$project$ProgrissStore$Store = F5(
 	function (a, b, c, d, e) {
 		return {projects: a, actions: b, contexts: c, notes: d, settings: e};
 	});
-var _user$project$ProgrissStore$Settings = function (a) {
-	return {projectOverviewSettings: a};
-};
-var _user$project$ProgrissStore$ProjectOverviewSettings = function (a) {
-	return {projectsPerRow: a};
-};
 var _user$project$ProgrissStore$ActionData = F4(
 	function (a, b, c, d) {
 		return {description: a, contextId: b, projectId: c, state: d};
@@ -14247,122 +14271,108 @@ var _user$project$ProgrissStore$ProgrissStore = function (a) {
 	return {ctor: 'ProgrissStore', _0: a};
 };
 var _user$project$ProgrissStore$empty = _user$project$ProgrissStore$ProgrissStore(
-	{
-		projects: _elm_lang$core$Dict$empty,
-		actions: _elm_lang$core$Dict$empty,
-		contexts: _elm_lang$core$Dict$empty,
-		notes: _elm_lang$core$Dict$empty,
-		settings: {
-			projectOverviewSettings: {projectsPerRow: 3}
-		}
-	});
+	{projects: _elm_lang$core$Dict$empty, actions: _elm_lang$core$Dict$empty, contexts: _elm_lang$core$Dict$empty, notes: _elm_lang$core$Dict$empty, settings: _user$project$SettingsStore$initialStore});
 var _user$project$ProgrissStore$createContext = F2(
-	function (name, _p17) {
-		var _p18 = _p17;
-		var _p19 = _p18._0;
+	function (name, _p19) {
+		var _p20 = _p19;
+		var _p21 = _p20._0;
 		var updatedContexts = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p19.contexts),
+			_user$project$ProgrissStore$getNextFreeId(_p21.contexts),
 			_user$project$ProgrissStore$ContextData(name),
-			_p19.contexts);
+			_p21.contexts);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p19,
+				_p21,
 				{contexts: updatedContexts}));
 	});
 var _user$project$ProgrissStore$createProject = F2(
-	function (name, _p20) {
-		var _p21 = _p20;
-		var _p22 = _p21._0;
+	function (name, _p22) {
+		var _p23 = _p22;
+		var _p24 = _p23._0;
 		var updatedProjects = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p22.projects),
+			_user$project$ProgrissStore$getNextFreeId(_p24.projects),
 			_user$project$ProgrissStore$ProjectData(name),
-			_p22.projects);
+			_p24.projects);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p22,
+				_p24,
 				{projects: updatedProjects}));
 	});
 var _user$project$ProgrissStore$updateAction = F2(
-	function (action, _p23) {
-		var _p24 = _p23;
-		var _p26 = _p24._0;
-		var _p25 = action.id;
+	function (action, _p25) {
+		var _p26 = _p25;
+		var _p28 = _p26._0;
+		var _p27 = action.id;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p25._0,
+			_p27._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{description: action.description, state: action.state});
 				}),
-			_p26.actions);
+			_p28.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p26,
+				_p28,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$associateActionToContext = F3(
-	function (_p29, _p28, _p27) {
-		var _p30 = _p29;
-		var _p31 = _p28;
-		var _p32 = _p27;
-		var _p33 = _p32._0;
+	function (_p31, _p30, _p29) {
+		var _p32 = _p31;
+		var _p33 = _p30;
+		var _p34 = _p29;
+		var _p35 = _p34._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p30._0,
+			_p32._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{
-							contextId: _elm_lang$core$Maybe$Just(_p31._0)
+							contextId: _elm_lang$core$Maybe$Just(_p33._0)
 						});
 				}),
-			_p33.actions);
+			_p35.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p33,
+				_p35,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$associateActionToProject = F3(
-	function (_p36, _p35, _p34) {
-		var _p37 = _p36;
-		var _p38 = _p35;
-		var _p39 = _p34;
-		var _p40 = _p39._0;
+	function (_p38, _p37, _p36) {
+		var _p39 = _p38;
+		var _p40 = _p37;
+		var _p41 = _p36;
+		var _p42 = _p41._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p37._0,
+			_p39._0,
 			_elm_lang$core$Maybe$map(
 				function (actionData) {
 					return _elm_lang$core$Native_Utils.update(
 						actionData,
 						{
-							projectId: _elm_lang$core$Maybe$Just(_p38._0)
+							projectId: _elm_lang$core$Maybe$Just(_p40._0)
 						});
 				}),
-			_p40.actions);
+			_p42.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p40,
+				_p42,
 				{actions: updatedActions}));
 	});
-var _user$project$ProgrissStore$updateSettingsForWorkflow = F2(
-	function (workflowSettings, _p41) {
-		var _p42 = _p41;
-		var _p44 = _p42._0;
-		var settings = _p44.settings;
-		var _p43 = workflowSettings;
-		var updatedSettings = _elm_lang$core$Native_Utils.update(
-			settings,
-			{projectOverviewSettings: _p43._0});
+var _user$project$ProgrissStore$updateSettings = F2(
+	function (_p43, settings) {
+		var _p44 = _p43;
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p44,
-				{settings: updatedSettings}));
+				_p44._0,
+				{settings: settings}));
 	});
 var _user$project$ProgrissStore$progrissStoreConstructor = F4(
 	function (actions, contexts, projects, notes) {
@@ -14372,42 +14382,30 @@ var _user$project$ProgrissStore$progrissStoreConstructor = F4(
 				contexts: _elm_lang$core$Dict$fromList(contexts),
 				projects: _elm_lang$core$Dict$fromList(projects),
 				notes: _elm_lang$core$Dict$fromList(notes),
-				settings: {
-					projectOverviewSettings: {projectsPerRow: 3}
-				}
+				settings: _user$project$SettingsStore$initialStore
 			});
-	});
-var _user$project$ProgrissStore$ProjectOverviewSettingsQuery = {ctor: 'ProjectOverviewSettingsQuery'};
-var _user$project$ProgrissStore$ProjectOverviewSettingsItem = function (a) {
-	return {ctor: 'ProjectOverviewSettingsItem', _0: a};
-};
-var _user$project$ProgrissStore$getSettingsForWorkflow = F2(
-	function (query, _p45) {
-		var _p46 = _p45;
-		var _p47 = query;
-		return _user$project$ProgrissStore$ProjectOverviewSettingsItem(_p46._0.settings.projectOverviewSettings);
 	});
 var _user$project$ProgrissStore$ActionId = function (a) {
 	return {ctor: 'ActionId', _0: a};
 };
-var _user$project$ProgrissStore$castActionDataToAction = function (_p48) {
-	var _p49 = _p48;
-	var _p50 = _p49._1;
+var _user$project$ProgrissStore$castActionDataToAction = function (_p45) {
+	var _p46 = _p45;
+	var _p47 = _p46._1;
 	return A3(
 		_user$project$ProgrissStore$Action,
-		_user$project$ProgrissStore$ActionId(_p49._0),
-		_p50.description,
-		_p50.state);
+		_user$project$ProgrissStore$ActionId(_p46._0),
+		_p47.description,
+		_p47.state);
 };
-var _user$project$ProgrissStore$getAllActions = function (_p51) {
-	var _p52 = _p51;
+var _user$project$ProgrissStore$getAllActions = function (_p48) {
+	var _p49 = _p48;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
-		_elm_lang$core$Dict$toList(_p52._0.actions));
+		_elm_lang$core$Dict$toList(_p49._0.actions));
 };
-var _user$project$ProgrissStore$getActionsWithoutContext = function (_p53) {
-	var _p54 = _p53;
+var _user$project$ProgrissStore$getActionsWithoutContext = function (_p50) {
+	var _p51 = _p50;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
@@ -14418,10 +14416,10 @@ var _user$project$ProgrissStore$getActionsWithoutContext = function (_p53) {
 					function (id, actionData) {
 						return _elm_lang$core$Native_Utils.eq(actionData.contextId, _elm_lang$core$Maybe$Nothing);
 					}),
-				_p54._0.actions)));
+				_p51._0.actions)));
 };
-var _user$project$ProgrissStore$getActionsWithoutProject = function (_p55) {
-	var _p56 = _p55;
+var _user$project$ProgrissStore$getActionsWithoutProject = function (_p52) {
+	var _p53 = _p52;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castActionDataToAction,
@@ -14432,41 +14430,41 @@ var _user$project$ProgrissStore$getActionsWithoutProject = function (_p55) {
 					function (id, actionData) {
 						return _elm_lang$core$Native_Utils.eq(actionData.projectId, _elm_lang$core$Maybe$Nothing);
 					}),
-				_p56._0.actions)));
+				_p53._0.actions)));
 };
 var _user$project$ProgrissStore$getActionsForContext = F2(
-	function (_p58, _p57) {
-		var _p59 = _p58;
-		var _p60 = _p57;
+	function (_p55, _p54) {
+		var _p56 = _p55;
+		var _p57 = _p54;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castActionDataToAction,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p61) {
-					var _p62 = _p61;
+				function (_p58) {
+					var _p59 = _p58;
 					return _elm_lang$core$Native_Utils.eq(
-						_p62._1.contextId,
-						_elm_lang$core$Maybe$Just(_p59._0));
+						_p59._1.contextId,
+						_elm_lang$core$Maybe$Just(_p56._0));
 				},
-				_elm_lang$core$Dict$toList(_p60._0.actions)));
+				_elm_lang$core$Dict$toList(_p57._0.actions)));
 	});
 var _user$project$ProgrissStore$getActionsForProject = F2(
-	function (_p64, _p63) {
-		var _p65 = _p64;
-		var _p66 = _p63;
+	function (_p61, _p60) {
+		var _p62 = _p61;
+		var _p63 = _p60;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castActionDataToAction,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p67) {
-					var _p68 = _p67;
+				function (_p64) {
+					var _p65 = _p64;
 					return _elm_lang$core$Native_Utils.eq(
-						_p68._1.projectId,
-						_elm_lang$core$Maybe$Just(_p65._0));
+						_p65._1.projectId,
+						_elm_lang$core$Maybe$Just(_p62._0));
 				},
-				_elm_lang$core$Dict$toList(_p66._0.actions)));
+				_elm_lang$core$Dict$toList(_p63._0.actions)));
 	});
 var _user$project$ProgrissStore$Deleted = function (a) {
 	return {ctor: 'Deleted', _0: a};
@@ -14476,34 +14474,34 @@ var _user$project$ProgrissStore$Done = function (a) {
 };
 var _user$project$ProgrissStore$Active = {ctor: 'Active'};
 var _user$project$ProgrissStore$createAction = F2(
-	function (description, _p69) {
-		var _p70 = _p69;
-		var _p71 = _p70._0;
+	function (description, _p66) {
+		var _p67 = _p66;
+		var _p68 = _p67._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$insert,
-			_user$project$ProgrissStore$getNextFreeId(_p71.actions),
+			_user$project$ProgrissStore$getNextFreeId(_p68.actions),
 			A4(_user$project$ProgrissStore$ActionData, description, _elm_lang$core$Maybe$Nothing, _elm_lang$core$Maybe$Nothing, _user$project$ProgrissStore$Active),
-			_p71.actions);
+			_p68.actions);
 		return {
 			ctor: '_Tuple2',
 			_0: _user$project$ProgrissStore$ActionId(
-				_user$project$ProgrissStore$getNextFreeId(_p71.actions)),
+				_user$project$ProgrissStore$getNextFreeId(_p68.actions)),
 			_1: _user$project$ProgrissStore$ProgrissStore(
 				_elm_lang$core$Native_Utils.update(
-					_p71,
+					_p68,
 					{actions: updatedActions}))
 		};
 	});
 var _user$project$ProgrissStore$actionsStateAfterToggle = function (actionData) {
 	var updatedState = function () {
-		var _p72 = actionData.state;
-		switch (_p72.ctor) {
+		var _p69 = actionData.state;
+		switch (_p69.ctor) {
 			case 'Done':
 				return _user$project$ProgrissStore$Active;
 			case 'Active':
 				return _user$project$ProgrissStore$Done(0);
 			default:
-				return _user$project$ProgrissStore$Deleted(_p72._0);
+				return _user$project$ProgrissStore$Deleted(_p69._0);
 		}
 	}();
 	return _elm_lang$core$Native_Utils.update(
@@ -14511,33 +14509,33 @@ var _user$project$ProgrissStore$actionsStateAfterToggle = function (actionData) 
 		{state: updatedState});
 };
 var _user$project$ProgrissStore$toggleActionDone = F2(
-	function (_p74, _p73) {
-		var _p75 = _p74;
-		var _p76 = _p73;
-		var _p77 = _p76._0;
+	function (_p71, _p70) {
+		var _p72 = _p71;
+		var _p73 = _p70;
+		var _p74 = _p73._0;
 		var updatedActions = A3(
 			_elm_lang$core$Dict$update,
-			_p75._0,
+			_p72._0,
 			_elm_lang$core$Maybe$map(_user$project$ProgrissStore$actionsStateAfterToggle),
-			_p77.actions);
+			_p74.actions);
 		return _user$project$ProgrissStore$ProgrissStore(
 			_elm_lang$core$Native_Utils.update(
-				_p77,
+				_p74,
 				{actions: updatedActions}));
 	});
 var _user$project$ProgrissStore$actionDataConstructor = F6(
 	function (id, description, maybeContextId, maybeProjectId, finishedAt, deletedAt) {
 		var state = function () {
-			var _p78 = deletedAt;
-			if (_p78.ctor === 'Nothing') {
-				var _p79 = finishedAt;
-				if (_p79.ctor === 'Nothing') {
+			var _p75 = deletedAt;
+			if (_p75.ctor === 'Nothing') {
+				var _p76 = finishedAt;
+				if (_p76.ctor === 'Nothing') {
 					return _user$project$ProgrissStore$Active;
 				} else {
-					return _user$project$ProgrissStore$Done(_p79._0);
+					return _user$project$ProgrissStore$Done(_p76._0);
 				}
 			} else {
-				return _user$project$ProgrissStore$Deleted(_p78._0);
+				return _user$project$ProgrissStore$Deleted(_p75._0);
 			}
 		}();
 		return {
@@ -14599,33 +14597,33 @@ var _user$project$ProgrissStore$decoder = A4(
 var _user$project$ProgrissStore$ContextId = function (a) {
 	return {ctor: 'ContextId', _0: a};
 };
-var _user$project$ProgrissStore$castContextDataToContext = function (_p80) {
-	var _p81 = _p80;
+var _user$project$ProgrissStore$castContextDataToContext = function (_p77) {
+	var _p78 = _p77;
 	return A2(
 		_user$project$ProgrissStore$Context,
-		_user$project$ProgrissStore$ContextId(_p81._0),
-		_p81._1.name);
+		_user$project$ProgrissStore$ContextId(_p78._0),
+		_p78._1.name);
 };
 var _user$project$ProgrissStore$getContext = F2(
-	function (_p83, _p82) {
-		var _p84 = _p83;
-		var _p86 = _p84._0;
-		var _p85 = _p82;
+	function (_p80, _p79) {
+		var _p81 = _p80;
+		var _p83 = _p81._0;
+		var _p82 = _p79;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castContextDataToContext,
 			A2(
 				_elm_lang$core$Maybe$map,
 				function (contextData) {
-					return {ctor: '_Tuple2', _0: _p86, _1: contextData};
+					return {ctor: '_Tuple2', _0: _p83, _1: contextData};
 				},
-				A2(_elm_lang$core$Dict$get, _p86, _p85._0.contexts)));
+				A2(_elm_lang$core$Dict$get, _p83, _p82._0.contexts)));
 	});
 var _user$project$ProgrissStore$getContextForAction = F2(
-	function (_p88, _p87) {
-		var _p89 = _p88;
-		var _p90 = _p87;
-		var _p91 = _p90._0;
+	function (_p85, _p84) {
+		var _p86 = _p85;
+		var _p87 = _p84;
+		var _p88 = _p87._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castContextDataToContext,
@@ -14637,37 +14635,37 @@ var _user$project$ProgrissStore$getContextForAction = F2(
 						function (context) {
 							return {ctor: '_Tuple2', _0: contextId, _1: context};
 						},
-						A2(_elm_lang$core$Dict$get, contextId, _p91.contexts));
+						A2(_elm_lang$core$Dict$get, contextId, _p88.contexts));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.contextId;
 					},
-					A2(_elm_lang$core$Dict$get, _p89._0, _p91.actions))));
+					A2(_elm_lang$core$Dict$get, _p86._0, _p88.actions))));
 	});
-var _user$project$ProgrissStore$getAllContexts = function (_p92) {
-	var _p93 = _p92;
+var _user$project$ProgrissStore$getAllContexts = function (_p89) {
+	var _p90 = _p89;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castContextDataToContext,
-		_elm_lang$core$Dict$toList(_p93._0.contexts));
+		_elm_lang$core$Dict$toList(_p90._0.contexts));
 };
 var _user$project$ProgrissStore$ProjectId = function (a) {
 	return {ctor: 'ProjectId', _0: a};
 };
-var _user$project$ProgrissStore$castProjectDataToProject = function (_p94) {
-	var _p95 = _p94;
+var _user$project$ProgrissStore$castProjectDataToProject = function (_p91) {
+	var _p92 = _p91;
 	return A2(
 		_user$project$ProgrissStore$Project,
-		_user$project$ProgrissStore$ProjectId(_p95._0),
-		_p95._1.title);
+		_user$project$ProgrissStore$ProjectId(_p92._0),
+		_p92._1.title);
 };
 var _user$project$ProgrissStore$getProjectForAction = F2(
-	function (_p97, _p96) {
-		var _p98 = _p97;
-		var _p99 = _p96;
-		var _p100 = _p99._0;
+	function (_p94, _p93) {
+		var _p95 = _p94;
+		var _p96 = _p93;
+		var _p97 = _p96._0;
 		return A2(
 			_elm_lang$core$Maybe$map,
 			_user$project$ProgrissStore$castProjectDataToProject,
@@ -14679,46 +14677,46 @@ var _user$project$ProgrissStore$getProjectForAction = F2(
 						function (project) {
 							return {ctor: '_Tuple2', _0: projectId, _1: project};
 						},
-						A2(_elm_lang$core$Dict$get, projectId, _p100.projects));
+						A2(_elm_lang$core$Dict$get, projectId, _p97.projects));
 				},
 				A2(
 					_elm_lang$core$Maybe$andThen,
 					function (action) {
 						return action.projectId;
 					},
-					A2(_elm_lang$core$Dict$get, _p98._0, _p100.actions))));
+					A2(_elm_lang$core$Dict$get, _p95._0, _p97.actions))));
 	});
-var _user$project$ProgrissStore$getAllProjects = function (_p101) {
-	var _p102 = _p101;
+var _user$project$ProgrissStore$getAllProjects = function (_p98) {
+	var _p99 = _p98;
 	return A2(
 		_elm_lang$core$List$map,
 		_user$project$ProgrissStore$castProjectDataToProject,
-		_elm_lang$core$Dict$toList(_p102._0.projects));
+		_elm_lang$core$Dict$toList(_p99._0.projects));
 };
 var _user$project$ProgrissStore$NoteId = function (a) {
 	return {ctor: 'NoteId', _0: a};
 };
-var _user$project$ProgrissStore$castNoteDataToNote = function (_p103) {
-	var _p104 = _p103;
+var _user$project$ProgrissStore$castNoteDataToNote = function (_p100) {
+	var _p101 = _p100;
 	return A2(
 		_user$project$ProgrissStore$Note,
-		_user$project$ProgrissStore$NoteId(_p104._0),
-		_p104._1.body);
+		_user$project$ProgrissStore$NoteId(_p101._0),
+		_p101._1.body);
 };
 var _user$project$ProgrissStore$getNotesForProject = F2(
-	function (_p106, _p105) {
-		var _p107 = _p106;
-		var _p108 = _p105;
+	function (_p103, _p102) {
+		var _p104 = _p103;
+		var _p105 = _p102;
 		return A2(
 			_elm_lang$core$List$map,
 			_user$project$ProgrissStore$castNoteDataToNote,
 			A2(
 				_elm_lang$core$List$filter,
-				function (_p109) {
-					var _p110 = _p109;
-					return _elm_lang$core$Native_Utils.eq(_p110._1.projectId, _p107._0);
+				function (_p106) {
+					var _p107 = _p106;
+					return _elm_lang$core$Native_Utils.eq(_p107._1.projectId, _p104._0);
 				},
-				_elm_lang$core$Dict$toList(_p108._0.notes)));
+				_elm_lang$core$Dict$toList(_p105._0.notes)));
 	});
 
 var _user$project$Workflows_GtdActionLists$contextName = F2(
@@ -15281,13 +15279,15 @@ var _user$project$Workflows_ProjectOverview$projectCard = F2(
 	});
 var _user$project$Workflows_ProjectOverview$view = F2(
 	function (store, model) {
-		var allProjects = _user$project$ProgrissStore$getAllProjects(store);
-		var _p0 = A2(_user$project$ProgrissStore$getSettingsForWorkflow, _user$project$ProgrissStore$ProjectOverviewSettingsQuery, store);
-		var workflowSettings = _p0._0;
+		var projectsPerRow = function (_) {
+			return _.projectsPerRow;
+		}(
+			_user$project$SettingsStore$getSettingsForProjectOverview(
+				_user$project$ProgrissStore$getAllSettings(store)));
 		var groupedProjects = A3(
 			_user$project$ListHelper$groupsOf,
-			workflowSettings.projectsPerRow,
-			allProjects,
+			projectsPerRow,
+			_user$project$ProgrissStore$getAllProjects(store),
 			{ctor: '[]'});
 		return A2(
 			_rundis$elm_bootstrap$Bootstrap_Grid$container,
@@ -15310,6 +15310,215 @@ var _user$project$Workflows_ProjectOverview$update = F3(
 var _user$project$Workflows_ProjectOverview$initialModel = {};
 var _user$project$Workflows_ProjectOverview$Model = {};
 var _user$project$Workflows_ProjectOverview$Never = {ctor: 'Never'};
+
+var _user$project$Workflows_Settings$update = F3(
+	function (msg, store, model) {
+		var _p0 = msg;
+		var oldSettings = _user$project$SettingsStore$getSettingsForProjectOverview(
+			_user$project$ProgrissStore$getAllSettings(store));
+		return {
+			ctor: '_Tuple3',
+			_0: model,
+			_1: A2(
+				_user$project$ProgrissStore$updateSettings,
+				store,
+				A2(
+					_user$project$SettingsStore$updateSettingsForProjectOverview,
+					_elm_lang$core$Native_Utils.update(
+						oldSettings,
+						{projectsPerRow: _p0._0}),
+					_user$project$ProgrissStore$getAllSettings(store))),
+			_2: _elm_lang$core$Platform_Cmd$none
+		};
+	});
+var _user$project$Workflows_Settings$initialModel = {};
+var _user$project$Workflows_Settings$Model = {};
+var _user$project$Workflows_Settings$ChangeNumberOfProjectsPerRow = function (a) {
+	return {ctor: 'ChangeNumberOfProjectsPerRow', _0: a};
+};
+var _user$project$Workflows_Settings$view = F2(
+	function (store, model) {
+		var projectsPerRow = function (_) {
+			return _.projectsPerRow;
+		}(
+			_user$project$SettingsStore$getSettingsForProjectOverview(
+				_user$project$ProgrissStore$getAllSettings(store)));
+		return A2(
+			_rundis$elm_bootstrap$Bootstrap_Grid$container,
+			{ctor: '[]'},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$h1,
+					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('projectOverviewSettings'),
+						_1: {ctor: '[]'}
+					}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'projects per row: ',
+							_elm_lang$core$Basics$toString(projectsPerRow))),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_rundis$elm_bootstrap$Bootstrap_Button$button,
+							{
+								ctor: '::',
+								_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+								_1: {
+									ctor: '::',
+									_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(
+												_user$project$Workflows_Settings$ChangeNumberOfProjectsPerRow(1)),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$classList(
+													{
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'active',
+															_1: _elm_lang$core$Native_Utils.eq(projectsPerRow, 1)
+														},
+														_1: {ctor: '[]'}
+													}),
+												_1: {ctor: '[]'}
+											}
+										}),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('1'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_rundis$elm_bootstrap$Bootstrap_Button$button,
+								{
+									ctor: '::',
+									_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+									_1: {
+										ctor: '::',
+										_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onClick(
+													_user$project$Workflows_Settings$ChangeNumberOfProjectsPerRow(2)),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$classList(
+														{
+															ctor: '::',
+															_0: {
+																ctor: '_Tuple2',
+																_0: 'active',
+																_1: _elm_lang$core$Native_Utils.eq(projectsPerRow, 2)
+															},
+															_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('2'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_rundis$elm_bootstrap$Bootstrap_Button$button,
+									{
+										ctor: '::',
+										_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+										_1: {
+											ctor: '::',
+											_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html_Events$onClick(
+														_user$project$Workflows_Settings$ChangeNumberOfProjectsPerRow(3)),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$classList(
+															{
+																ctor: '::',
+																_0: {
+																	ctor: '_Tuple2',
+																	_0: 'active',
+																	_1: _elm_lang$core$Native_Utils.eq(projectsPerRow, 3)
+																},
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('3'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_rundis$elm_bootstrap$Bootstrap_Button$button,
+										{
+											ctor: '::',
+											_0: _rundis$elm_bootstrap$Bootstrap_Button$primary,
+											_1: {
+												ctor: '::',
+												_0: _rundis$elm_bootstrap$Bootstrap_Button$attrs(
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(
+															_user$project$Workflows_Settings$ChangeNumberOfProjectsPerRow(4)),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$classList(
+																{
+																	ctor: '::',
+																	_0: {
+																		ctor: '_Tuple2',
+																		_0: 'active',
+																		_1: _elm_lang$core$Native_Utils.eq(projectsPerRow, 4)
+																	},
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('4'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			});
+	});
 
 var _user$project$Workflows_SimpleTodos$cardConfigForAction = function (action) {
 	var _p0 = action.state;
@@ -15717,16 +15926,17 @@ var _user$project$Main$triggerStoreLoad = _elm_lang$core$Native_Platform.outgoin
 	function (v) {
 		return null;
 	});
-var _user$project$Main$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {store: a, gtdActionListsModel: b, projectCardOverviewModel: c, simpleTodosModel: d, selectedWorkflow: e, workflowMenuVisible: f};
+var _user$project$Main$Model = F7(
+	function (a, b, c, d, e, f, g) {
+		return {store: a, gtdActionListsModel: b, projectCardOverviewModel: c, simpleTodosModel: d, settingsModel: e, selectedWorkflow: f, workflowMenuVisible: g};
 	});
+var _user$project$Main$SettingsWorkflow = {ctor: 'SettingsWorkflow'};
 var _user$project$Main$ProjectOverviewWorkflow = {ctor: 'ProjectOverviewWorkflow'};
 var _user$project$Main$GtdActionListsWorkflow = {ctor: 'GtdActionListsWorkflow'};
 var _user$project$Main$SimpleTodosWorkflow = {ctor: 'SimpleTodosWorkflow'};
 var _user$project$Main$initialModel = {
 	ctor: '_Tuple2',
-	_0: {store: _user$project$Main$initialStore, gtdActionListsModel: _user$project$Workflows_GtdActionLists$initialModel, projectCardOverviewModel: _user$project$Workflows_ProjectOverview$initialModel, simpleTodosModel: _user$project$Workflows_SimpleTodos$initialModel, selectedWorkflow: _user$project$Main$SimpleTodosWorkflow, workflowMenuVisible: false},
+	_0: {store: _user$project$Main$initialStore, gtdActionListsModel: _user$project$Workflows_GtdActionLists$initialModel, projectCardOverviewModel: _user$project$Workflows_ProjectOverview$initialModel, simpleTodosModel: _user$project$Workflows_SimpleTodos$initialModel, settingsModel: _user$project$Workflows_Settings$initialModel, selectedWorkflow: _user$project$Main$SimpleTodosWorkflow, workflowMenuVisible: false},
 	_1: _elm_lang$core$Platform_Cmd$none
 };
 var _user$project$Main$ToggleDrawer = function (a) {
@@ -15742,6 +15952,9 @@ var _user$project$Main$subscriptions = function (model) {
 var _user$project$Main$Save = {ctor: 'Save'};
 var _user$project$Main$SelectWorkflow = function (a) {
 	return {ctor: 'SelectWorkflow', _0: a};
+};
+var _user$project$Main$SettingsMsg = function (a) {
+	return {ctor: 'SettingsMsg', _0: a};
 };
 var _user$project$Main$SimpleTodosMsg = function (a) {
 	return {ctor: 'SimpleTodosMsg', _0: a};
@@ -15831,6 +16044,18 @@ var _user$project$Main$update = F2(
 						model,
 						{store: store, simpleTodosModel: simpleTodosModel}),
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SimpleTodosMsg, cmd)
+				};
+			case 'SettingsMsg':
+				var _p6 = A3(_user$project$Workflows_Settings$update, _p1._0, model.store, model.settingsModel);
+				var settingsModel = _p6._0;
+				var store = _p6._1;
+				var cmd = _p6._2;
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{store: store, settingsModel: settingsModel}),
+					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SettingsMsg, cmd)
 				};
 			case 'SelectWorkflow':
 				return {
@@ -15939,8 +16164,8 @@ var _user$project$Main$workflowMenu = function (model) {
 							_1: {
 								ctor: '::',
 								_0: function () {
-									var _p6 = model.selectedWorkflow;
-									if (_p6.ctor === 'GtdActionListsWorkflow') {
+									var _p7 = model.selectedWorkflow;
+									if (_p7.ctor === 'GtdActionListsWorkflow') {
 										return A2(
 											_elm_lang$html$Html$map,
 											_user$project$Main$GtdActionListsMsg,
@@ -16074,25 +16299,13 @@ var _user$project$Main$workflowMenu = function (model) {
 											_1: {
 												ctor: '::',
 												_0: A2(
-													_elm_lang$html$Html$a,
+													_elm_lang$html$Html$div,
 													{
 														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$href('#'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Save),
-																_1: {ctor: '[]'}
-															}
-														}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Save'),
+														_0: _elm_lang$html$Html_Attributes$class('dropdown-divider'),
 														_1: {ctor: '[]'}
-													}),
+													},
+													{ctor: '[]'}),
 												_1: {
 													ctor: '::',
 													_0: A2(
@@ -16105,17 +16318,64 @@ var _user$project$Main$workflowMenu = function (model) {
 																_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$TriggerLoad),
+																	_0: _elm_lang$html$Html_Events$onClick(
+																		_user$project$Main$SelectWorkflow(_user$project$Main$SettingsWorkflow)),
 																	_1: {ctor: '[]'}
 																}
 															}
 														},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('Load'),
+															_0: _elm_lang$html$Html$text('Settings'),
 															_1: {ctor: '[]'}
 														}),
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$a,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$href('#'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Save),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Save'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$a,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$href('#'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$TriggerLoad),
+																			_1: {ctor: '[]'}
+																		}
+																	}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('Load'),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {ctor: '[]'}
+														}
+													}
 												}
 											}
 										}
@@ -16129,13 +16389,18 @@ var _user$project$Main$workflowMenu = function (model) {
 		});
 };
 var _user$project$Main$renderWorkflow = function (model) {
-	var _p7 = model.selectedWorkflow;
-	switch (_p7.ctor) {
+	var _p8 = model.selectedWorkflow;
+	switch (_p8.ctor) {
 		case 'SimpleTodosWorkflow':
 			return A2(
 				_elm_lang$html$Html$map,
 				_user$project$Main$SimpleTodosMsg,
 				A2(_user$project$Workflows_SimpleTodos$view, model.store, model.simpleTodosModel));
+		case 'SettingsWorkflow':
+			return A2(
+				_elm_lang$html$Html$map,
+				_user$project$Main$SettingsMsg,
+				A2(_user$project$Workflows_Settings$view, model.store, model.settingsModel));
 		case 'GtdActionListsWorkflow':
 			return A2(
 				_elm_lang$html$Html$map,

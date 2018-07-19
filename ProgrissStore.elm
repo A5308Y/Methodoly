@@ -8,8 +8,6 @@ module ProgrissStore
         , ProgrissStore
         , Project
         , ProjectId
-        , WorkflowSettings(..)
-        , WorkflowSettingsQuery(..)
         , associateActionToContext
         , associateActionToProject
         , createAction
@@ -25,19 +23,21 @@ module ProgrissStore
         , getAllActions
         , getAllContexts
         , getAllProjects
+        , getAllSettings
         , getContext
         , getContextForAction
         , getNotesForProject
         , getProjectForAction
-        , getSettingsForWorkflow
         , toggleActionDone
         , updateAction
+        , updateSettings
         )
 
 import Dict exposing (Dict)
 import Json.Decode exposing (Decoder, float, int, nullable, string)
 import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required)
 import Json.Encode
+import SettingsStore exposing (SettingsStore)
 import Time exposing (Time)
 
 
@@ -50,24 +50,8 @@ type alias Store =
     , actions : Dict Int ActionData
     , contexts : Dict Int ContextData
     , notes : Dict Int NoteData
-    , settings : Settings
+    , settings : SettingsStore
     }
-
-
-type WorkflowSettingsQuery
-    = ProjectOverviewSettingsQuery
-
-
-type WorkflowSettings
-    = ProjectOverviewSettingsItem ProjectOverviewSettings
-
-
-type alias Settings =
-    { projectOverviewSettings : ProjectOverviewSettings }
-
-
-type alias ProjectOverviewSettings =
-    { projectsPerRow : Int }
 
 
 type alias ActionData =
@@ -140,7 +124,7 @@ empty =
         , actions = Dict.empty
         , contexts = Dict.empty
         , notes = Dict.empty
-        , settings = { projectOverviewSettings = { projectsPerRow = 3 } }
+        , settings = SettingsStore.initialStore
         }
 
 
@@ -259,23 +243,13 @@ associateActionToProject (ActionId actionId) (ProjectId projectId) (ProgrissStor
     ProgrissStore { store | actions = updatedActions }
 
 
-updateSettingsForWorkflow : WorkflowSettings -> ProgrissStore -> ProgrissStore
-updateSettingsForWorkflow workflowSettings (ProgrissStore store) =
-    let
-        settings =
-            store.settings
-    in
-    case workflowSettings of
-        ProjectOverviewSettingsItem projectOverviewSettings ->
-            let
-                updatedSettings =
-                    { settings | projectOverviewSettings = projectOverviewSettings }
-            in
-            ProgrissStore { store | settings = updatedSettings }
+updateSettings : ProgrissStore -> SettingsStore -> ProgrissStore
+updateSettings (ProgrissStore store) settings =
+    ProgrissStore { store | settings = settings }
 
 
 
--- Retrieving data from the store
+--Retrieving data from the store
 
 
 getAllActions : ProgrissStore -> List Action
@@ -357,11 +331,9 @@ getAllProjects (ProgrissStore store) =
         |> List.map castProjectDataToProject
 
 
-getSettingsForWorkflow : WorkflowSettingsQuery -> ProgrissStore -> WorkflowSettings
-getSettingsForWorkflow query (ProgrissStore store) =
-    case query of
-        ProjectOverviewSettingsQuery ->
-            ProjectOverviewSettingsItem store.settings.projectOverviewSettings
+getAllSettings : ProgrissStore -> SettingsStore
+getAllSettings (ProgrissStore store) =
+    store.settings
 
 
 castActionDataToAction : ( Int, ActionData ) -> Action
@@ -404,7 +376,7 @@ progrissStoreConstructor actions contexts projects notes =
         , contexts = Dict.fromList contexts
         , projects = Dict.fromList projects
         , notes = Dict.fromList notes
-        , settings = { projectOverviewSettings = { projectsPerRow = 3 } }
+        , settings = SettingsStore.initialStore
         }
 
 

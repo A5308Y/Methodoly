@@ -8,6 +8,7 @@ import Json.Encode
 import ProgrissStore as Store exposing (ProgrissStore)
 import Workflows.GtdActionLists
 import Workflows.ProjectOverview
+import Workflows.Settings
 import Workflows.SimpleTodos
 
 
@@ -16,6 +17,7 @@ type alias Model =
     , gtdActionListsModel : Workflows.GtdActionLists.Model
     , projectCardOverviewModel : Workflows.ProjectOverview.Model
     , simpleTodosModel : Workflows.SimpleTodos.Model
+    , settingsModel : Workflows.Settings.Model
     , selectedWorkflow : SelectableWorkflow
     , workflowMenuVisible : Bool
     }
@@ -25,12 +27,14 @@ type SelectableWorkflow
     = SimpleTodosWorkflow
     | GtdActionListsWorkflow
     | ProjectOverviewWorkflow
+    | SettingsWorkflow
 
 
 type Msg
     = GtdActionListsMsg Workflows.GtdActionLists.Msg
     | ProjectOverviewMsg Workflows.ProjectOverview.Msg
     | SimpleTodosMsg Workflows.SimpleTodos.Msg
+    | SettingsMsg Workflows.Settings.Msg
     | SelectWorkflow SelectableWorkflow
     | Save
     | ReceiveStore String
@@ -86,6 +90,7 @@ initialModel =
       , gtdActionListsModel = Workflows.GtdActionLists.initialModel
       , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
       , simpleTodosModel = Workflows.SimpleTodos.initialModel
+      , settingsModel = Workflows.Settings.initialModel
       , selectedWorkflow = SimpleTodosWorkflow
       , workflowMenuVisible = False
       }
@@ -154,6 +159,15 @@ update msg model =
             , Cmd.map SimpleTodosMsg cmd
             )
 
+        SettingsMsg msg ->
+            let
+                ( settingsModel, store, cmd ) =
+                    Workflows.Settings.update msg model.store model.settingsModel
+            in
+            ( { model | store = store, settingsModel = settingsModel }
+            , Cmd.map SettingsMsg cmd
+            )
+
         SelectWorkflow selectedWorkflow ->
             ( { model
                 | selectedWorkflow = selectedWorkflow
@@ -205,6 +219,9 @@ workflowMenu model =
                     [ text "GTD" ]
                 , a [ href "#", class "list-group-item", onClick (SelectWorkflow ProjectOverviewWorkflow) ]
                     [ text "Projects" ]
+                , div [ class "dropdown-divider" ] []
+                , a [ href "#", class "list-group-item", onClick (SelectWorkflow SettingsWorkflow) ]
+                    [ text "Settings" ]
                 , a [ href "#", class "list-group-item", onClick Save ]
                     [ text "Save" ]
                 , a [ href "#", class "list-group-item", onClick TriggerLoad ]
@@ -219,6 +236,9 @@ renderWorkflow model =
     case model.selectedWorkflow of
         SimpleTodosWorkflow ->
             Html.map SimpleTodosMsg (Workflows.SimpleTodos.view model.store model.simpleTodosModel)
+
+        SettingsWorkflow ->
+            Html.map SettingsMsg (Workflows.Settings.view model.store model.settingsModel)
 
         GtdActionListsWorkflow ->
             Html.map

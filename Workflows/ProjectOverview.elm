@@ -8,14 +8,8 @@ import Bootstrap.ListGroup as ListGroup
 import Html exposing (Html, i, li, text, ul)
 import Html.Attributes exposing (href)
 import ListHelper
-import ProgrissStore as Store
-    exposing
-        ( ProgrissStore
-        , Project
-        , ProjectId
-        , WorkflowSettings(..)
-        , WorkflowSettingsQuery(..)
-        )
+import ProgrissStore as Store exposing (ProgrissStore, Project, ProjectId)
+import SettingsStore
 
 
 type Msg
@@ -39,14 +33,13 @@ update msg store model =
 view : ProgrissStore -> Model -> Html Msg
 view store model =
     let
-        (ProjectOverviewSettingsItem workflowSettings) =
-            Store.getSettingsForWorkflow ProjectOverviewSettingsQuery store
-
-        allProjects =
-            Store.getAllProjects store
+        projectsPerRow =
+            Store.getAllSettings store
+                |> SettingsStore.getSettingsForProjectOverview
+                |> .projectsPerRow
 
         groupedProjects =
-            ListHelper.groupsOf workflowSettings.projectsPerRow allProjects []
+            ListHelper.groupsOf projectsPerRow (Store.getAllProjects store) []
     in
     Grid.container []
         (List.map (\projectGroup -> Card.deck (List.map (projectCard store) projectGroup)) groupedProjects)

@@ -1,5 +1,6 @@
 Compile the app with `elm-make Main.elm --output main.js`. There is no
-hotloading yet.
+hotloading yet. Then open `index.html` in your browser. No need to run a server
+yet. The app is only in the client so far.
 
 We use fezvrasta.github.io/bootstrap-material-design/docs/4.0 to allow
 a material design look while using elm-bootstrap to have typesafe styling I can
