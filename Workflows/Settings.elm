@@ -2,7 +2,7 @@ module Workflows.Settings exposing (Model, Msg, initialModel, update, view)
 
 import Bootstrap.Button as Button
 import Bootstrap.Grid as Grid
-import Html exposing (Html, h1, text)
+import Html exposing (Html, h1, h2, text)
 import Html.Attributes exposing (classList)
 import Html.Events exposing (onClick)
 import ProgrissStore as Store exposing (ProgrissStore)
@@ -48,8 +48,9 @@ view store model =
                 |> .projectsPerRow
     in
     Grid.container []
-        [ h1 [] [ text "projectOverviewSettings" ]
-        , text ("projects per row: " ++ toString projectsPerRow)
+        [ h1 [] [ text "Settings" ]
+        , h2 [] [ text "Project Overview" ]
+        , text "Projects per row: "
         , Button.button
             [ Button.primary
             , Button.attrs

@@ -68,7 +68,9 @@ initialStore =
                     ],
                     "projects": [
                         {"id": 1, "title": "Build our familiy house"},
-                        {"id": 2, "title": "Mom's Birthday"}
+                        {"id": 2, "title": "Mom's Birthday"},
+                        {"id": 3, "title": "Write Essay about my favourite fish"},
+                        {"id": 4, "title": "Clean Garage"}
                     ],
                     "notes": [
                         {"id": 1, "body": "Don't forget she likes tulips the best! So if you can get those please do. Whatever you do though, don't get roses. She hates them!", "project_id": 2}

@@ -5,7 +5,8 @@ import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as ListGroup
-import Html exposing (Html, i, li, text, ul)
+import Bootstrap.Utilities.Spacing as Spacing
+import Html exposing (Html, div, i, li, text, ul)
 import Html.Attributes exposing (href)
 import ListHelper
 import ProgrissStore as Store exposing (ProgrissStore, Project, ProjectId)
@@ -37,12 +38,20 @@ view store model =
             Store.getAllSettings store
                 |> SettingsStore.getSettingsForProjectOverview
                 |> .projectsPerRow
-
-        groupedProjects =
-            ListHelper.groupsOf projectsPerRow (Store.getAllProjects store) []
     in
-    Grid.container []
-        (List.map (\projectGroup -> Card.deck (List.map (projectCard store) projectGroup)) groupedProjects)
+    ListHelper.groupsOf projectsPerRow (Store.getAllProjects store) []
+        |> List.reverse
+        |> List.map (projectCardColumn store)
+        |> Grid.container []
+
+
+projectCardColumn : ProgrissStore -> List Project -> Html Msg
+projectCardColumn store projectGroup =
+    div [ Spacing.m4 ]
+        [ projectGroup
+            |> List.map (projectCard store)
+            |> Card.deck
+        ]
 
 
 projectCard : ProgrissStore -> Project -> Card.Config Msg
