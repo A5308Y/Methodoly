@@ -9,10 +9,13 @@ import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
+import Dom
 import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (action, href)
-import Html.Events exposing (onSubmit)
+import Html.Attributes exposing (action, class, defaultValue, id, style, value)
+import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
+import Json.Decode
 import ProgrissStore as Store exposing (Action, ActionId, ActionState(Done), ProgrissStore, decoder)
+import Task
 
 
 type Msg
@@ -21,6 +24,8 @@ type Msg
     | CreateNewAction
     | ToggleActionDone ActionId
     | ToggleEditAction (Maybe ActionId)
+    | SetFocusTo String
+    | FocusResult (Result Dom.Error ())
 
 
 type alias Model =
@@ -53,10 +58,30 @@ update msg store model =
             ( { model | newActionDescription = "" }, updatedStore, Cmd.none )
 
         ToggleActionDone actionId ->
-            ( model, Store.toggleActionDone actionId store, Cmd.none )
+            ( { model | editing = Nothing }, Store.toggleActionDone actionId store, Cmd.none )
 
         ToggleEditAction maybeActionId ->
-            ( { model | editing = maybeActionId }, store, Cmd.none )
+            case maybeActionId of
+                Nothing ->
+                    ( { model | editing = maybeActionId }, store, Cmd.none )
+
+                Just actionId ->
+                    let
+                        domId =
+                            "edit-" ++ toString actionId
+                    in
+                    ( { model | editing = maybeActionId }, store, Task.attempt FocusResult (Dom.focus domId) )
+
+        SetFocusTo domId ->
+            ( model, store, Task.attempt FocusResult (Dom.focus domId) )
+
+        FocusResult result ->
+            case result of
+                Err (Dom.NotFound id) ->
+                    ( model, store, Cmd.none )
+
+                Ok () ->
+                    ( model, store, Cmd.none )
 
 
 view : ProgrissStore -> Model -> Html Msg
@@ -65,29 +90,60 @@ view store model =
         [ Grid.row []
             [ Grid.col []
                 [ renderActions model.editing (Store.getAllActions store)
-                , hr [] []
-                , Form.form [ onSubmit CreateNewAction, action "javascript:void(0);" ]
-                    [ InputGroup.config
-                        (InputGroup.text
-                            [ Input.placeholder "Type action description here"
-                            , Input.attrs
-                                [ Html.Attributes.value model.newActionDescription
-                                , Html.Events.onInput UpdateNewActionDescription
-                                ]
-                            ]
-                        )
-                        |> InputGroup.successors
-                            [ InputGroup.button
-                                [ Button.success
-                                , Button.disabled (String.isEmpty model.newActionDescription)
-                                , Button.attrs []
-                                ]
-                                [ text "Create Action" ]
-                            ]
-                        |> InputGroup.view
-                    ]
+                , renderNewActionFormCard model
                 ]
             ]
+        ]
+
+
+renderNewActionFormCard : Model -> Html Msg
+renderNewActionFormCard model =
+    Card.config [ Card.light ]
+        |> Card.block []
+            [ Block.custom
+                (Grid.row [ Row.middleXs ]
+                    [ Grid.col [ Col.xs2, Col.md1 ]
+                        [ Button.button
+                            [ Button.success
+                            , Button.attrs
+                                [ class "bmd-btn-fab bmd-btn-fab-sm"
+                                , onClick (SetFocusTo "new-action-description")
+                                ]
+                            ]
+                            [ i [ class "material-icons" ] [ text "add" ] ]
+                        ]
+                    , Grid.col [] [ newActionForm model ]
+                    ]
+                )
+            ]
+        |> Card.view
+
+
+newActionForm : Model -> Html Msg
+newActionForm model =
+    Form.form
+        [ onSubmit CreateNewAction
+        , Html.Attributes.action "javascript:void(0);"
+        ]
+        [ InputGroup.config
+            (InputGroup.text
+                [ Input.placeholder "Add an Action"
+                , Input.attrs
+                    [ value model.newActionDescription
+                    , onInput UpdateNewActionDescription
+                    , id "new-action-description"
+                    ]
+                ]
+            )
+            |> InputGroup.successors
+                [ InputGroup.button
+                    [ Button.success
+                    , Button.disabled (String.isEmpty model.newActionDescription)
+                    , Button.attrs []
+                    ]
+                    [ text "Create Action" ]
+                ]
+            |> InputGroup.view
         ]
 
 
@@ -99,18 +155,20 @@ renderActions editing actions =
 actionCard : Maybe ActionId -> Action -> Html Msg
 actionCard editing action =
     Card.config (cardConfigForAction action)
-        |> Card.block []
+        |> Card.block [ Block.attrs [ onClick (ToggleEditAction (Just action.id)) ] ]
             [ Block.custom
                 (Grid.row [ Row.middleXs ]
                     [ Grid.col [ Col.xs2, Col.md1 ]
                         [ Button.button
                             [ buttonColorForActionState action.state
                             , Button.attrs
-                                [ Html.Events.onClick (ToggleActionDone action.id)
-                                , Html.Attributes.class "bmd-btn-fab bmd-btn-fab-sm"
+                                [ onWithOptions "click"
+                                    { preventDefault = True, stopPropagation = True }
+                                    (Json.Decode.succeed (ToggleActionDone action.id))
+                                , class "bmd-btn-fab bmd-btn-fab-sm"
                                 ]
                             ]
-                            [ i [ Html.Attributes.class "material-icons" ]
+                            [ i [ class "material-icons" ]
                                 [ text (iconForActionState action.state) ]
                             ]
                         ]
@@ -118,14 +176,18 @@ actionCard editing action =
                         Grid.col
                             []
                             [ Form.form
-                                [ Html.Attributes.style [ ( "margin-bottom", "0" ) ]
+                                [ style [ ( "margin-bottom", "0" ) ]
                                 , Html.Attributes.action "javascript:void(0);"
-                                , Html.Events.onSubmit (ToggleEditAction Nothing)
+                                , onSubmit (ToggleEditAction Nothing)
                                 ]
                                 [ InputGroup.config
                                     (InputGroup.text
                                         [ Input.small
-                                        , Input.attrs [ Html.Events.onInput (UpdateActionDescription action), Html.Attributes.defaultValue action.description ]
+                                        , Input.attrs
+                                            [ onInput (UpdateActionDescription action)
+                                            , defaultValue action.description
+                                            , id ("edit-" ++ toString action.id)
+                                            ]
                                         ]
                                     )
                                     |> InputGroup.successors
@@ -135,7 +197,7 @@ actionCard editing action =
                             ]
                       else
                         Grid.col
-                            [ Col.attrs [ Html.Events.onClick (ToggleEditAction (Just action.id)) ] ]
+                            [ Col.attrs [] ]
                             [ text action.description ]
                     ]
                 )

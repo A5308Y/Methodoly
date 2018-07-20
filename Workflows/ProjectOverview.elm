@@ -7,7 +7,7 @@ import Bootstrap.Grid as Grid
 import Bootstrap.ListGroup as ListGroup
 import Bootstrap.Utilities.Spacing as Spacing
 import Html exposing (Html, div, i, li, text, ul)
-import Html.Attributes exposing (href)
+import Html.Attributes exposing (class, href)
 import ListHelper
 import ProgrissStore as Store exposing (ProgrissStore, Project, ProjectId)
 import SettingsStore
@@ -63,8 +63,8 @@ projectCard store project =
             [ Block.text []
                 [ projectCardNoteList project.id store
                 , Button.button
-                    [ Button.primary, Button.attrs [ Html.Attributes.class "bmd-btn-fab" ] ]
-                    [ i [ Html.Attributes.class "material-icons" ] [ text "grade" ] ]
+                    [ Button.primary, Button.attrs [ class "bmd-btn-fab" ] ]
+                    [ i [ class "material-icons" ] [ text "grade" ] ]
                 ]
             ]
 

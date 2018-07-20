@@ -8,7 +8,9 @@ module ProgrissStore
         , ProgrissStore
         , Project
         , ProjectId
+        , associateActionToAnywhereContext
         , associateActionToContext
+        , associateActionToNoProject
         , associateActionToProject
         , createAction
         , createContext
@@ -226,6 +228,30 @@ associateActionToContext (ActionId actionId) (ContextId contextId) (ProgrissStor
             Dict.update
                 actionId
                 (Maybe.map (\actionData -> { actionData | contextId = Just contextId }))
+                store.actions
+    in
+    ProgrissStore { store | actions = updatedActions }
+
+
+associateActionToAnywhereContext : ActionId -> ProgrissStore -> ProgrissStore
+associateActionToAnywhereContext (ActionId actionId) (ProgrissStore store) =
+    let
+        updatedActions =
+            Dict.update
+                actionId
+                (Maybe.map (\actionData -> { actionData | contextId = Nothing }))
+                store.actions
+    in
+    ProgrissStore { store | actions = updatedActions }
+
+
+associateActionToNoProject : ActionId -> ProgrissStore -> ProgrissStore
+associateActionToNoProject (ActionId actionId) (ProgrissStore store) =
+    let
+        updatedActions =
+            Dict.update
+                actionId
+                (Maybe.map (\actionData -> { actionData | projectId = Nothing }))
                 store.actions
     in
     ProgrissStore { store | actions = updatedActions }

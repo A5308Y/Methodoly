@@ -1,6 +1,7 @@
 module Workflows.GtdActionLists exposing (Model, Msg, initialModel, navbarContent, update, view)
 
 import Bootstrap.Button as Button
+import Bootstrap.ButtonGroup as ButtonGroup
 import Bootstrap.Card as Card
 import Bootstrap.Card.Block as Block
 import Bootstrap.Form as Form
@@ -9,11 +10,23 @@ import Bootstrap.Form.InputGroup as InputGroup
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
-import Bootstrap.ListGroup as ListGroup
-import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (action, class, href)
-import Html.Events exposing (onClick)
-import ProgrissStore as Store exposing (Action, ActionId, ActionState(..), Context, ContextId, ProgrissStore)
+import Dom
+import Html exposing (Html, a, div, hr, i, li, span, text, ul)
+import Html.Attributes exposing (class, classList, defaultValue, href, id, style, value)
+import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
+import Json.Decode
+import ProgrissStore as Store
+    exposing
+        ( Action
+        , ActionId
+        , ActionState(..)
+        , Context
+        , ContextId
+        , ProgrissStore
+        , Project
+        , ProjectId
+        )
+import Task
 
 
 type SelectedContext
@@ -22,26 +35,48 @@ type SelectedContext
     | AllContexts
 
 
+type EditingActionState
+    = EditingAction ActionId ActionEditState
+    | NotEditingAction
+
+
+type ActionEditState
+    = SelectingEditedAttribute
+    | EditingDescription
+    | EditingContext
+    | EditingProject
+
+
 type Msg
     = ChangeContext SelectedContext
     | UpdateNewActionDescription String
     | CreateNewAction
     | ToggleActionDone ActionId
     | ToggleContextMenu Bool
+    | SelectActionToEdit EditingActionState
+    | UpdateActionContextAnywhere ActionId
+    | UpdateActionContext ActionId ContextId
+    | UpdateActionNoProject ActionId
+    | UpdateActionProject ActionId ProjectId
+    | UpdateActionDescription Action String
+    | SetFocusTo String
+    | FocusResult (Result Dom.Error ())
 
 
 type alias Model =
     { selectedContext : SelectedContext
     , newActionDescription : String
     , contextMenuVisible : Bool
+    , editingAction : EditingActionState
     }
 
 
 initialModel : Model
 initialModel =
-    { selectedContext = AnywhereContext
+    { selectedContext = AllContexts
     , newActionDescription = ""
     , contextMenuVisible = False
+    , editingAction = NotEditingAction
     }
 
 
@@ -54,11 +89,73 @@ update msg store model =
         ChangeContext selectedContext ->
             ( { model | selectedContext = selectedContext, contextMenuVisible = False }, store, Cmd.none )
 
+        UpdateActionContext actionId contextId ->
+            ( { model | editingAction = NotEditingAction }
+            , Store.associateActionToContext actionId contextId store
+            , Cmd.none
+            )
+
+        UpdateActionContextAnywhere actionId ->
+            ( { model | editingAction = NotEditingAction }
+            , Store.associateActionToAnywhereContext actionId store
+            , Cmd.none
+            )
+
+        UpdateActionProject actionId projectId ->
+            ( { model | editingAction = NotEditingAction }
+            , Store.associateActionToProject actionId projectId store
+            , Cmd.none
+            )
+
+        UpdateActionNoProject actionId ->
+            ( { model | editingAction = NotEditingAction }
+            , Store.associateActionToNoProject actionId store
+            , Cmd.none
+            )
+
+        UpdateActionDescription action description ->
+            let
+                updatedStore =
+                    Store.updateAction { action | description = description } store
+            in
+            ( model, updatedStore, Cmd.none )
+
         ToggleActionDone actionId ->
-            ( model, Store.toggleActionDone actionId store, Cmd.none )
+            ( { model | editingAction = NotEditingAction }, Store.toggleActionDone actionId store, Cmd.none )
 
         ToggleContextMenu state ->
             ( { model | contextMenuVisible = state }, store, Cmd.none )
+
+        SelectActionToEdit editingAction ->
+            case editingAction of
+                EditingAction actionId actionEditState ->
+                    let
+                        domId =
+                            "edit-" ++ toString actionId
+                    in
+                    case actionEditState of
+                        EditingDescription ->
+                            ( { model | editingAction = editingAction }
+                            , store
+                            , Task.attempt FocusResult (Dom.focus domId)
+                            )
+
+                        _ ->
+                            ( { model | editingAction = editingAction }, store, Cmd.none )
+
+                NotEditingAction ->
+                    ( { model | editingAction = editingAction }, store, Cmd.none )
+
+        SetFocusTo domId ->
+            ( model, store, Task.attempt FocusResult (Dom.focus domId) )
+
+        FocusResult result ->
+            case result of
+                Err (Dom.NotFound id) ->
+                    ( model, store, Cmd.none )
+
+                Ok () ->
+                    ( model, store, Cmd.none )
 
         CreateNewAction ->
             let
@@ -82,70 +179,116 @@ update msg store model =
 
 view : ProgrissStore -> Model -> Html Msg
 view store model =
-    if model.contextMenuVisible then
-        Grid.container []
-            [ renderContextMenu store model.selectedContext ]
-    else
-        Grid.container []
-            [ renderActions (actionsToRender store model.selectedContext)
-            , hr [] []
-            , Form.form [ Html.Events.onSubmit CreateNewAction, action "javascript:void(0);" ]
-                [ InputGroup.config
-                    (InputGroup.text
-                        [ Input.placeholder "Type action description here"
-                        , Input.attrs
-                            [ Html.Attributes.value model.newActionDescription
-                            , Html.Events.onInput UpdateNewActionDescription
-                            ]
-                        ]
-                    )
-                    |> InputGroup.successors
-                        [ InputGroup.button
+    div []
+        [ actionEditMenu model.editingAction store
+        , contextMenu store model.selectedContext model.contextMenuVisible
+        , actionContainer store model
+        ]
+
+
+actionContainer : ProgrissStore -> Model -> Html Msg
+actionContainer store model =
+    Grid.container []
+        [ renderActions store model.editingAction (actionsToRender store model.selectedContext)
+        , renderNewActionFormCard model
+        ]
+
+
+renderNewActionFormCard : Model -> Html Msg
+renderNewActionFormCard model =
+    Card.config [ Card.light ]
+        |> Card.block []
+            [ Block.custom
+                (Grid.row [ Row.middleXs ]
+                    [ Grid.col [ Col.xs2, Col.md1 ]
+                        [ Button.button
                             [ Button.success
-                            , Button.disabled (String.isEmpty model.newActionDescription)
-                            , Button.attrs []
+                            , Button.attrs
+                                [ class "bmd-btn-fab bmd-btn-fab-sm"
+                                , onClick (SetFocusTo "new-action-description")
+                                ]
                             ]
-                            [ text "Create Action" ]
+                            [ i [ class "material-icons" ] [ text "add" ] ]
                         ]
-                    |> InputGroup.view
-                ]
+                    , Grid.col [] [ newActionForm model ]
+                    ]
+                )
             ]
+        |> Card.view
 
 
-renderContextMenu : ProgrissStore -> SelectedContext -> Html Msg
-renderContextMenu store selectedContext =
-    ListGroup.custom
-        (store
-            |> Store.getAllContexts
-            |> List.map (clickableContext selectedContext)
-            |> (::) (clickableAnywhereContext selectedContext)
-            |> (::) (clickableAllContexts selectedContext)
-        )
+newActionForm : Model -> Html Msg
+newActionForm model =
+    Form.form
+        [ onSubmit CreateNewAction
+        , Html.Attributes.action "javascript:void(0);"
+        ]
+        [ InputGroup.config
+            (InputGroup.text
+                [ Input.placeholder "Add an Action"
+                , Input.attrs
+                    [ value model.newActionDescription
+                    , onInput UpdateNewActionDescription
+                    , id "new-action-description"
+                    ]
+                ]
+            )
+            |> InputGroup.successors
+                [ InputGroup.button
+                    [ Button.success
+                    , Button.disabled (String.isEmpty model.newActionDescription)
+                    , Button.attrs []
+                    ]
+                    [ text "Create Action" ]
+                ]
+            |> InputGroup.view
+        ]
 
 
-clickableAllContexts : SelectedContext -> ListGroup.CustomItem Msg
-clickableAllContexts selectedContext =
-    ListGroup.anchor (clickableContextAttributes selectedContext AllContexts) [ text "All" ]
-
-
-clickableAnywhereContext : SelectedContext -> ListGroup.CustomItem Msg
-clickableAnywhereContext selectedContext =
-    ListGroup.anchor (clickableContextAttributes selectedContext AnywhereContext) [ text "Anywhere" ]
-
-
-clickableContext : SelectedContext -> Context -> ListGroup.CustomItem Msg
-clickableContext selectedContext context =
-    ListGroup.anchor
-        (clickableContextAttributes selectedContext (SpecificContext context.id))
-        [ text context.name ]
-
-
-clickableContextAttributes : SelectedContext -> SelectedContext -> List (ListGroup.ItemOption Msg)
-clickableContextAttributes selectedContext context =
-    if selectedContext == context then
-        [ ListGroup.active, ListGroup.attrs [ href "#", onClick (ChangeContext context) ] ]
+contextMenu : ProgrissStore -> SelectedContext -> Bool -> Html Msg
+contextMenu store selectedContext contextMenuVisible =
+    let
+        selectableItems =
+            store
+                |> Store.getAllContexts
+                |> List.map (clickableContext selectedContext)
+                |> (::) (clickableAnywhereContext selectedContext)
+                |> (::) (clickableAllContexts selectedContext)
+    in
+    if contextMenuVisible then
+        visibleSideMenu selectableItems
     else
-        [ ListGroup.attrs [ href "#", onClick (ChangeContext context) ] ]
+        hiddenSideMenu
+
+
+clickableAllContexts : SelectedContext -> Html Msg
+clickableAllContexts selectedContext =
+    a
+        [ href "#"
+        , classList [ ( "list-group-item", True ), ( "active", selectedContext == AllContexts ) ]
+        , onClick (ChangeContext AllContexts)
+        ]
+        [ text "All" ]
+
+
+clickableAnywhereContext : SelectedContext -> Html Msg
+clickableAnywhereContext selectedContext =
+    a
+        [ href "#"
+        , classList [ ( "list-group-item", True ), ( "active", selectedContext == AnywhereContext ) ]
+        , onClick (ChangeContext AnywhereContext)
+        ]
+        [ text "Anywhere" ]
+
+
+clickableContext : SelectedContext -> Context -> Html Msg
+clickableContext selectedContext context =
+    a
+        [ href "#"
+        , classList [ ( "list-group-item", True ), ( "active", selectedContext == SpecificContext context.id ) ]
+        , onClick (ChangeContext (SpecificContext context.id))
+        ]
+        [ text context.name ]
 
 
 actionsToRender : ProgrissStore -> SelectedContext -> List Action
@@ -161,34 +304,163 @@ actionsToRender store selectedContext =
             Store.getActionsForContext contextId store
 
 
-renderActions : List Action -> Html Msg
-renderActions actions =
-    div [] (List.map (\action -> actionCard action) actions)
+renderActions : ProgrissStore -> EditingActionState -> List Action -> Html Msg
+renderActions store editingAction actions =
+    div [] (List.map (actionCard store editingAction) actions)
 
 
-actionCard : Action -> Html Msg
-actionCard action =
+actionCard : ProgrissStore -> EditingActionState -> Action -> Html Msg
+actionCard store editingAction action =
     Card.config (cardConfigForAction action)
-        |> Card.block []
-            [ Block.custom
-                (Grid.row [ Row.middleXs ]
-                    [ Grid.col [ Col.xs2, Col.md1 ]
-                        [ Button.button
-                            [ buttonColorForActionState action.state
-                            , Button.attrs
-                                [ Html.Events.onClick (ToggleActionDone action.id)
-                                , Html.Attributes.class "bmd-btn-fab bmd-btn-fab-sm"
-                                ]
-                            ]
-                            [ i [ Html.Attributes.class "material-icons" ]
-                                [ text (iconForActionState action.state) ]
+        |> actionCardBlock editingAction action
+        |> actionCardFooter store editingAction action
+        |> Card.view
+
+
+actionCardBlock : EditingActionState -> Action -> Card.Config Msg -> Card.Config Msg
+actionCardBlock editingAction action =
+    let
+        blockAttrs =
+            if editingAction == EditingAction action.id SelectingEditedAttribute then
+                [ onClick (SelectActionToEdit NotEditingAction) ]
+            else if editingAction == EditingAction action.id EditingDescription then
+                []
+            else
+                [ onClick (SelectActionToEdit (EditingAction action.id SelectingEditedAttribute)) ]
+    in
+    Card.block [ Block.attrs blockAttrs ]
+        [ Block.custom
+            (Grid.row [ Row.middleXs ]
+                [ Grid.col [ Col.xs2, Col.md1 ]
+                    [ Button.button
+                        [ buttonColorForActionState action.state
+                        , Button.attrs
+                            [ onWithOptions "click"
+                                { preventDefault = True, stopPropagation = True }
+                                (Json.Decode.succeed (ToggleActionDone action.id))
+                            , class "bmd-btn-fab bmd-btn-fab-sm"
                             ]
                         ]
-                    , Grid.col [] [ text action.description ]
+                        [ i [ class "material-icons" ]
+                            [ text (iconForActionState action.state) ]
+                        ]
                     ]
-                )
-            ]
-        |> Card.view
+                , if editingAction == EditingAction action.id EditingDescription then
+                    Grid.col
+                        []
+                        [ Form.form
+                            [ style [ ( "margin-bottom", "0" ) ]
+                            , Html.Attributes.action "javascript:void(0);"
+                            , onSubmit (SelectActionToEdit NotEditingAction)
+                            ]
+                            [ InputGroup.config
+                                (InputGroup.text
+                                    [ Input.small
+                                    , Input.attrs
+                                        [ onInput (UpdateActionDescription action)
+                                        , defaultValue action.description
+                                        , id ("edit-" ++ toString action.id)
+                                        ]
+                                    ]
+                                )
+                                |> InputGroup.successors
+                                    [ InputGroup.button [ Button.success ] [ text "Save" ] ]
+                                |> InputGroup.view
+                            ]
+                        ]
+                  else
+                    Grid.col [] [ text action.description ]
+                ]
+            )
+        ]
+
+
+actionCardFooter : ProgrissStore -> EditingActionState -> Action -> Card.Config Msg -> Card.Config Msg
+actionCardFooter store editingAction action =
+    let
+        footerStyle =
+            if
+                (editingAction == EditingAction action.id SelectingEditedAttribute)
+                    || (editingAction == EditingAction action.id EditingContext)
+                    || (editingAction == EditingAction action.id EditingProject)
+            then
+                [ ( "transition", "all 0.5s" )
+                , ( "height", "80px" )
+                , ( "visibility", "visible" )
+                ]
+            else
+                [ ( "transition", "all 0.5s" )
+                , ( "height", "0px" )
+                , ( "transform", "TranslateY(-8px)" )
+                , ( "padding-bottom", "0" )
+                , ( "padding-top", "0" )
+                , ( "visibility", "hidden" )
+                ]
+    in
+    Card.block [ Block.attrs [ style footerStyle ] ]
+        [ Block.custom <|
+            div
+                []
+                [ ButtonGroup.buttonGroup [ ButtonGroup.small, ButtonGroup.attrs [ style [ ( "width", "100%" ) ] ] ]
+                    [ ButtonGroup.button
+                        [ Button.primary
+                        , Button.attrs
+                            [ onClick (SelectActionToEdit (EditingAction action.id EditingDescription))
+                            , style
+                                [ ( "text-overflow", "ellipsis" )
+                                , ( "overflow", "hidden" )
+                                , ( "width", "33%" )
+                                ]
+                            ]
+                        ]
+                        [ text "Edit" ]
+                    , ButtonGroup.button
+                        [ Button.primary
+                        , Button.attrs
+                            [ onClick (SelectActionToEdit (EditingAction action.id EditingContext))
+                            , style
+                                [ ( "text-overflow", "ellipsis" )
+                                , ( "overflow", "hidden" )
+                                , ( "width", "33%" )
+                                ]
+                            ]
+                        ]
+                        [ text (contextName store action) ]
+                    , ButtonGroup.button
+                        [ Button.primary
+                        , Button.attrs
+                            [ onClick (SelectActionToEdit (EditingAction action.id EditingProject))
+                            , style
+                                [ ( "text-overflow", "ellipsis" )
+                                , ( "overflow", "hidden" )
+                                , ( "width", "33%" )
+                                ]
+                            ]
+                        ]
+                        [ text (projectName store action) ]
+                    ]
+                ]
+        ]
+
+
+contextName : ProgrissStore -> Action -> String
+contextName store action =
+    case Store.getContextForAction action.id store of
+        Nothing ->
+            "Anywhere"
+
+        Just context ->
+            context.name
+
+
+projectName : ProgrissStore -> Action -> String
+projectName store action =
+    case Store.getProjectForAction action.id store of
+        Nothing ->
+            "No Project"
+
+        Just project ->
+            project.title
 
 
 buttonColorForActionState : ActionState -> Button.Option Msg
@@ -227,11 +499,11 @@ navbarContent store model =
         [ class "btn btn-outline-primary"
         , onClick (ToggleContextMenu (not model.contextMenuVisible))
         ]
-        [ text (contextName store model.selectedContext) ]
+        [ text (selectedContextName store model.selectedContext) ]
 
 
-contextName : ProgrissStore -> SelectedContext -> String
-contextName store selectedContext =
+selectedContextName : ProgrissStore -> SelectedContext -> String
+selectedContextName store selectedContext =
     case selectedContext of
         AllContexts ->
             "All"
@@ -243,3 +515,107 @@ contextName store selectedContext =
             Store.getContext contextId store
                 |> Maybe.map .name
                 |> Maybe.withDefault ""
+
+
+actionEditMenu : EditingActionState -> ProgrissStore -> Html Msg
+actionEditMenu editingAction store =
+    case editingAction of
+        EditingAction actionId actionEditState ->
+            case actionEditState of
+                EditingContext ->
+                    let
+                        selectableItems =
+                            [ a
+                                [ href "#"
+                                , classList
+                                    [ ( "list-group-item", True )
+                                    , ( "active"
+                                      , Store.getContextForAction actionId store == Nothing
+                                      )
+                                    ]
+                                , onClick (UpdateActionContextAnywhere actionId)
+                                ]
+                                [ text "Anywhere" ]
+                            ]
+                                ++ List.map (contextSelectLink store actionId) (Store.getAllContexts store)
+                    in
+                    visibleSideMenu selectableItems
+
+                EditingProject ->
+                    let
+                        selectableItems =
+                            [ a
+                                [ href "#"
+                                , classList
+                                    [ ( "list-group-item", True )
+                                    , ( "active"
+                                      , Store.getProjectForAction actionId store == Nothing
+                                      )
+                                    ]
+                                , onClick (UpdateActionNoProject actionId)
+                                ]
+                                [ text "No Project" ]
+                            ]
+                                ++ List.map (projectSelectLink store actionId) (Store.getAllProjects store)
+                    in
+                    visibleSideMenu selectableItems
+
+                _ ->
+                    hiddenSideMenu
+
+        _ ->
+            hiddenSideMenu
+
+
+visibleSideMenu : List (Html Msg) -> Html Msg
+visibleSideMenu selectableItems =
+    div
+        [ classList
+            [ ( "bmd-layout-container", True )
+            , ( "bmd-drawer-f-r", True )
+            , ( "bmd-drawer-overlay", True )
+            , ( "bmd-drawer-in", True )
+            ]
+        , style [ ( "position", "static" ) ]
+        ]
+        [ div
+            [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
+            [ ul [ class "list-group" ] selectableItems ]
+        ]
+
+
+hiddenSideMenu : Html Msg
+hiddenSideMenu =
+    div
+        [ classList
+            [ ( "bmd-layout-container", True )
+            , ( "bmd-drawer-f-r", True )
+            , ( "bmd-drawer-overlay", True )
+            , ( "bmd-drawer-in", False )
+            ]
+        , style [ ( "position", "static" ) ]
+        ]
+        [ div
+            [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
+            [ ul [ class "list-group" ] [] ]
+        ]
+
+
+contextSelectLink : ProgrissStore -> ActionId -> Context -> Html Msg
+contextSelectLink store actionId context =
+    a
+        [ href "#"
+        , classList [ ( "list-group-item", True ), ( "active", Store.getContextForAction actionId store == Just context ) ]
+        , onClick (UpdateActionContext actionId context.id)
+        ]
+        [ text context.name ]
+
+
+projectSelectLink : ProgrissStore -> ActionId -> Project -> Html Msg
+projectSelectLink store actionId project =
+    a
+        [ href "#"
+        , classList [ ( "list-group-item", True ), ( "active", Store.getProjectForAction actionId store == Just project ) ]
+        , onClick (UpdateActionProject actionId project.id)
+        ]
+        [ text project.title ]

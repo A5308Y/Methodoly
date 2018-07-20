@@ -93,7 +93,7 @@ initialModel =
       , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
       , simpleTodosModel = Workflows.SimpleTodos.initialModel
       , settingsModel = Workflows.Settings.initialModel
-      , selectedWorkflow = SimpleTodosWorkflow
+      , selectedWorkflow = GtdActionListsWorkflow
       , workflowMenuVisible = False
       }
     , Cmd.none
@@ -213,7 +213,7 @@ workflowMenu model =
             ]
         , div
             [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
-            [ header [] [ a [ class "navbar-brand" ] [ text "Title" ] ]
+            [ header [] [ a [ class "navbar-brand" ] [ text "Progriss" ] ]
             , ul [ class "list-group" ]
                 [ a [ href "#", class "list-group-item", onClick (SelectWorkflow SimpleTodosWorkflow) ]
                     [ text "Simple" ]
