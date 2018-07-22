@@ -328,7 +328,7 @@ workflowMenu model =
             ]
         , div
             [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
-            [ header [] [ a [ class "navbar-brand" ] [ text "Progriss" ] ]
+            [ header [] [ a [ class "navbar-brand" ] [ text "Methodoly" ] ]
             , ul [ class "list-group" ]
                 [ a
                     [ href "#"

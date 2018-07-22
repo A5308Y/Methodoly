@@ -11,7 +11,7 @@ import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Dom
-import Html exposing (Html, a, div, hr, i, li, span, text, ul)
+import Html exposing (Html, a, div, header, hr, i, li, span, text, ul)
 import Html.Attributes exposing (class, classList, defaultValue, href, id, style, value)
 import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
 import Json.Decode
@@ -256,7 +256,7 @@ contextMenu store selectedContext contextMenuVisible =
                 |> (::) (clickableAllContexts selectedContext)
     in
     if contextMenuVisible then
-        visibleSideMenu selectableItems
+        visibleSideMenu "Switch Context" selectableItems
     else
         hiddenSideMenu
 
@@ -539,7 +539,7 @@ actionEditMenu editingAction store =
                             ]
                                 ++ List.map (contextSelectLink store actionId) (Store.getAllContexts store)
                     in
-                    visibleSideMenu selectableItems
+                    visibleSideMenu "Change Context" selectableItems
 
                 EditingProject ->
                     let
@@ -558,7 +558,7 @@ actionEditMenu editingAction store =
                             ]
                                 ++ List.map (projectSelectLink store actionId) (Store.getAllProjects store)
                     in
-                    visibleSideMenu selectableItems
+                    visibleSideMenu "Change Project" selectableItems
 
                 _ ->
                     hiddenSideMenu
@@ -567,8 +567,8 @@ actionEditMenu editingAction store =
             hiddenSideMenu
 
 
-visibleSideMenu : List (Html Msg) -> Html Msg
-visibleSideMenu selectableItems =
+visibleSideMenu : String -> List (Html Msg) -> Html Msg
+visibleSideMenu title selectableItems =
     div
         [ classList
             [ ( "bmd-layout-container", True )
@@ -580,7 +580,9 @@ visibleSideMenu selectableItems =
         ]
         [ div
             [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
-            [ ul [ class "list-group" ] selectableItems ]
+            [ header [] [ a [ class "navbar-brand" ] [ text title ] ]
+            , ul [ class "list-group" ] selectableItems
+            ]
         ]
 
 

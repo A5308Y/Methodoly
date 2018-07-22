@@ -16275,73 +16275,96 @@ var _user$project$Workflows_GtdActionLists$hiddenSideMenu = A2(
 			}),
 		_1: {ctor: '[]'}
 	});
-var _user$project$Workflows_GtdActionLists$visibleSideMenu = function (selectableItems) {
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$classList(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'bmd-layout-container', _1: true},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'bmd-drawer-f-r', _1: true},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'bmd-drawer-overlay', _1: true},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'bmd-drawer-in', _1: true},
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}),
-			_1: {
+var _user$project$Workflows_GtdActionLists$visibleSideMenu = F2(
+	function (title, selectableItems) {
+		return A2(
+			_elm_lang$html$Html$div,
+			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$style(
+				_0: _elm_lang$html$Html_Attributes$classList(
 					{
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'position', _1: 'static'},
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$div,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$classList(
-						{
+						_0: {ctor: '_Tuple2', _0: 'bmd-layout-container', _1: true},
+						_1: {
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'bmd-layout-drawer', _1: true},
+							_0: {ctor: '_Tuple2', _0: 'bmd-drawer-f-r', _1: true},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'bg-faded', _1: true},
-								_1: {ctor: '[]'}
+								_0: {ctor: '_Tuple2', _0: 'bmd-drawer-overlay', _1: true},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'bmd-drawer-in', _1: true},
+									_1: {ctor: '[]'}
+								}
 							}
-						}),
-					_1: {ctor: '[]'}
-				},
-				{
+						}
+					}),
+				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$ul,
+					_0: _elm_lang$html$Html_Attributes$style(
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$class('list-group'),
+							_0: {ctor: '_Tuple2', _0: 'position', _1: 'static'},
 							_1: {ctor: '[]'}
-						},
-						selectableItems),
+						}),
 					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		});
-};
+				}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$classList(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'bmd-layout-drawer', _1: true},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'bg-faded', _1: true},
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$header,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$a,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$class('navbar-brand'),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(title),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$ul,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('list-group'),
+									_1: {ctor: '[]'}
+								},
+								selectableItems),
+							_1: {ctor: '[]'}
+						}
+					}),
+				_1: {ctor: '[]'}
+			});
+	});
 var _user$project$Workflows_GtdActionLists$selectedContextName = F2(
 	function (store, selectedContext) {
 		var _p0 = selectedContext;
@@ -16762,7 +16785,7 @@ var _user$project$Workflows_GtdActionLists$actionEditMenu = F2(
 							_elm_lang$core$List$map,
 							A2(_user$project$Workflows_GtdActionLists$contextSelectLink, store, _p16),
 							_user$project$ProgrissStore$getAllContexts(store)));
-					return _user$project$Workflows_GtdActionLists$visibleSideMenu(selectableItems);
+					return A2(_user$project$Workflows_GtdActionLists$visibleSideMenu, 'Change Context', selectableItems);
 				case 'EditingProject':
 					var selectableItems = A2(
 						_elm_lang$core$Basics_ops['++'],
@@ -16810,7 +16833,7 @@ var _user$project$Workflows_GtdActionLists$actionEditMenu = F2(
 							_elm_lang$core$List$map,
 							A2(_user$project$Workflows_GtdActionLists$projectSelectLink, store, _p16),
 							_user$project$ProgrissStore$getAllProjects(store)));
-					return _user$project$Workflows_GtdActionLists$visibleSideMenu(selectableItems);
+					return A2(_user$project$Workflows_GtdActionLists$visibleSideMenu, 'Change Project', selectableItems);
 				default:
 					return _user$project$Workflows_GtdActionLists$hiddenSideMenu;
 			}
@@ -17604,7 +17627,7 @@ var _user$project$Workflows_GtdActionLists$contextMenu = F3(
 					_elm_lang$core$List$map,
 					_user$project$Workflows_GtdActionLists$clickableContext(selectedContext),
 					_user$project$ProgrissStore$getAllContexts(store))));
-		return contextMenuVisible ? _user$project$Workflows_GtdActionLists$visibleSideMenu(selectableItems) : _user$project$Workflows_GtdActionLists$hiddenSideMenu;
+		return contextMenuVisible ? A2(_user$project$Workflows_GtdActionLists$visibleSideMenu, 'Switch Context', selectableItems) : _user$project$Workflows_GtdActionLists$hiddenSideMenu;
 	});
 var _user$project$Workflows_GtdActionLists$view = F2(
 	function (store, model) {
@@ -19002,7 +19025,7 @@ var _user$project$Main$workflowMenu = function (model) {
 									},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Progriss'),
+										_0: _elm_lang$html$Html$text('Methodoly'),
 										_1: {ctor: '[]'}
 									}),
 								_1: {ctor: '[]'}
