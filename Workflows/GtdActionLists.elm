@@ -581,7 +581,7 @@ hiddenSideMenu =
         ]
         [ div
             [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
-            [ ul [ class "list-group" ] [] ]
+            []
         ]
 
 
@@ -589,7 +589,10 @@ contextSelectLink : ProgrissStore -> ActionId -> Context -> Html Msg
 contextSelectLink store actionId context =
     a
         [ href "#"
-        , classList [ ( "list-group-item", True ), ( "active", Store.getContextForAction actionId store == Just context ) ]
+        , classList
+            [ ( "list-group-item", True )
+            , ( "active", Store.getContextForAction actionId store == Just context )
+            ]
         , onClick (UpdateActionContext actionId context.id)
         ]
         [ text context.name ]
@@ -599,7 +602,10 @@ projectSelectLink : ProgrissStore -> ActionId -> Project -> Html Msg
 projectSelectLink store actionId project =
     a
         [ href "#"
-        , classList [ ( "list-group-item", True ), ( "active", Store.getProjectForAction actionId store == Just project ) ]
+        , classList
+            [ ( "list-group-item", True )
+            , ( "active", Store.getProjectForAction actionId store == Just project )
+            ]
         , onClick (UpdateActionProject actionId project.id)
         ]
         [ text project.title ]
