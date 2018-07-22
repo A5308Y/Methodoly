@@ -1,6 +1,6 @@
 port module Main exposing (..)
 
-import Html exposing (..)
+import Html exposing (Html, a, div, header, i, text, ul)
 import Html.Attributes exposing (class, classList, href, style)
 import Html.Events exposing (onClick, onWithOptions)
 import Http
