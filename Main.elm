@@ -1,10 +1,13 @@
 port module Main exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
-import Json.Decode
+import Html.Attributes exposing (class, classList, href, style)
+import Html.Events exposing (onClick, onWithOptions)
+import Http
+import Json.Decode exposing (int, string)
+import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode
+import Navigation
 import ProgrissStore as Store exposing (ProgrissStore)
 import Workflows.GtdActionLists
 import Workflows.ProjectOverview
@@ -20,7 +23,12 @@ type alias Model =
     , settingsModel : Workflows.Settings.Model
     , selectedWorkflow : SelectableWorkflow
     , workflowMenuVisible : Bool
+    , pasteBinId : Maybe String
     }
+
+
+type alias PasteBinResult =
+    { uri : String }
 
 
 type SelectableWorkflow
@@ -38,8 +46,12 @@ type Msg
     | SelectWorkflow SelectableWorkflow
     | Save
     | ReceiveStore String
-    | TriggerLoad
+    | ReceiveStoreFromBin (Result Http.Error ProgrissStore)
+    | TriggerStoreLoad
+    | TriggerBinLoad String
     | ToggleDrawer Bool
+    | RecieveBinConfirmation (Result Http.Error PasteBinResult)
+    | Noop
 
 
 port persistStore : String -> Cmd msg
@@ -86,8 +98,18 @@ initialStore =
             Store.empty
 
 
-initialModel : ( Model, Cmd Msg )
-initialModel =
+pasteBinResultDecoder : Json.Decode.Decoder PasteBinResult
+pasteBinResultDecoder =
+    decode PasteBinResult
+        |> required "uri" string
+
+
+initialModel : Navigation.Location -> ( Model, Cmd Msg )
+initialModel location =
+    let
+        search =
+            String.split "#" location.hash |> List.reverse |> List.head
+    in
     ( { store = initialStore
       , gtdActionListsModel = Workflows.GtdActionLists.initialModel
       , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
@@ -95,14 +117,30 @@ initialModel =
       , settingsModel = Workflows.Settings.initialModel
       , selectedWorkflow = GtdActionListsWorkflow
       , workflowMenuVisible = False
+      , pasteBinId =
+            if String.isEmpty (Maybe.withDefault "" search) then
+                Nothing
+            else
+                search
       }
-    , Cmd.none
+    , case search of
+        Nothing ->
+            Cmd.none
+
+        Just possibleBinId ->
+            case possibleBinId of
+                "" ->
+                    Cmd.none
+
+                _ ->
+                    Http.send ReceiveStoreFromBin (getFromBin (binUri possibleBinId))
     )
 
 
 main : Program Never Model Msg
 main =
-    Html.program
+    Navigation.program
+        (\location -> Noop)
         { init = initialModel
         , view = view
         , update = update
@@ -118,16 +156,40 @@ subscriptions model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Noop ->
+            ( model, Cmd.none )
+
         Save ->
             ( { model | workflowMenuVisible = False }
-            , persistStore (Json.Encode.encode 2 (Store.encoder model.store))
+            , Cmd.batch
+                [ persistStore (Json.Encode.encode 2 (Store.encoder model.store))
+                , case model.pasteBinId of
+                    Nothing ->
+                        Http.send RecieveBinConfirmation (postToBin (Store.encoder model.store))
+
+                    Just id ->
+                        Http.send ReceiveStoreFromBin (putToBin (binUri id) (Store.encoder model.store))
+                ]
             )
 
-        TriggerLoad ->
+        TriggerStoreLoad ->
             ( { model | workflowMenuVisible = False }, triggerStoreLoad () )
+
+        TriggerBinLoad id ->
+            ( { model | workflowMenuVisible = False }
+            , Http.send ReceiveStoreFromBin (getFromBin (binUri id))
+            )
 
         ReceiveStore value ->
             case Json.Decode.decodeString Store.decoder value of
+                Ok store ->
+                    ( { model | store = store }, Cmd.none )
+
+                Err message ->
+                    ( { model | store = Store.empty }, Cmd.none )
+
+        ReceiveStoreFromBin result ->
+            case result of
                 Ok store ->
                     ( { model | store = store }, Cmd.none )
 
@@ -181,6 +243,59 @@ update msg model =
         ToggleDrawer newState ->
             ( { model | workflowMenuVisible = newState }, Cmd.none )
 
+        RecieveBinConfirmation result ->
+            case result of
+                Ok pasteBin ->
+                    let
+                        pasteBinId =
+                            String.split "/" pasteBin.uri |> List.reverse |> List.head
+                    in
+                    ( { model | pasteBinId = pasteBinId }
+                    , case pasteBinId of
+                        Nothing ->
+                            Cmd.none
+
+                        Just id ->
+                            Navigation.modifyUrl ("https://a5308y.github.io/Methodoly#" ++ id)
+                      --Navigation.modifyUrl ("file:///Users/ahe/code/repositories/Active/ProgrissStore/index.html#" ++ id)
+                    )
+
+                Err _ ->
+                    ( model, Cmd.none )
+
+
+binUri : String -> String
+binUri id =
+    baseBinUri ++ "/" ++ id
+
+
+baseBinUri : String
+baseBinUri =
+    "https://api.myjson.com/bins"
+
+
+postToBin : Json.Encode.Value -> Http.Request PasteBinResult
+postToBin jsonValue =
+    Http.post baseBinUri (Http.jsonBody jsonValue) pasteBinResultDecoder
+
+
+putToBin : String -> Json.Encode.Value -> Http.Request ProgrissStore
+putToBin uri jsonValue =
+    Http.request
+        { method = "PUT"
+        , headers = []
+        , url = uri
+        , body = Http.jsonBody jsonValue
+        , expect = Http.expectJson Store.decoder
+        , timeout = Nothing
+        , withCredentials = False
+        }
+
+
+getFromBin : String -> Http.Request ProgrissStore
+getFromBin uri =
+    Http.get uri Store.decoder
+
 
 view : Model -> Html Msg
 view model =
@@ -200,7 +315,7 @@ workflowMenu model =
         ]
         [ header [ class "bmd-layout-header" ]
             [ div [ class "navbar navbar-light bg-faded" ]
-                [ a [ href "#", class "btn", onClick (ToggleDrawer (not model.workflowMenuVisible)) ]
+                [ a [ class "btn", onClick (ToggleDrawer (not model.workflowMenuVisible)) ]
                     [ i [ class "material-icons" ] [ text "menu" ] ]
                 , case model.selectedWorkflow of
                     GtdActionListsWorkflow ->
@@ -215,19 +330,68 @@ workflowMenu model =
             [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
             [ header [] [ a [ class "navbar-brand" ] [ text "Progriss" ] ]
             , ul [ class "list-group" ]
-                [ a [ href "#", class "list-group-item", onClick (SelectWorkflow SimpleTodosWorkflow) ]
+                [ a
+                    [ href "#"
+                    , class "list-group-item"
+                    , onWithOptions "click"
+                        { stopPropagation = True, preventDefault = True }
+                        (Json.Decode.succeed (SelectWorkflow SimpleTodosWorkflow))
+                    ]
                     [ text "Simple" ]
-                , a [ href "#", class "list-group-item", onClick (SelectWorkflow GtdActionListsWorkflow) ]
+                , a
+                    [ href "#"
+                    , class "list-group-item"
+                    , onWithOptions "click"
+                        { stopPropagation = True, preventDefault = True }
+                        (Json.Decode.succeed (SelectWorkflow GtdActionListsWorkflow))
+                    ]
                     [ text "GTD" ]
-                , a [ href "#", class "list-group-item", onClick (SelectWorkflow ProjectOverviewWorkflow) ]
+                , a
+                    [ href "#"
+                    , class "list-group-item"
+                    , onWithOptions "click"
+                        { stopPropagation = True, preventDefault = True }
+                        (Json.Decode.succeed (SelectWorkflow ProjectOverviewWorkflow))
+                    ]
                     [ text "Projects" ]
                 , div [ class "dropdown-divider" ] []
-                , a [ href "#", class "list-group-item", onClick (SelectWorkflow SettingsWorkflow) ]
+                , a
+                    [ href "#"
+                    , class "list-group-item"
+                    , onWithOptions "click"
+                        { stopPropagation = True, preventDefault = True }
+                        (Json.Decode.succeed (SelectWorkflow SettingsWorkflow))
+                    ]
                     [ text "Settings" ]
-                , a [ href "#", class "list-group-item", onClick Save ]
+                , a
+                    [ href "#"
+                    , class "list-group-item"
+                    , onWithOptions "click"
+                        { stopPropagation = True, preventDefault = True }
+                        (Json.Decode.succeed Save)
+                    ]
                     [ text "Save" ]
-                , a [ href "#", class "list-group-item", onClick TriggerLoad ]
+                , a
+                    [ href "#"
+                    , class "list-group-item"
+                    , onWithOptions "click"
+                        { stopPropagation = True, preventDefault = True }
+                        (Json.Decode.succeed TriggerStoreLoad)
+                    ]
                     [ text "Load" ]
+                , case model.pasteBinId of
+                    Nothing ->
+                        text ""
+
+                    Just id ->
+                        a
+                            [ href "#"
+                            , class "list-group-item"
+                            , onWithOptions "click"
+                                { stopPropagation = True, preventDefault = True }
+                                (Json.Decode.succeed (TriggerBinLoad (binUri id)))
+                            ]
+                            [ text "Load from server" ]
                 ]
             ]
         ]

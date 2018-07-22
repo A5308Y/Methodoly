@@ -1,6 +1,14 @@
 Compile the app with `elm-make Main.elm --output main.js`. There is no
 hotloading yet. Then open `index.html` in your browser. No need to run a server
-yet. The app is only in the client so far.
+yet. The app uses a simple json storage. For now it's http://myjson.com/api, but it could be our own
+Json-Server.
+
+For development it might be helpful to include the debug flag:
+`elm-make Main.elm --output main.js --debug`
+
+
+Use `google-closure-compiler-js main.js > minified.js` to minify the js result.
+`npm install -g google-closure-compiler-js` to install the compiler.
 
 We use fezvrasta.github.io/bootstrap-material-design/docs/4.0 to allow
 a material design look while using elm-bootstrap to have typesafe styling I can

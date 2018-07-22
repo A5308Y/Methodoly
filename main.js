@@ -9246,6 +9246,367 @@ var _elm_lang$html$Html_Keyed$node = _elm_lang$virtual_dom$VirtualDom$keyedNode;
 var _elm_lang$html$Html_Keyed$ol = _elm_lang$html$Html_Keyed$node('ol');
 var _elm_lang$html$Html_Keyed$ul = _elm_lang$html$Html_Keyed$node('ul');
 
+var _elm_lang$http$Native_Http = function() {
+
+
+// ENCODING AND DECODING
+
+function encodeUri(string)
+{
+	return encodeURIComponent(string);
+}
+
+function decodeUri(string)
+{
+	try
+	{
+		return _elm_lang$core$Maybe$Just(decodeURIComponent(string));
+	}
+	catch(e)
+	{
+		return _elm_lang$core$Maybe$Nothing;
+	}
+}
+
+
+// SEND REQUEST
+
+function toTask(request, maybeProgress)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		var xhr = new XMLHttpRequest();
+
+		configureProgress(xhr, maybeProgress);
+
+		xhr.addEventListener('error', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'NetworkError' }));
+		});
+		xhr.addEventListener('timeout', function() {
+			callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'Timeout' }));
+		});
+		xhr.addEventListener('load', function() {
+			callback(handleResponse(xhr, request.expect.responseToResult));
+		});
+
+		try
+		{
+			xhr.open(request.method, request.url, true);
+		}
+		catch (e)
+		{
+			return callback(_elm_lang$core$Native_Scheduler.fail({ ctor: 'BadUrl', _0: request.url }));
+		}
+
+		configureRequest(xhr, request);
+		send(xhr, request.body);
+
+		return function() { xhr.abort(); };
+	});
+}
+
+function configureProgress(xhr, maybeProgress)
+{
+	if (maybeProgress.ctor === 'Nothing')
+	{
+		return;
+	}
+
+	xhr.addEventListener('progress', function(event) {
+		if (!event.lengthComputable)
+		{
+			return;
+		}
+		_elm_lang$core$Native_Scheduler.rawSpawn(maybeProgress._0({
+			bytes: event.loaded,
+			bytesExpected: event.total
+		}));
+	});
+}
+
+function configureRequest(xhr, request)
+{
+	function setHeader(pair)
+	{
+		xhr.setRequestHeader(pair._0, pair._1);
+	}
+
+	A2(_elm_lang$core$List$map, setHeader, request.headers);
+	xhr.responseType = request.expect.responseType;
+	xhr.withCredentials = request.withCredentials;
+
+	if (request.timeout.ctor === 'Just')
+	{
+		xhr.timeout = request.timeout._0;
+	}
+}
+
+function send(xhr, body)
+{
+	switch (body.ctor)
+	{
+		case 'EmptyBody':
+			xhr.send();
+			return;
+
+		case 'StringBody':
+			xhr.setRequestHeader('Content-Type', body._0);
+			xhr.send(body._1);
+			return;
+
+		case 'FormDataBody':
+			xhr.send(body._0);
+			return;
+	}
+}
+
+
+// RESPONSES
+
+function handleResponse(xhr, responseToResult)
+{
+	var response = toResponse(xhr);
+
+	if (xhr.status < 200 || 300 <= xhr.status)
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadStatus',
+			_0: response
+		});
+	}
+
+	var result = responseToResult(response);
+
+	if (result.ctor === 'Ok')
+	{
+		return _elm_lang$core$Native_Scheduler.succeed(result._0);
+	}
+	else
+	{
+		response.body = xhr.responseText;
+		return _elm_lang$core$Native_Scheduler.fail({
+			ctor: 'BadPayload',
+			_0: result._0,
+			_1: response
+		});
+	}
+}
+
+function toResponse(xhr)
+{
+	return {
+		status: { code: xhr.status, message: xhr.statusText },
+		headers: parseHeaders(xhr.getAllResponseHeaders()),
+		url: xhr.responseURL,
+		body: xhr.response
+	};
+}
+
+function parseHeaders(rawHeaders)
+{
+	var headers = _elm_lang$core$Dict$empty;
+
+	if (!rawHeaders)
+	{
+		return headers;
+	}
+
+	var headerPairs = rawHeaders.split('\u000d\u000a');
+	for (var i = headerPairs.length; i--; )
+	{
+		var headerPair = headerPairs[i];
+		var index = headerPair.indexOf('\u003a\u0020');
+		if (index > 0)
+		{
+			var key = headerPair.substring(0, index);
+			var value = headerPair.substring(index + 2);
+
+			headers = A3(_elm_lang$core$Dict$update, key, function(oldValue) {
+				if (oldValue.ctor === 'Just')
+				{
+					return _elm_lang$core$Maybe$Just(value + ', ' + oldValue._0);
+				}
+				return _elm_lang$core$Maybe$Just(value);
+			}, headers);
+		}
+	}
+
+	return headers;
+}
+
+
+// EXPECTORS
+
+function expectStringResponse(responseToResult)
+{
+	return {
+		responseType: 'text',
+		responseToResult: responseToResult
+	};
+}
+
+function mapExpect(func, expect)
+{
+	return {
+		responseType: expect.responseType,
+		responseToResult: function(response) {
+			var convertedResponse = expect.responseToResult(response);
+			return A2(_elm_lang$core$Result$map, func, convertedResponse);
+		}
+	};
+}
+
+
+// BODY
+
+function multipart(parts)
+{
+	var formData = new FormData();
+
+	while (parts.ctor !== '[]')
+	{
+		var part = parts._0;
+		formData.append(part._0, part._1);
+		parts = parts._1;
+	}
+
+	return { ctor: 'FormDataBody', _0: formData };
+}
+
+return {
+	toTask: F2(toTask),
+	expectStringResponse: expectStringResponse,
+	mapExpect: F2(mapExpect),
+	multipart: multipart,
+	encodeUri: encodeUri,
+	decodeUri: decodeUri
+};
+
+}();
+
+var _elm_lang$http$Http_Internal$map = F2(
+	function (func, request) {
+		return _elm_lang$core$Native_Utils.update(
+			request,
+			{
+				expect: A2(_elm_lang$http$Native_Http.mapExpect, func, request.expect)
+			});
+	});
+var _elm_lang$http$Http_Internal$RawRequest = F7(
+	function (a, b, c, d, e, f, g) {
+		return {method: a, headers: b, url: c, body: d, expect: e, timeout: f, withCredentials: g};
+	});
+var _elm_lang$http$Http_Internal$Request = function (a) {
+	return {ctor: 'Request', _0: a};
+};
+var _elm_lang$http$Http_Internal$Expect = {ctor: 'Expect'};
+var _elm_lang$http$Http_Internal$FormDataBody = {ctor: 'FormDataBody'};
+var _elm_lang$http$Http_Internal$StringBody = F2(
+	function (a, b) {
+		return {ctor: 'StringBody', _0: a, _1: b};
+	});
+var _elm_lang$http$Http_Internal$EmptyBody = {ctor: 'EmptyBody'};
+var _elm_lang$http$Http_Internal$Header = F2(
+	function (a, b) {
+		return {ctor: 'Header', _0: a, _1: b};
+	});
+
+var _elm_lang$http$Http$decodeUri = _elm_lang$http$Native_Http.decodeUri;
+var _elm_lang$http$Http$encodeUri = _elm_lang$http$Native_Http.encodeUri;
+var _elm_lang$http$Http$expectStringResponse = _elm_lang$http$Native_Http.expectStringResponse;
+var _elm_lang$http$Http$expectJson = function (decoder) {
+	return _elm_lang$http$Http$expectStringResponse(
+		function (response) {
+			return A2(_elm_lang$core$Json_Decode$decodeString, decoder, response.body);
+		});
+};
+var _elm_lang$http$Http$expectString = _elm_lang$http$Http$expectStringResponse(
+	function (response) {
+		return _elm_lang$core$Result$Ok(response.body);
+	});
+var _elm_lang$http$Http$multipartBody = _elm_lang$http$Native_Http.multipart;
+var _elm_lang$http$Http$stringBody = _elm_lang$http$Http_Internal$StringBody;
+var _elm_lang$http$Http$jsonBody = function (value) {
+	return A2(
+		_elm_lang$http$Http_Internal$StringBody,
+		'application/json',
+		A2(_elm_lang$core$Json_Encode$encode, 0, value));
+};
+var _elm_lang$http$Http$emptyBody = _elm_lang$http$Http_Internal$EmptyBody;
+var _elm_lang$http$Http$header = _elm_lang$http$Http_Internal$Header;
+var _elm_lang$http$Http$request = _elm_lang$http$Http_Internal$Request;
+var _elm_lang$http$Http$post = F3(
+	function (url, body, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'POST',
+				headers: {ctor: '[]'},
+				url: url,
+				body: body,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$get = F2(
+	function (url, decoder) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'GET',
+				headers: {ctor: '[]'},
+				url: url,
+				body: _elm_lang$http$Http$emptyBody,
+				expect: _elm_lang$http$Http$expectJson(decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _elm_lang$http$Http$getString = function (url) {
+	return _elm_lang$http$Http$request(
+		{
+			method: 'GET',
+			headers: {ctor: '[]'},
+			url: url,
+			body: _elm_lang$http$Http$emptyBody,
+			expect: _elm_lang$http$Http$expectString,
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+};
+var _elm_lang$http$Http$toTask = function (_p0) {
+	var _p1 = _p0;
+	return A2(_elm_lang$http$Native_Http.toTask, _p1._0, _elm_lang$core$Maybe$Nothing);
+};
+var _elm_lang$http$Http$send = F2(
+	function (resultToMessage, request) {
+		return A2(
+			_elm_lang$core$Task$attempt,
+			resultToMessage,
+			_elm_lang$http$Http$toTask(request));
+	});
+var _elm_lang$http$Http$Response = F4(
+	function (a, b, c, d) {
+		return {url: a, status: b, headers: c, body: d};
+	});
+var _elm_lang$http$Http$BadPayload = F2(
+	function (a, b) {
+		return {ctor: 'BadPayload', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$BadStatus = function (a) {
+	return {ctor: 'BadStatus', _0: a};
+};
+var _elm_lang$http$Http$NetworkError = {ctor: 'NetworkError'};
+var _elm_lang$http$Http$Timeout = {ctor: 'Timeout'};
+var _elm_lang$http$Http$BadUrl = function (a) {
+	return {ctor: 'BadUrl', _0: a};
+};
+var _elm_lang$http$Http$StringPart = F2(
+	function (a, b) {
+		return {ctor: 'StringPart', _0: a, _1: b};
+	});
+var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
+
 var _elm_lang$mouse$Mouse_ops = _elm_lang$mouse$Mouse_ops || {};
 _elm_lang$mouse$Mouse_ops['&>'] = F2(
 	function (t1, t2) {
@@ -9428,6 +9789,408 @@ var _elm_lang$mouse$Mouse$subMap = F2(
 			});
 	});
 _elm_lang$core$Native_Platform.effectManagers['Mouse'] = {pkg: 'elm-lang/mouse', init: _elm_lang$mouse$Mouse$init, onEffects: _elm_lang$mouse$Mouse$onEffects, onSelfMsg: _elm_lang$mouse$Mouse$onSelfMsg, tag: 'sub', subMap: _elm_lang$mouse$Mouse$subMap};
+
+var _elm_lang$navigation$Native_Navigation = function() {
+
+
+// FAKE NAVIGATION
+
+function go(n)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		if (n !== 0)
+		{
+			history.go(n);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function pushState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.pushState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+function replaceState(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		history.replaceState({}, '', url);
+		callback(_elm_lang$core$Native_Scheduler.succeed(getLocation()));
+	});
+}
+
+
+// REAL NAVIGATION
+
+function reloadPage(skipCache)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		document.location.reload(skipCache);
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+function setLocation(url)
+{
+	return _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)
+	{
+		try
+		{
+			window.location = url;
+		}
+		catch(err)
+		{
+			// Only Firefox can throw a NS_ERROR_MALFORMED_URI exception here.
+			// Other browsers reload the page, so let's be consistent about that.
+			document.location.reload(false);
+		}
+		callback(_elm_lang$core$Native_Scheduler.succeed(_elm_lang$core$Native_Utils.Tuple0));
+	});
+}
+
+
+// GET LOCATION
+
+function getLocation()
+{
+	var location = document.location;
+
+	return {
+		href: location.href,
+		host: location.host,
+		hostname: location.hostname,
+		protocol: location.protocol,
+		origin: location.origin,
+		port_: location.port,
+		pathname: location.pathname,
+		search: location.search,
+		hash: location.hash,
+		username: location.username,
+		password: location.password
+	};
+}
+
+
+// DETECT IE11 PROBLEMS
+
+function isInternetExplorer11()
+{
+	return window.navigator.userAgent.indexOf('Trident') !== -1;
+}
+
+
+return {
+	go: go,
+	setLocation: setLocation,
+	reloadPage: reloadPage,
+	pushState: pushState,
+	replaceState: replaceState,
+	getLocation: getLocation,
+	isInternetExplorer11: isInternetExplorer11
+};
+
+}();
+
+var _elm_lang$navigation$Navigation$replaceState = _elm_lang$navigation$Native_Navigation.replaceState;
+var _elm_lang$navigation$Navigation$pushState = _elm_lang$navigation$Native_Navigation.pushState;
+var _elm_lang$navigation$Navigation$go = _elm_lang$navigation$Native_Navigation.go;
+var _elm_lang$navigation$Navigation$reloadPage = _elm_lang$navigation$Native_Navigation.reloadPage;
+var _elm_lang$navigation$Navigation$setLocation = _elm_lang$navigation$Native_Navigation.setLocation;
+var _elm_lang$navigation$Navigation_ops = _elm_lang$navigation$Navigation_ops || {};
+_elm_lang$navigation$Navigation_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$navigation$Navigation$notify = F3(
+	function (router, subs, location) {
+		var send = function (_p1) {
+			var _p2 = _p1;
+			return A2(
+				_elm_lang$core$Platform$sendToApp,
+				router,
+				_p2._0(location));
+		};
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(_elm_lang$core$List$map, send, subs)),
+			_elm_lang$core$Task$succeed(
+				{ctor: '_Tuple0'}));
+	});
+var _elm_lang$navigation$Navigation$cmdHelp = F3(
+	function (router, subs, cmd) {
+		var _p3 = cmd;
+		switch (_p3.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$go(_p3._0);
+			case 'New':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$pushState(_p3._0));
+			case 'Modify':
+				return A2(
+					_elm_lang$core$Task$andThen,
+					A2(_elm_lang$navigation$Navigation$notify, router, subs),
+					_elm_lang$navigation$Navigation$replaceState(_p3._0));
+			case 'Visit':
+				return _elm_lang$navigation$Navigation$setLocation(_p3._0);
+			default:
+				return _elm_lang$navigation$Navigation$reloadPage(_p3._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$killPopWatcher = function (popWatcher) {
+	var _p4 = popWatcher;
+	if (_p4.ctor === 'Normal') {
+		return _elm_lang$core$Process$kill(_p4._0);
+	} else {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Process$kill(_p4._0),
+			_elm_lang$core$Process$kill(_p4._1));
+	}
+};
+var _elm_lang$navigation$Navigation$onSelfMsg = F3(
+	function (router, location, state) {
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			A3(_elm_lang$navigation$Navigation$notify, router, state.subs, location),
+			_elm_lang$core$Task$succeed(state));
+	});
+var _elm_lang$navigation$Navigation$subscription = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$command = _elm_lang$core$Native_Platform.leaf('Navigation');
+var _elm_lang$navigation$Navigation$Location = function (a) {
+	return function (b) {
+		return function (c) {
+			return function (d) {
+				return function (e) {
+					return function (f) {
+						return function (g) {
+							return function (h) {
+								return function (i) {
+									return function (j) {
+										return function (k) {
+											return {href: a, host: b, hostname: c, protocol: d, origin: e, port_: f, pathname: g, search: h, hash: i, username: j, password: k};
+										};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var _elm_lang$navigation$Navigation$State = F2(
+	function (a, b) {
+		return {subs: a, popWatcher: b};
+	});
+var _elm_lang$navigation$Navigation$init = _elm_lang$core$Task$succeed(
+	A2(
+		_elm_lang$navigation$Navigation$State,
+		{ctor: '[]'},
+		_elm_lang$core$Maybe$Nothing));
+var _elm_lang$navigation$Navigation$Reload = function (a) {
+	return {ctor: 'Reload', _0: a};
+};
+var _elm_lang$navigation$Navigation$reload = _elm_lang$navigation$Navigation$command(
+	_elm_lang$navigation$Navigation$Reload(false));
+var _elm_lang$navigation$Navigation$reloadAndSkipCache = _elm_lang$navigation$Navigation$command(
+	_elm_lang$navigation$Navigation$Reload(true));
+var _elm_lang$navigation$Navigation$Visit = function (a) {
+	return {ctor: 'Visit', _0: a};
+};
+var _elm_lang$navigation$Navigation$load = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Visit(url));
+};
+var _elm_lang$navigation$Navigation$Modify = function (a) {
+	return {ctor: 'Modify', _0: a};
+};
+var _elm_lang$navigation$Navigation$modifyUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Modify(url));
+};
+var _elm_lang$navigation$Navigation$New = function (a) {
+	return {ctor: 'New', _0: a};
+};
+var _elm_lang$navigation$Navigation$newUrl = function (url) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$New(url));
+};
+var _elm_lang$navigation$Navigation$Jump = function (a) {
+	return {ctor: 'Jump', _0: a};
+};
+var _elm_lang$navigation$Navigation$back = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(0 - n));
+};
+var _elm_lang$navigation$Navigation$forward = function (n) {
+	return _elm_lang$navigation$Navigation$command(
+		_elm_lang$navigation$Navigation$Jump(n));
+};
+var _elm_lang$navigation$Navigation$cmdMap = F2(
+	function (_p5, myCmd) {
+		var _p6 = myCmd;
+		switch (_p6.ctor) {
+			case 'Jump':
+				return _elm_lang$navigation$Navigation$Jump(_p6._0);
+			case 'New':
+				return _elm_lang$navigation$Navigation$New(_p6._0);
+			case 'Modify':
+				return _elm_lang$navigation$Navigation$Modify(_p6._0);
+			case 'Visit':
+				return _elm_lang$navigation$Navigation$Visit(_p6._0);
+			default:
+				return _elm_lang$navigation$Navigation$Reload(_p6._0);
+		}
+	});
+var _elm_lang$navigation$Navigation$Monitor = function (a) {
+	return {ctor: 'Monitor', _0: a};
+};
+var _elm_lang$navigation$Navigation$program = F2(
+	function (locationToMessage, stuff) {
+		var init = stuff.init(
+			_elm_lang$navigation$Native_Navigation.getLocation(
+				{ctor: '_Tuple0'}));
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$program(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$programWithFlags = F2(
+	function (locationToMessage, stuff) {
+		var init = function (flags) {
+			return A2(
+				stuff.init,
+				flags,
+				_elm_lang$navigation$Native_Navigation.getLocation(
+					{ctor: '_Tuple0'}));
+		};
+		var subs = function (model) {
+			return _elm_lang$core$Platform_Sub$batch(
+				{
+					ctor: '::',
+					_0: _elm_lang$navigation$Navigation$subscription(
+						_elm_lang$navigation$Navigation$Monitor(locationToMessage)),
+					_1: {
+						ctor: '::',
+						_0: stuff.subscriptions(model),
+						_1: {ctor: '[]'}
+					}
+				});
+		};
+		return _elm_lang$html$Html$programWithFlags(
+			{init: init, view: stuff.view, update: stuff.update, subscriptions: subs});
+	});
+var _elm_lang$navigation$Navigation$subMap = F2(
+	function (func, _p7) {
+		var _p8 = _p7;
+		return _elm_lang$navigation$Navigation$Monitor(
+			function (_p9) {
+				return func(
+					_p8._0(_p9));
+			});
+	});
+var _elm_lang$navigation$Navigation$InternetExplorer = F2(
+	function (a, b) {
+		return {ctor: 'InternetExplorer', _0: a, _1: b};
+	});
+var _elm_lang$navigation$Navigation$Normal = function (a) {
+	return {ctor: 'Normal', _0: a};
+};
+var _elm_lang$navigation$Navigation$spawnPopWatcher = function (router) {
+	var reportLocation = function (_p10) {
+		return A2(
+			_elm_lang$core$Platform$sendToSelf,
+			router,
+			_elm_lang$navigation$Native_Navigation.getLocation(
+				{ctor: '_Tuple0'}));
+	};
+	return _elm_lang$navigation$Native_Navigation.isInternetExplorer11(
+		{ctor: '_Tuple0'}) ? A3(
+		_elm_lang$core$Task$map2,
+		_elm_lang$navigation$Navigation$InternetExplorer,
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)),
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'hashchange', _elm_lang$core$Json_Decode$value, reportLocation))) : A2(
+		_elm_lang$core$Task$map,
+		_elm_lang$navigation$Navigation$Normal,
+		_elm_lang$core$Process$spawn(
+			A3(_elm_lang$dom$Dom_LowLevel$onWindow, 'popstate', _elm_lang$core$Json_Decode$value, reportLocation)));
+};
+var _elm_lang$navigation$Navigation$onEffects = F4(
+	function (router, cmds, subs, _p11) {
+		var _p12 = _p11;
+		var _p15 = _p12.popWatcher;
+		var stepState = function () {
+			var _p13 = {ctor: '_Tuple2', _0: subs, _1: _p15};
+			_v6_2:
+			do {
+				if (_p13._0.ctor === '[]') {
+					if (_p13._1.ctor === 'Just') {
+						return A2(
+							_elm_lang$navigation$Navigation_ops['&>'],
+							_elm_lang$navigation$Navigation$killPopWatcher(_p13._1._0),
+							_elm_lang$core$Task$succeed(
+								A2(_elm_lang$navigation$Navigation$State, subs, _elm_lang$core$Maybe$Nothing)));
+					} else {
+						break _v6_2;
+					}
+				} else {
+					if (_p13._1.ctor === 'Nothing') {
+						return A2(
+							_elm_lang$core$Task$map,
+							function (_p14) {
+								return A2(
+									_elm_lang$navigation$Navigation$State,
+									subs,
+									_elm_lang$core$Maybe$Just(_p14));
+							},
+							_elm_lang$navigation$Navigation$spawnPopWatcher(router));
+					} else {
+						break _v6_2;
+					}
+				}
+			} while(false);
+			return _elm_lang$core$Task$succeed(
+				A2(_elm_lang$navigation$Navigation$State, subs, _p15));
+		}();
+		return A2(
+			_elm_lang$navigation$Navigation_ops['&>'],
+			_elm_lang$core$Task$sequence(
+				A2(
+					_elm_lang$core$List$map,
+					A2(_elm_lang$navigation$Navigation$cmdHelp, router, subs),
+					cmds)),
+			stepState);
+	});
+_elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
 
 var _rundis$elm_bootstrap$Bootstrap_General_Internal$screenSizeOption = function (size) {
 	var _p0 = size;
@@ -17773,6 +18536,29 @@ var _user$project$Workflows_SimpleTodos$view = F2(
 			});
 	});
 
+var _user$project$Main$getFromBin = function (uri) {
+	return A2(_elm_lang$http$Http$get, uri, _user$project$ProgrissStore$decoder);
+};
+var _user$project$Main$putToBin = F2(
+	function (uri, jsonValue) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'PUT',
+				headers: {ctor: '[]'},
+				url: uri,
+				body: _elm_lang$http$Http$jsonBody(jsonValue),
+				expect: _elm_lang$http$Http$expectJson(_user$project$ProgrissStore$decoder),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _user$project$Main$baseBinUri = 'https://api.myjson.com/bins';
+var _user$project$Main$binUri = function (id) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_user$project$Main$baseBinUri,
+		A2(_elm_lang$core$Basics_ops['++'], '/', id));
+};
 var _user$project$Main$initialStore = function () {
 	var jsonData = '\n                {\n                    \"actions\": [\n                        {\"id\": 1, \"description\": \"Call architect about garden\", \"project_id\": 1},\n                        {\"id\": 2, \"description\": \"Buy cat food\", \"context_id\": 1},\n                        {\"id\": 3, \"description\": \"Call Florist about Mom\'s favourite flowers\", \"project_id\": 2, \"context_id\": 2}\n                    ],\n                    \"contexts\": [\n                        {\"id\": 1, \"name\": \"Errands\"},\n                        {\"id\": 2, \"name\": \"Calls\"}\n                    ],\n                    \"projects\": [\n                        {\"id\": 1, \"title\": \"Build our familiy house\"},\n                        {\"id\": 2, \"title\": \"Mom\'s Birthday\"},\n                        {\"id\": 3, \"title\": \"Write Essay about my favourite fish\"},\n                        {\"id\": 4, \"title\": \"Clean Garage\"}\n                    ],\n                    \"notes\": [\n                        {\"id\": 1, \"body\": \"Don\'t forget she likes tulips the best! So if you can get those please do. Whatever you do though, don\'t get roses. She hates them!\", \"project_id\": 2}\n                    ]\n                }\n            ';
 	var _p0 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, jsonData);
@@ -17793,23 +18579,80 @@ var _user$project$Main$triggerStoreLoad = _elm_lang$core$Native_Platform.outgoin
 	function (v) {
 		return null;
 	});
-var _user$project$Main$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {store: a, gtdActionListsModel: b, projectCardOverviewModel: c, simpleTodosModel: d, settingsModel: e, selectedWorkflow: f, workflowMenuVisible: g};
+var _user$project$Main$Model = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {store: a, gtdActionListsModel: b, projectCardOverviewModel: c, simpleTodosModel: d, settingsModel: e, selectedWorkflow: f, workflowMenuVisible: g, pasteBinId: h};
 	});
+var _user$project$Main$PasteBinResult = function (a) {
+	return {uri: a};
+};
+var _user$project$Main$pasteBinResultDecoder = A3(
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$required,
+	'uri',
+	_elm_lang$core$Json_Decode$string,
+	_NoRedInk$elm_decode_pipeline$Json_Decode_Pipeline$decode(_user$project$Main$PasteBinResult));
+var _user$project$Main$postToBin = function (jsonValue) {
+	return A3(
+		_elm_lang$http$Http$post,
+		_user$project$Main$baseBinUri,
+		_elm_lang$http$Http$jsonBody(jsonValue),
+		_user$project$Main$pasteBinResultDecoder);
+};
 var _user$project$Main$SettingsWorkflow = {ctor: 'SettingsWorkflow'};
 var _user$project$Main$ProjectOverviewWorkflow = {ctor: 'ProjectOverviewWorkflow'};
 var _user$project$Main$GtdActionListsWorkflow = {ctor: 'GtdActionListsWorkflow'};
-var _user$project$Main$initialModel = {
-	ctor: '_Tuple2',
-	_0: {store: _user$project$Main$initialStore, gtdActionListsModel: _user$project$Workflows_GtdActionLists$initialModel, projectCardOverviewModel: _user$project$Workflows_ProjectOverview$initialModel, simpleTodosModel: _user$project$Workflows_SimpleTodos$initialModel, settingsModel: _user$project$Workflows_Settings$initialModel, selectedWorkflow: _user$project$Main$GtdActionListsWorkflow, workflowMenuVisible: false},
-	_1: _elm_lang$core$Platform_Cmd$none
-};
 var _user$project$Main$SimpleTodosWorkflow = {ctor: 'SimpleTodosWorkflow'};
+var _user$project$Main$Noop = {ctor: 'Noop'};
+var _user$project$Main$RecieveBinConfirmation = function (a) {
+	return {ctor: 'RecieveBinConfirmation', _0: a};
+};
 var _user$project$Main$ToggleDrawer = function (a) {
 	return {ctor: 'ToggleDrawer', _0: a};
 };
-var _user$project$Main$TriggerLoad = {ctor: 'TriggerLoad'};
+var _user$project$Main$TriggerBinLoad = function (a) {
+	return {ctor: 'TriggerBinLoad', _0: a};
+};
+var _user$project$Main$TriggerStoreLoad = {ctor: 'TriggerStoreLoad'};
+var _user$project$Main$ReceiveStoreFromBin = function (a) {
+	return {ctor: 'ReceiveStoreFromBin', _0: a};
+};
+var _user$project$Main$initialModel = function (location) {
+	var search = _elm_lang$core$List$head(
+		_elm_lang$core$List$reverse(
+			A2(_elm_lang$core$String$split, '#', location.hash)));
+	return {
+		ctor: '_Tuple2',
+		_0: {
+			store: _user$project$Main$initialStore,
+			gtdActionListsModel: _user$project$Workflows_GtdActionLists$initialModel,
+			projectCardOverviewModel: _user$project$Workflows_ProjectOverview$initialModel,
+			simpleTodosModel: _user$project$Workflows_SimpleTodos$initialModel,
+			settingsModel: _user$project$Workflows_Settings$initialModel,
+			selectedWorkflow: _user$project$Main$GtdActionListsWorkflow,
+			workflowMenuVisible: false,
+			pasteBinId: _elm_lang$core$String$isEmpty(
+				A2(_elm_lang$core$Maybe$withDefault, '', search)) ? _elm_lang$core$Maybe$Nothing : search
+		},
+		_1: function () {
+			var _p1 = search;
+			if (_p1.ctor === 'Nothing') {
+				return _elm_lang$core$Platform_Cmd$none;
+			} else {
+				var _p3 = _p1._0;
+				var _p2 = _p3;
+				if (_p2 === '') {
+					return _elm_lang$core$Platform_Cmd$none;
+				} else {
+					return A2(
+						_elm_lang$http$Http$send,
+						_user$project$Main$ReceiveStoreFromBin,
+						_user$project$Main$getFromBin(
+							_user$project$Main$binUri(_p3)));
+				}
+			}
+		}()
+	};
+};
 var _user$project$Main$ReceiveStore = function (a) {
 	return {ctor: 'ReceiveStore', _0: a};
 };
@@ -17834,21 +18677,49 @@ var _user$project$Main$GtdActionListsMsg = function (a) {
 };
 var _user$project$Main$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p4 = msg;
+		switch (_p4.ctor) {
+			case 'Noop':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Save':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{workflowMenuVisible: false}),
-					_1: _user$project$Main$persistStore(
-						A2(
-							_elm_lang$core$Json_Encode$encode,
-							2,
-							_user$project$ProgrissStore$encoder(model.store)))
+					_1: _elm_lang$core$Platform_Cmd$batch(
+						{
+							ctor: '::',
+							_0: _user$project$Main$persistStore(
+								A2(
+									_elm_lang$core$Json_Encode$encode,
+									2,
+									_user$project$ProgrissStore$encoder(model.store))),
+							_1: {
+								ctor: '::',
+								_0: function () {
+									var _p5 = model.pasteBinId;
+									if (_p5.ctor === 'Nothing') {
+										return A2(
+											_elm_lang$http$Http$send,
+											_user$project$Main$RecieveBinConfirmation,
+											_user$project$Main$postToBin(
+												_user$project$ProgrissStore$encoder(model.store)));
+									} else {
+										return A2(
+											_elm_lang$http$Http$send,
+											_user$project$Main$ReceiveStoreFromBin,
+											A2(
+												_user$project$Main$putToBin,
+												_user$project$Main$binUri(_p5._0),
+												_user$project$ProgrissStore$encoder(model.store)));
+									}
+								}(),
+								_1: {ctor: '[]'}
+							}
+						})
 				};
-			case 'TriggerLoad':
+			case 'TriggerStoreLoad':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17857,14 +18728,45 @@ var _user$project$Main$update = F2(
 					_1: _user$project$Main$triggerStoreLoad(
 						{ctor: '_Tuple0'})
 				};
+			case 'TriggerBinLoad':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{workflowMenuVisible: false}),
+					_1: A2(
+						_elm_lang$http$Http$send,
+						_user$project$Main$ReceiveStoreFromBin,
+						_user$project$Main$getFromBin(
+							_user$project$Main$binUri(_p4._0)))
+				};
 			case 'ReceiveStore':
-				var _p2 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, _p1._0);
-				if (_p2.ctor === 'Ok') {
+				var _p6 = A2(_elm_lang$core$Json_Decode$decodeString, _user$project$ProgrissStore$decoder, _p4._0);
+				if (_p6.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{store: _p2._0}),
+							{store: _p6._0}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{store: _user$project$ProgrissStore$empty}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				}
+			case 'ReceiveStoreFromBin':
+				var _p7 = _p4._0;
+				if (_p7.ctor === 'Ok') {
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{store: _p7._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -17877,10 +18779,10 @@ var _user$project$Main$update = F2(
 					};
 				}
 			case 'GtdActionListsMsg':
-				var _p3 = A3(_user$project$Workflows_GtdActionLists$update, _p1._0, model.store, model.gtdActionListsModel);
-				var gtdActionListsModel = _p3._0;
-				var store = _p3._1;
-				var cmd = _p3._2;
+				var _p8 = A3(_user$project$Workflows_GtdActionLists$update, _p4._0, model.store, model.gtdActionListsModel);
+				var gtdActionListsModel = _p8._0;
+				var store = _p8._1;
+				var cmd = _p8._2;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17889,10 +18791,10 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$GtdActionListsMsg, cmd)
 				};
 			case 'ProjectOverviewMsg':
-				var _p4 = A3(_user$project$Workflows_ProjectOverview$update, _p1._0, model.store, model.projectCardOverviewModel);
-				var projectCardOverviewModel = _p4._0;
-				var store = _p4._1;
-				var cmd = _p4._2;
+				var _p9 = A3(_user$project$Workflows_ProjectOverview$update, _p4._0, model.store, model.projectCardOverviewModel);
+				var projectCardOverviewModel = _p9._0;
+				var store = _p9._1;
+				var cmd = _p9._2;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17901,10 +18803,10 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$ProjectOverviewMsg, cmd)
 				};
 			case 'SimpleTodosMsg':
-				var _p5 = A3(_user$project$Workflows_SimpleTodos$update, _p1._0, model.store, model.simpleTodosModel);
-				var simpleTodosModel = _p5._0;
-				var store = _p5._1;
-				var cmd = _p5._2;
+				var _p10 = A3(_user$project$Workflows_SimpleTodos$update, _p4._0, model.store, model.simpleTodosModel);
+				var simpleTodosModel = _p10._0;
+				var store = _p10._1;
+				var cmd = _p10._2;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17913,10 +18815,10 @@ var _user$project$Main$update = F2(
 					_1: A2(_elm_lang$core$Platform_Cmd$map, _user$project$Main$SimpleTodosMsg, cmd)
 				};
 			case 'SettingsMsg':
-				var _p6 = A3(_user$project$Workflows_Settings$update, _p1._0, model.store, model.settingsModel);
-				var settingsModel = _p6._0;
-				var store = _p6._1;
-				var cmd = _p6._2;
+				var _p11 = A3(_user$project$Workflows_Settings$update, _p4._0, model.store, model.settingsModel);
+				var settingsModel = _p11._0;
+				var store = _p11._1;
+				var cmd = _p11._2;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -17929,17 +18831,41 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{selectedWorkflow: _p1._0, workflowMenuVisible: false}),
+						{selectedWorkflow: _p4._0, workflowMenuVisible: false}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'ToggleDrawer':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{workflowMenuVisible: _p1._0}),
+						{workflowMenuVisible: _p4._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			default:
+				var _p12 = _p4._0;
+				if (_p12.ctor === 'Ok') {
+					var pasteBinId = _elm_lang$core$List$head(
+						_elm_lang$core$List$reverse(
+							A2(_elm_lang$core$String$split, '/', _p12._0.uri)));
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{pasteBinId: pasteBinId}),
+						_1: function () {
+							var _p13 = pasteBinId;
+							if (_p13.ctor === 'Nothing') {
+								return _elm_lang$core$Platform_Cmd$none;
+							} else {
+								return _elm_lang$navigation$Navigation$modifyUrl(
+									A2(_elm_lang$core$Basics_ops['++'], 'https://a5308y.github.io/Methodoly#', _p13._0));
+							}
+						}()
+					};
+				} else {
+					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+				}
 		}
 	});
 var _user$project$Main$workflowMenu = function (model) {
@@ -18000,16 +18926,12 @@ var _user$project$Main$workflowMenu = function (model) {
 								_elm_lang$html$Html$a,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$href('#'),
+									_0: _elm_lang$html$Html_Attributes$class('btn'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$class('btn'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onClick(
-												_user$project$Main$ToggleDrawer(!model.workflowMenuVisible)),
-											_1: {ctor: '[]'}
-										}
+										_0: _elm_lang$html$Html_Events$onClick(
+											_user$project$Main$ToggleDrawer(!model.workflowMenuVisible)),
+										_1: {ctor: '[]'}
 									}
 								},
 								{
@@ -18031,8 +18953,8 @@ var _user$project$Main$workflowMenu = function (model) {
 							_1: {
 								ctor: '::',
 								_0: function () {
-									var _p7 = model.selectedWorkflow;
-									if (_p7.ctor === 'GtdActionListsWorkflow') {
+									var _p14 = model.selectedWorkflow;
+									if (_p14.ctor === 'GtdActionListsWorkflow') {
 										return A2(
 											_elm_lang$html$Html$map,
 											_user$project$Main$GtdActionListsMsg,
@@ -18106,8 +19028,12 @@ var _user$project$Main$workflowMenu = function (model) {
 												_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(
-														_user$project$Main$SelectWorkflow(_user$project$Main$SimpleTodosWorkflow)),
+													_0: A3(
+														_elm_lang$html$Html_Events$onWithOptions,
+														'click',
+														{stopPropagation: true, preventDefault: true},
+														_elm_lang$core$Json_Decode$succeed(
+															_user$project$Main$SelectWorkflow(_user$project$Main$SimpleTodosWorkflow))),
 													_1: {ctor: '[]'}
 												}
 											}
@@ -18129,8 +19055,12 @@ var _user$project$Main$workflowMenu = function (model) {
 													_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(
-															_user$project$Main$SelectWorkflow(_user$project$Main$GtdActionListsWorkflow)),
+														_0: A3(
+															_elm_lang$html$Html_Events$onWithOptions,
+															'click',
+															{stopPropagation: true, preventDefault: true},
+															_elm_lang$core$Json_Decode$succeed(
+																_user$project$Main$SelectWorkflow(_user$project$Main$GtdActionListsWorkflow))),
 														_1: {ctor: '[]'}
 													}
 												}
@@ -18152,8 +19082,12 @@ var _user$project$Main$workflowMenu = function (model) {
 														_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Events$onClick(
-																_user$project$Main$SelectWorkflow(_user$project$Main$ProjectOverviewWorkflow)),
+															_0: A3(
+																_elm_lang$html$Html_Events$onWithOptions,
+																'click',
+																{stopPropagation: true, preventDefault: true},
+																_elm_lang$core$Json_Decode$succeed(
+																	_user$project$Main$SelectWorkflow(_user$project$Main$ProjectOverviewWorkflow))),
 															_1: {ctor: '[]'}
 														}
 													}
@@ -18185,8 +19119,12 @@ var _user$project$Main$workflowMenu = function (model) {
 																_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Events$onClick(
-																		_user$project$Main$SelectWorkflow(_user$project$Main$SettingsWorkflow)),
+																	_0: A3(
+																		_elm_lang$html$Html_Events$onWithOptions,
+																		'click',
+																		{stopPropagation: true, preventDefault: true},
+																		_elm_lang$core$Json_Decode$succeed(
+																			_user$project$Main$SelectWorkflow(_user$project$Main$SettingsWorkflow))),
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -18208,7 +19146,11 @@ var _user$project$Main$workflowMenu = function (model) {
 																	_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 																	_1: {
 																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$Save),
+																		_0: A3(
+																			_elm_lang$html$Html_Events$onWithOptions,
+																			'click',
+																			{stopPropagation: true, preventDefault: true},
+																			_elm_lang$core$Json_Decode$succeed(_user$project$Main$Save)),
 																		_1: {ctor: '[]'}
 																	}
 																}
@@ -18230,7 +19172,11 @@ var _user$project$Main$workflowMenu = function (model) {
 																		_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
 																		_1: {
 																			ctor: '::',
-																			_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$TriggerLoad),
+																			_0: A3(
+																				_elm_lang$html$Html_Events$onWithOptions,
+																				'click',
+																				{stopPropagation: true, preventDefault: true},
+																				_elm_lang$core$Json_Decode$succeed(_user$project$Main$TriggerStoreLoad)),
 																			_1: {ctor: '[]'}
 																		}
 																	}
@@ -18240,7 +19186,43 @@ var _user$project$Main$workflowMenu = function (model) {
 																	_0: _elm_lang$html$Html$text('Load'),
 																	_1: {ctor: '[]'}
 																}),
-															_1: {ctor: '[]'}
+															_1: {
+																ctor: '::',
+																_0: function () {
+																	var _p15 = model.pasteBinId;
+																	if (_p15.ctor === 'Nothing') {
+																		return _elm_lang$html$Html$text('');
+																	} else {
+																		return A2(
+																			_elm_lang$html$Html$a,
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$href('#'),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$class('list-group-item'),
+																					_1: {
+																						ctor: '::',
+																						_0: A3(
+																							_elm_lang$html$Html_Events$onWithOptions,
+																							'click',
+																							{stopPropagation: true, preventDefault: true},
+																							_elm_lang$core$Json_Decode$succeed(
+																								_user$project$Main$TriggerBinLoad(
+																									_user$project$Main$binUri(_p15._0)))),
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text('Load from server'),
+																				_1: {ctor: '[]'}
+																			});
+																	}
+																}(),
+																_1: {ctor: '[]'}
+															}
 														}
 													}
 												}
@@ -18256,8 +19238,8 @@ var _user$project$Main$workflowMenu = function (model) {
 		});
 };
 var _user$project$Main$renderWorkflow = function (model) {
-	var _p8 = model.selectedWorkflow;
-	switch (_p8.ctor) {
+	var _p16 = model.selectedWorkflow;
+	switch (_p16.ctor) {
 		case 'SimpleTodosWorkflow':
 			return A2(
 				_elm_lang$html$Html$map,
@@ -18294,7 +19276,11 @@ var _user$project$Main$view = function (model) {
 			}
 		});
 };
-var _user$project$Main$main = _elm_lang$html$Html$program(
+var _user$project$Main$main = A2(
+	_elm_lang$navigation$Navigation$program,
+	function (location) {
+		return _user$project$Main$Noop;
+	},
 	{init: _user$project$Main$initialModel, view: _user$project$Main$view, update: _user$project$Main$update, subscriptions: _user$project$Main$subscriptions})();
 
 var Elm = {};
