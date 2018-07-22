@@ -1,0 +1,37 @@
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.side-menu {
+  position: static;
+}
+
+.edit-action-form {
+  margin-bottom: 0;
+}
+
+.visible-footer {
+    transition: all 0.5s;
+    height: 80px;
+    visibility: visible;
+}
+
+.hidden-footer {
+  transition: all 0.5s;
+  height: 0px;
+  transform: TranslateY(-8px);
+  padding-bottom: 0;
+  padding-top: 0;
+  visibility: hidden;
+}
+
+.footer-button-group {
+  width: 100%;
+}
+
+.footer-button {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 33%;
+}

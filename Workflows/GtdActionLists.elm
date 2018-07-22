@@ -12,7 +12,7 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Dom
 import Html exposing (Html, a, div, header, hr, i, li, span, text, ul)
-import Html.Attributes exposing (class, classList, defaultValue, href, id, style, value)
+import Html.Attributes exposing (class, classList, defaultValue, href, id, value)
 import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
 import Json.Decode
 import ProgrissStore as Store
@@ -349,7 +349,7 @@ actionCardBlock editingAction action =
                     Grid.col
                         []
                         [ Form.form
-                            [ style [ ( "margin-bottom", "0" ) ]
+                            [ class "edit-action-form"
                             , Html.Attributes.action "javascript:void(0);"
                             , onSubmit (SelectActionToEdit NotEditingAction)
                             ]
@@ -378,39 +378,29 @@ actionCardBlock editingAction action =
 actionCardFooter : ProgrissStore -> EditingActionState -> Action -> Card.Config Msg -> Card.Config Msg
 actionCardFooter store editingAction action =
     let
-        footerStyle =
+        footerClass =
             if
                 (editingAction == EditingAction action.id SelectingEditedAttribute)
                     || (editingAction == EditingAction action.id EditingContext)
                     || (editingAction == EditingAction action.id EditingProject)
             then
-                [ ( "transition", "all 0.5s" )
-                , ( "height", "80px" )
-                , ( "visibility", "visible" )
-                ]
+                "visible-footer"
             else
-                [ ( "transition", "all 0.5s" )
-                , ( "height", "0px" )
-                , ( "transform", "TranslateY(-8px)" )
-                , ( "padding-bottom", "0" )
-                , ( "padding-top", "0" )
-                , ( "visibility", "hidden" )
-                ]
+                "hidden-footer"
     in
-    Card.block [ Block.attrs [ style footerStyle ] ]
+    Card.block [ Block.attrs [ class footerClass ] ]
         [ Block.custom <|
             div
                 []
-                [ ButtonGroup.buttonGroup [ ButtonGroup.small, ButtonGroup.attrs [ style [ ( "width", "100%" ) ] ] ]
+                [ ButtonGroup.buttonGroup
+                    [ ButtonGroup.small
+                    , ButtonGroup.attrs [ class "footer-button-group" ]
+                    ]
                     [ ButtonGroup.button
                         [ Button.primary
                         , Button.attrs
                             [ onClick (SelectActionToEdit (EditingAction action.id EditingDescription))
-                            , style
-                                [ ( "text-overflow", "ellipsis" )
-                                , ( "overflow", "hidden" )
-                                , ( "width", "33%" )
-                                ]
+                            , class "footer-button"
                             ]
                         ]
                         [ text "Edit" ]
@@ -418,11 +408,7 @@ actionCardFooter store editingAction action =
                         [ Button.primary
                         , Button.attrs
                             [ onClick (SelectActionToEdit (EditingAction action.id EditingContext))
-                            , style
-                                [ ( "text-overflow", "ellipsis" )
-                                , ( "overflow", "hidden" )
-                                , ( "width", "33%" )
-                                ]
+                            , class "footer-button"
                             ]
                         ]
                         [ text (contextName store action) ]
@@ -430,11 +416,7 @@ actionCardFooter store editingAction action =
                         [ Button.primary
                         , Button.attrs
                             [ onClick (SelectActionToEdit (EditingAction action.id EditingProject))
-                            , style
-                                [ ( "text-overflow", "ellipsis" )
-                                , ( "overflow", "hidden" )
-                                , ( "width", "33%" )
-                                ]
+                            , class "footer-button"
                             ]
                         ]
                         [ text (projectName store action) ]
@@ -575,8 +557,8 @@ visibleSideMenu title selectableItems =
             , ( "bmd-drawer-f-r", True )
             , ( "bmd-drawer-overlay", True )
             , ( "bmd-drawer-in", True )
+            , ( "side-menu", True )
             ]
-        , style [ ( "position", "static" ) ]
         ]
         [ div
             [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]
@@ -594,8 +576,8 @@ hiddenSideMenu =
             , ( "bmd-drawer-f-r", True )
             , ( "bmd-drawer-overlay", True )
             , ( "bmd-drawer-in", False )
+            , ( "side-menu", True )
             ]
-        , style [ ( "position", "static" ) ]
         ]
         [ div
             [ classList [ ( "bmd-layout-drawer", True ), ( "bg-faded", True ) ] ]

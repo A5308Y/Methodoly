@@ -1,7 +1,7 @@
 port module Main exposing (..)
 
 import Html exposing (Html, a, div, header, i, text, ul)
-import Html.Attributes exposing (class, classList, href, style)
+import Html.Attributes exposing (class, classList, href)
 import Html.Events exposing (onClick, onWithOptions)
 import Http
 import Json.Decode exposing (int, string)
@@ -310,8 +310,8 @@ workflowMenu model =
             , ( "bmd-drawer-f-l", True )
             , ( "bmd-drawer-overlay", True )
             , ( "bmd-drawer-in", model.workflowMenuVisible )
+            , ( "side-menu", True )
             ]
-        , style [ ( "position", "static" ) ]
         ]
         [ header [ class "bmd-layout-header" ]
             [ div [ class "navbar navbar-light bg-faded" ]

@@ -11,7 +11,7 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
 import Dom
 import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (action, class, defaultValue, id, style, value)
+import Html.Attributes exposing (action, class, defaultValue, id, value)
 import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
 import Json.Decode
 import ProgrissStore as Store exposing (Action, ActionId, ActionState(Done), ProgrissStore, decoder)
@@ -176,7 +176,7 @@ actionCard editing action =
                         Grid.col
                             []
                             [ Form.form
-                                [ style [ ( "margin-bottom", "0" ) ]
+                                [ class "edit-action-form"
                                 , Html.Attributes.action "javascript:void(0);"
                                 , onSubmit (ToggleEditAction Nothing)
                                 ]

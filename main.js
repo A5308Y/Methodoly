@@ -16227,21 +16227,16 @@ var _user$project$Workflows_GtdActionLists$hiddenSideMenu = A2(
 						_1: {
 							ctor: '::',
 							_0: {ctor: '_Tuple2', _0: 'bmd-drawer-in', _1: false},
-							_1: {ctor: '[]'}
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'side-menu', _1: true},
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				}
 			}),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'position', _1: 'static'},
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		}
+		_1: {ctor: '[]'}
 	},
 	{
 		ctor: '::',
@@ -16294,21 +16289,16 @@ var _user$project$Workflows_GtdActionLists$visibleSideMenu = F2(
 								_1: {
 									ctor: '::',
 									_0: {ctor: '_Tuple2', _0: 'bmd-drawer-in', _1: true},
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'side-menu', _1: true},
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
 					}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'position', _1: 'static'},
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
+				_1: {ctor: '[]'}
 			},
 			{
 				ctor: '::',
@@ -16846,49 +16836,13 @@ var _user$project$Workflows_GtdActionLists$SelectActionToEdit = function (a) {
 };
 var _user$project$Workflows_GtdActionLists$actionCardFooter = F3(
 	function (store, editingAction, action) {
-		var footerStyle = (_elm_lang$core$Native_Utils.eq(
+		var footerClass = (_elm_lang$core$Native_Utils.eq(
 			editingAction,
 			A2(_user$project$Workflows_GtdActionLists$EditingAction, action.id, _user$project$Workflows_GtdActionLists$SelectingEditedAttribute)) || (_elm_lang$core$Native_Utils.eq(
 			editingAction,
 			A2(_user$project$Workflows_GtdActionLists$EditingAction, action.id, _user$project$Workflows_GtdActionLists$EditingContext)) || _elm_lang$core$Native_Utils.eq(
 			editingAction,
-			A2(_user$project$Workflows_GtdActionLists$EditingAction, action.id, _user$project$Workflows_GtdActionLists$EditingProject)))) ? {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'transition', _1: 'all 0.5s'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'height', _1: '80px'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'visibility', _1: 'visible'},
-					_1: {ctor: '[]'}
-				}
-			}
-		} : {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'transition', _1: 'all 0.5s'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'height', _1: '0px'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'transform', _1: 'TranslateY(-8px)'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '0'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '0'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'visibility', _1: 'hidden'},
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
-			}
-		};
+			A2(_user$project$Workflows_GtdActionLists$EditingAction, action.id, _user$project$Workflows_GtdActionLists$EditingProject)))) ? 'visible-footer' : 'hidden-footer';
 		return A2(
 			_rundis$elm_bootstrap$Bootstrap_Card$block,
 			{
@@ -16896,7 +16850,7 @@ var _user$project$Workflows_GtdActionLists$actionCardFooter = F3(
 				_0: _rundis$elm_bootstrap$Bootstrap_Card_Block$attrs(
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$style(footerStyle),
+						_0: _elm_lang$html$Html_Attributes$class(footerClass),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -16919,12 +16873,7 @@ var _user$project$Workflows_GtdActionLists$actionCardFooter = F3(
 										_0: _rundis$elm_bootstrap$Bootstrap_ButtonGroup$attrs(
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$style(
-													{
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-														_1: {ctor: '[]'}
-													}),
+												_0: _elm_lang$html$Html_Attributes$class('footer-button-group'),
 												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
@@ -16947,20 +16896,7 @@ var _user$project$Workflows_GtdActionLists$actionCardFooter = F3(
 																A2(_user$project$Workflows_GtdActionLists$EditingAction, action.id, _user$project$Workflows_GtdActionLists$EditingDescription))),
 														_1: {
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$style(
-																{
-																	ctor: '::',
-																	_0: {ctor: '_Tuple2', _0: 'text-overflow', _1: 'ellipsis'},
-																	_1: {
-																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
-																		_1: {
-																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: 'width', _1: '33%'},
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}),
+															_0: _elm_lang$html$Html_Attributes$class('footer-button'),
 															_1: {ctor: '[]'}
 														}
 													}),
@@ -16989,20 +16925,7 @@ var _user$project$Workflows_GtdActionLists$actionCardFooter = F3(
 																	A2(_user$project$Workflows_GtdActionLists$EditingAction, action.id, _user$project$Workflows_GtdActionLists$EditingContext))),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$style(
-																	{
-																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: 'text-overflow', _1: 'ellipsis'},
-																		_1: {
-																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
-																			_1: {
-																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: 'width', _1: '33%'},
-																				_1: {ctor: '[]'}
-																			}
-																		}
-																	}),
+																_0: _elm_lang$html$Html_Attributes$class('footer-button'),
 																_1: {ctor: '[]'}
 															}
 														}),
@@ -17032,20 +16955,7 @@ var _user$project$Workflows_GtdActionLists$actionCardFooter = F3(
 																		A2(_user$project$Workflows_GtdActionLists$EditingAction, action.id, _user$project$Workflows_GtdActionLists$EditingProject))),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$style(
-																		{
-																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: 'text-overflow', _1: 'ellipsis'},
-																			_1: {
-																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
-																				_1: {
-																					ctor: '::',
-																					_0: {ctor: '_Tuple2', _0: 'width', _1: '33%'},
-																					_1: {ctor: '[]'}
-																				}
-																			}
-																		}),
+																	_0: _elm_lang$html$Html_Attributes$class('footer-button'),
 																	_1: {ctor: '[]'}
 																}
 															}),
@@ -17201,12 +17111,7 @@ var _user$project$Workflows_GtdActionLists$actionCardBlock = F2(
 											_rundis$elm_bootstrap$Bootstrap_Form$form,
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$style(
-													{
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '0'},
-														_1: {ctor: '[]'}
-													}),
+												_0: _elm_lang$html$Html_Attributes$class('edit-action-form'),
 												_1: {
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$action('javascript:void(0);'),
@@ -18259,12 +18164,7 @@ var _user$project$Workflows_SimpleTodos$actionCard = F2(
 												_rundis$elm_bootstrap$Bootstrap_Form$form,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$style(
-														{
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '0'},
-															_1: {ctor: '[]'}
-														}),
+													_0: _elm_lang$html$Html_Attributes$class('edit-action-form'),
 													_1: {
 														ctor: '::',
 														_0: _elm_lang$html$Html_Attributes$action('javascript:void(0);'),
@@ -18909,21 +18809,16 @@ var _user$project$Main$workflowMenu = function (model) {
 							_1: {
 								ctor: '::',
 								_0: {ctor: '_Tuple2', _0: 'bmd-drawer-in', _1: model.workflowMenuVisible},
-								_1: {ctor: '[]'}
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'side-menu', _1: true},
+									_1: {ctor: '[]'}
+								}
 							}
 						}
 					}
 				}),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'position', _1: 'static'},
-						_1: {ctor: '[]'}
-					}),
-				_1: {ctor: '[]'}
-			}
+			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
