@@ -28,3 +28,5 @@ Use http://material.io/tools/icons to explore icons of the robot font that can b
 
 Opaque store and opaque ids. Workflows should never access anything else than store and their own model.
 Possibly at one point we'll introduce something like elm-taco.
+
+The key components of the app are the workflows. They should be independent, be based on an already existing and tried methodology like GTD, Pomodoro, autofocus, ... and include a short description of how and why they work with a link to their theory. Why are they helpful to a human and what is their goal.
