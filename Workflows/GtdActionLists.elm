@@ -257,6 +257,7 @@ contextMenu store selectedContext contextMenuVisible =
     in
     if contextMenuVisible then
         visibleSideMenu "Switch Context" selectableItems
+
     else
         hiddenSideMenu
 
@@ -323,8 +324,10 @@ actionCardBlock editingAction action =
         blockAttrs =
             if editingAction == EditingAction action.id SelectingEditedAttribute then
                 [ onClick (SelectActionToEdit NotEditingAction) ]
+
             else if editingAction == EditingAction action.id EditingDescription then
                 []
+
             else
                 [ onClick (SelectActionToEdit (EditingAction action.id SelectingEditedAttribute)) ]
     in
@@ -368,6 +371,7 @@ actionCardBlock editingAction action =
                                 |> InputGroup.view
                             ]
                         ]
+
                   else
                     Grid.col [] [ text action.description ]
                 ]
@@ -385,6 +389,7 @@ actionCardFooter store editingAction action =
                     || (editingAction == EditingAction action.id EditingProject)
             then
                 "visible-footer"
+
             else
                 "hidden-footer"
     in

@@ -120,6 +120,7 @@ initialModel location =
       , pasteBinId =
             if String.isEmpty (Maybe.withDefault "" search) then
                 Nothing
+
             else
                 search
       }

@@ -1,10 +1,9 @@
-module SettingsStore
-    exposing
-        ( SettingsStore
-        , getSettingsForProjectOverview
-        , initialStore
-        , updateSettingsForProjectOverview
-        )
+module SettingsStore exposing
+    ( SettingsStore
+    , getSettingsForProjectOverview
+    , initialStore
+    , updateSettingsForProjectOverview
+    )
 
 
 type SettingsStore

@@ -1,8 +1,8 @@
-module ProgrissStoreTest exposing (..)
+module ProgrissStoreTest exposing (decodeStore, fixtureStore, suite)
 
 import Expect exposing (Expectation)
 import Json.Decode
-import ProgrissStore exposing (Action, ActionState(Active, Done), ProgrissStore)
+import ProgrissStore exposing (Action, ActionState(..), ProgrissStore)
 import Test exposing (Test, describe, test)
 
 

@@ -14,7 +14,7 @@ import Html exposing (Html, div, hr, i, text)
 import Html.Attributes exposing (action, class, defaultValue, id, value)
 import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
 import Json.Decode
-import ProgrissStore as Store exposing (Action, ActionId, ActionState(Done), ProgrissStore, decoder)
+import ProgrissStore as Store exposing (Action, ActionId, ActionState(..), ProgrissStore, decoder)
 import Task
 
 
@@ -195,6 +195,7 @@ actionCard editing action =
                                     |> InputGroup.view
                                 ]
                             ]
+
                       else
                         Grid.col
                             [ Col.attrs [] ]

@@ -1,39 +1,38 @@
-module ProgrissStore
-    exposing
-        ( Action
-        , ActionId
-        , ActionState(..)
-        , Context
-        , ContextId
-        , ProgrissStore
-        , Project
-        , ProjectId
-        , associateActionToAnywhereContext
-        , associateActionToContext
-        , associateActionToNoProject
-        , associateActionToProject
-        , createAction
-        , createContext
-        , createProject
-        , decoder
-        , empty
-        , encoder
-        , getActionsForContext
-        , getActionsForProject
-        , getActionsWithoutContext
-        , getActionsWithoutProject
-        , getAllActions
-        , getAllContexts
-        , getAllProjects
-        , getAllSettings
-        , getContext
-        , getContextForAction
-        , getNotesForProject
-        , getProjectForAction
-        , toggleActionDone
-        , updateAction
-        , updateSettings
-        )
+module ProgrissStore exposing
+    ( Action
+    , ActionId
+    , ActionState(..)
+    , Context
+    , ContextId
+    , ProgrissStore
+    , Project
+    , ProjectId
+    , associateActionToAnywhereContext
+    , associateActionToContext
+    , associateActionToNoProject
+    , associateActionToProject
+    , createAction
+    , createContext
+    , createProject
+    , decoder
+    , empty
+    , encoder
+    , getActionsForContext
+    , getActionsForProject
+    , getActionsWithoutContext
+    , getActionsWithoutProject
+    , getAllActions
+    , getAllContexts
+    , getAllProjects
+    , getAllSettings
+    , getContext
+    , getContextForAction
+    , getNotesForProject
+    , getProjectForAction
+    , toggleActionDone
+    , updateAction
+    , updateSettings
+    )
 
 import Dict exposing (Dict)
 import Json.Decode exposing (Decoder, float, int, nullable, string)
