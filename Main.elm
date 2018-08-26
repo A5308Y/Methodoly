@@ -1,14 +1,16 @@
 port module Main exposing (main)
 
+import Browser exposing (Document)
+import Browser.Navigation as Navigation
 import Html exposing (Html, a, div, header, i, text, ul)
 import Html.Attributes exposing (class, classList, href)
-import Html.Events exposing (onClick, onWithOptions)
+import Html.Events exposing (custom, onClick)
 import Http
-import Json.Decode exposing (int, string)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode exposing (int, string, succeed)
+import Json.Decode.Pipeline exposing (required)
 import Json.Encode
-import Navigation
 import ProgrissStore as Store exposing (ProgrissStore)
+import Url exposing (Url)
 import Workflows.GtdActionLists
 import Workflows.ProjectOverview
 import Workflows.Settings
@@ -24,6 +26,7 @@ type alias Model =
     , selectedWorkflow : SelectableWorkflow
     , workflowMenuVisible : Bool
     , pasteBinId : Maybe String
+    , key : Navigation.Key
     }
 
 
@@ -100,16 +103,12 @@ initialStore =
 
 pasteBinResultDecoder : Json.Decode.Decoder PasteBinResult
 pasteBinResultDecoder =
-    decode PasteBinResult
+    succeed PasteBinResult
         |> required "uri" string
 
 
-initialModel : Navigation.Location -> ( Model, Cmd Msg )
-initialModel location =
-    let
-        search =
-            String.split "#" location.hash |> List.reverse |> List.head
-    in
+init : Bool -> Url -> Navigation.Key -> ( Model, Cmd Msg )
+init flags url key =
     ( { store = initialStore
       , gtdActionListsModel = Workflows.GtdActionLists.initialModel
       , projectCardOverviewModel = Workflows.ProjectOverview.initialModel
@@ -117,14 +116,15 @@ initialModel location =
       , settingsModel = Workflows.Settings.initialModel
       , selectedWorkflow = GtdActionListsWorkflow
       , workflowMenuVisible = False
+      , key = key
       , pasteBinId =
-            if String.isEmpty (Maybe.withDefault "" search) then
+            if String.isEmpty (Maybe.withDefault "" url.fragment) then
                 Nothing
 
             else
-                search
+                url.fragment
       }
-    , case search of
+    , case url.fragment of
         Nothing ->
             Cmd.none
 
@@ -138,12 +138,23 @@ initialModel location =
     )
 
 
-main : Program Never Model Msg
+onUrlChange : Url.Url -> Msg
+onUrlChange url =
+    Noop
+
+
+onUrlRequest : Browser.UrlRequest -> Msg
+onUrlRequest urlRequest =
+    Noop
+
+
+main : Program Bool Model Msg
 main =
-    Navigation.program
-        (\location -> Noop)
-        { init = initialModel
+    Browser.application
+        { init = init
         , view = view
+        , onUrlChange = onUrlChange
+        , onUrlRequest = onUrlRequest
         , update = update
         , subscriptions = subscriptions
         }
@@ -197,37 +208,37 @@ update msg model =
                 Err message ->
                     ( { model | store = Store.empty }, Cmd.none )
 
-        GtdActionListsMsg msg ->
+        GtdActionListsMsg workflowMsg ->
             let
                 ( gtdActionListsModel, store, cmd ) =
-                    Workflows.GtdActionLists.update msg model.store model.gtdActionListsModel
+                    Workflows.GtdActionLists.update workflowMsg model.store model.gtdActionListsModel
             in
             ( { model | store = store, gtdActionListsModel = gtdActionListsModel }
             , Cmd.map GtdActionListsMsg cmd
             )
 
-        ProjectOverviewMsg msg ->
+        ProjectOverviewMsg workflowMsg ->
             let
                 ( projectCardOverviewModel, store, cmd ) =
-                    Workflows.ProjectOverview.update msg model.store model.projectCardOverviewModel
+                    Workflows.ProjectOverview.update workflowMsg model.store model.projectCardOverviewModel
             in
             ( { model | store = store, projectCardOverviewModel = projectCardOverviewModel }
             , Cmd.map ProjectOverviewMsg cmd
             )
 
-        SimpleTodosMsg msg ->
+        SimpleTodosMsg workflowMsg ->
             let
                 ( simpleTodosModel, store, cmd ) =
-                    Workflows.SimpleTodos.update msg model.store model.simpleTodosModel
+                    Workflows.SimpleTodos.update workflowMsg model.store model.simpleTodosModel
             in
             ( { model | store = store, simpleTodosModel = simpleTodosModel }
             , Cmd.map SimpleTodosMsg cmd
             )
 
-        SettingsMsg msg ->
+        SettingsMsg workflowMsg ->
             let
                 ( settingsModel, store, cmd ) =
-                    Workflows.Settings.update msg model.store model.settingsModel
+                    Workflows.Settings.update workflowMsg model.store model.settingsModel
             in
             ( { model | store = store, settingsModel = settingsModel }
             , Cmd.map SettingsMsg cmd
@@ -257,8 +268,8 @@ update msg model =
                             Cmd.none
 
                         Just id ->
-                            Navigation.modifyUrl ("https://a5308y.github.io/Methodoly#" ++ id)
-                      --Navigation.modifyUrl ("file:///Users/ahe/code/repositories/Active/ProgrissStore/index.html#" ++ id)
+                            Navigation.pushUrl model.key ("http://localhost:8000/index.html#" ++ id)
+                      --Navigation.pushUrl model.key ("https://a5308y.github.io/Methodoly#" ++ id)
                     )
 
                 Err _ ->
@@ -298,9 +309,11 @@ getFromBin uri =
     Http.get uri Store.decoder
 
 
-view : Model -> Html Msg
+view : Model -> Browser.Document Msg
 view model =
-    div [] [ workflowMenu model, renderWorkflow model ]
+    { title = "Methodoly"
+    , body = [ workflowMenu model, renderWorkflow model ]
+    }
 
 
 workflowMenu : Model -> Html Msg
@@ -334,50 +347,74 @@ workflowMenu model =
                 [ a
                     [ href "#"
                     , class "list-group-item"
-                    , onWithOptions "click"
-                        { stopPropagation = True, preventDefault = True }
-                        (Json.Decode.succeed (SelectWorkflow SimpleTodosWorkflow))
+                    , custom "click"
+                        (Json.Decode.succeed
+                            { message = SelectWorkflow SimpleTodosWorkflow
+                            , stopPropagation = True
+                            , preventDefault = True
+                            }
+                        )
                     ]
                     [ text "Simple" ]
                 , a
                     [ href "#"
                     , class "list-group-item"
-                    , onWithOptions "click"
-                        { stopPropagation = True, preventDefault = True }
-                        (Json.Decode.succeed (SelectWorkflow GtdActionListsWorkflow))
+                    , custom "click"
+                        (Json.Decode.succeed
+                            { message = SelectWorkflow GtdActionListsWorkflow
+                            , stopPropagation = True
+                            , preventDefault = True
+                            }
+                        )
                     ]
                     [ text "GTD" ]
                 , a
                     [ href "#"
                     , class "list-group-item"
-                    , onWithOptions "click"
-                        { stopPropagation = True, preventDefault = True }
-                        (Json.Decode.succeed (SelectWorkflow ProjectOverviewWorkflow))
+                    , custom "click"
+                        (Json.Decode.succeed
+                            { message = SelectWorkflow ProjectOverviewWorkflow
+                            , stopPropagation = True
+                            , preventDefault = True
+                            }
+                        )
                     ]
                     [ text "Projects" ]
                 , div [ class "dropdown-divider" ] []
                 , a
                     [ href "#"
                     , class "list-group-item"
-                    , onWithOptions "click"
-                        { stopPropagation = True, preventDefault = True }
-                        (Json.Decode.succeed (SelectWorkflow SettingsWorkflow))
+                    , custom "click"
+                        (Json.Decode.succeed
+                            { message = SelectWorkflow SettingsWorkflow
+                            , stopPropagation = True
+                            , preventDefault = True
+                            }
+                        )
                     ]
                     [ text "Settings" ]
                 , a
                     [ href "#"
                     , class "list-group-item"
-                    , onWithOptions "click"
-                        { stopPropagation = True, preventDefault = True }
-                        (Json.Decode.succeed Save)
+                    , custom "click"
+                        (Json.Decode.succeed
+                            { message = Save
+                            , stopPropagation = True
+                            , preventDefault = True
+                            }
+                        )
                     ]
                     [ text "Save" ]
                 , a
                     [ href "#"
                     , class "list-group-item"
-                    , onWithOptions "click"
-                        { stopPropagation = True, preventDefault = True }
-                        (Json.Decode.succeed TriggerStoreLoad)
+                    , custom "click"
+                        (Json.Decode.succeed
+                            { message = TriggerStoreLoad
+                            , stopPropagation = True
+                            , preventDefault = True
+                            }
+                        )
                     ]
                     [ text "Load" ]
                 , case model.pasteBinId of
@@ -388,9 +425,13 @@ workflowMenu model =
                         a
                             [ href "#"
                             , class "list-group-item"
-                            , onWithOptions "click"
-                                { stopPropagation = True, preventDefault = True }
-                                (Json.Decode.succeed (TriggerBinLoad (binUri id)))
+                            , custom "click"
+                                (Json.Decode.succeed
+                                    { message = TriggerBinLoad id
+                                    , stopPropagation = True
+                                    , preventDefault = True
+                                    }
+                                )
                             ]
                             [ text "Load from server" ]
                 ]

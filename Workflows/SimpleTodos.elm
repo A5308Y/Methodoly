@@ -1,18 +1,9 @@
 module Workflows.SimpleTodos exposing (Model, Msg, initialModel, update, view)
 
-import Bootstrap.Button as Button
-import Bootstrap.Card as Card
-import Bootstrap.Card.Block as Block
-import Bootstrap.Form as Form
-import Bootstrap.Form.Input as Input
-import Bootstrap.Form.InputGroup as InputGroup
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
-import Dom
-import Html exposing (Html, div, hr, i, text)
-import Html.Attributes exposing (action, class, defaultValue, id, value)
-import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
+import Browser.Dom as Dom
+import Html exposing (Html, button, div, form, hr, i, input, text)
+import Html.Attributes exposing (action, class, classList, disabled, id, placeholder, value)
+import Html.Events exposing (custom, onClick, onInput, onSubmit)
 import Json.Decode
 import ProgrissStore as Store exposing (Action, ActionId, ActionState(..), ProgrissStore, decoder)
 import Task
@@ -68,7 +59,7 @@ update msg store model =
                 Just actionId ->
                     let
                         domId =
-                            "edit-" ++ toString actionId
+                            "edit-" ++ Store.actionIdToString actionId
                     in
                     ( { model | editing = maybeActionId }, store, Task.attempt FocusResult (Dom.focus domId) )
 
@@ -86,9 +77,9 @@ update msg store model =
 
 view : ProgrissStore -> Model -> Html Msg
 view store model =
-    Grid.container []
-        [ Grid.row []
-            [ Grid.col []
+    div [ class "container" ]
+        [ div [ class "row" ]
+            [ div [ class "col" ]
                 [ renderActions model.editing (Store.getAllActions store)
                 , renderNewActionFormCard model
                 ]
@@ -98,52 +89,38 @@ view store model =
 
 renderNewActionFormCard : Model -> Html Msg
 renderNewActionFormCard model =
-    Card.config [ Card.light ]
-        |> Card.block []
-            [ Block.custom
-                (Grid.row [ Row.middleXs ]
-                    [ Grid.col [ Col.xs2, Col.md1 ]
-                        [ Button.button
-                            [ Button.success
-                            , Button.attrs
-                                [ class "bmd-btn-fab bmd-btn-fab-sm"
-                                , onClick (SetFocusTo "new-action-description")
-                                ]
-                            ]
-                            [ i [ class "material-icons" ] [ text "add" ] ]
+    div [ class "card bg-light" ]
+        [ div [ class "card-body" ]
+            [ div [ class "row align-middle" ]
+                [ div [ class "col-2 col-md-1" ]
+                    [ button
+                        [ class "btn btn-success bmd-btn-fab bmd-btn-fab-sm"
+                        , onClick (SetFocusTo "new-action-description")
                         ]
-                    , Grid.col [] [ newActionForm model ]
+                        [ i [ class "material-icons" ] [ text "add" ] ]
                     ]
-                )
+                , div [ class "col" ] [ newActionForm model ]
+                ]
             ]
-        |> Card.view
+        ]
 
 
 newActionForm : Model -> Html Msg
 newActionForm model =
-    Form.form
-        [ onSubmit CreateNewAction
-        , Html.Attributes.action "javascript:void(0);"
-        ]
-        [ InputGroup.config
-            (InputGroup.text
-                [ Input.placeholder "Add an Action"
-                , Input.attrs
-                    [ value model.newActionDescription
-                    , onInput UpdateNewActionDescription
-                    , id "new-action-description"
-                    ]
+    form
+        [ onSubmit CreateNewAction ]
+        [ div [ class "input-group" ]
+            [ input
+                [ placeholder "Add an Action"
+                , class "form-control"
+                , value model.newActionDescription
+                , onInput UpdateNewActionDescription
+                , id "new-action-description"
                 ]
-            )
-            |> InputGroup.successors
-                [ InputGroup.button
-                    [ Button.success
-                    , Button.disabled (String.isEmpty model.newActionDescription)
-                    , Button.attrs []
-                    ]
-                    [ text "Create Action" ]
-                ]
-            |> InputGroup.view
+                []
+            , div [ class "input-group-append", disabled (String.isEmpty model.newActionDescription) ]
+                [ button [ class "btn btn-success" ] [ text "Create Action" ] ]
+            ]
         ]
 
 
@@ -154,66 +131,28 @@ renderActions editing actions =
 
 actionCard : Maybe ActionId -> Action -> Html Msg
 actionCard editing action =
-    Card.config (cardConfigForAction action)
-        |> Card.block [ Block.attrs [ onClick (ToggleEditAction (Just action.id)) ] ]
-            [ Block.custom
-                (Grid.row [ Row.middleXs ]
-                    [ Grid.col [ Col.xs2, Col.md1 ]
-                        [ Button.button
-                            [ buttonColorForActionState action.state
-                            , Button.attrs
-                                [ onWithOptions "click"
-                                    { preventDefault = True, stopPropagation = True }
-                                    (Json.Decode.succeed (ToggleActionDone action.id))
-                                , class "bmd-btn-fab bmd-btn-fab-sm"
-                                ]
-                            ]
-                            [ i [ class "material-icons" ]
-                                [ text (iconForActionState action.state) ]
-                            ]
-                        ]
-                    , if editing == Just action.id then
-                        Grid.col
-                            []
-                            [ Form.form
-                                [ class "edit-action-form"
-                                , Html.Attributes.action "javascript:void(0);"
-                                , onSubmit (ToggleEditAction Nothing)
-                                ]
-                                [ InputGroup.config
-                                    (InputGroup.text
-                                        [ Input.small
-                                        , Input.attrs
-                                            [ onInput (UpdateActionDescription action)
-                                            , defaultValue action.description
-                                            , id ("edit-" ++ toString action.id)
-                                            ]
-                                        ]
-                                    )
-                                    |> InputGroup.successors
-                                        [ InputGroup.button [ Button.success ] [ text "Save" ] ]
-                                    |> InputGroup.view
-                                ]
-                            ]
+    div [ class (cardClassForAction action) ]
+        [ div [ class "card-body", onClick (ToggleEditAction (Just action.id)) ]
+            [ div [ class "row align-items-center" ]
+                [ div [ class "col-2 col-md-1" ] [ toggleDoneButton action ]
+                , if editing == Just action.id then
+                    div [ class "col" ] [ editActionForm action ]
 
-                      else
-                        Grid.col
-                            [ Col.attrs [] ]
-                            [ text action.description ]
-                    ]
-                )
+                  else
+                    div [ class "col" ] [ text action.description ]
+                ]
             ]
-        |> Card.view
+        ]
 
 
-buttonColorForActionState : ActionState -> Button.Option Msg
+buttonColorForActionState : ActionState -> String
 buttonColorForActionState state =
     case state of
         Done time ->
-            Button.success
+            "btn btn-success"
 
         _ ->
-            Button.primary
+            "btn btn-primary"
 
 
 iconForActionState : ActionState -> String
@@ -226,11 +165,47 @@ iconForActionState state =
             "check_box_outline_blank"
 
 
-cardConfigForAction : Action -> List (Card.Option Msg)
-cardConfigForAction action =
+cardClassForAction : Action -> String
+cardClassForAction action =
     case action.state of
         Done time ->
-            [ Card.light ]
+            "card bg-light"
 
         _ ->
-            []
+            "card"
+
+
+toggleDoneButton action =
+    button
+        [ classList
+            [ ( buttonColorForActionState action.state, True )
+            , ( "bmd-btn-fab bmd-btn-fab-sm", True )
+            ]
+        , custom "click"
+            (Json.Decode.succeed
+                { message = ToggleActionDone action.id
+                , preventDefault = True
+                , stopPropagation = True
+                }
+            )
+        ]
+        [ i [ class "material-icons" ] [ text (iconForActionState action.state) ] ]
+
+
+editActionForm action =
+    form
+        [ class "edit-action-form"
+        , onSubmit (ToggleEditAction Nothing)
+        ]
+        [ div [ class "input-group" ]
+            [ input
+                [ class "form-control form-control-sm"
+                , onInput (UpdateActionDescription action)
+                , value action.description
+                , id ("edit-" ++ Store.actionIdToString action.id)
+                ]
+                []
+            , div [ class "input-group-append" ]
+                [ button [ class "btn btn-success" ] [ text "Save" ] ]
+            ]
+        ]

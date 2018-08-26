@@ -1,4 +1,4 @@
-var app = Elm.Main.fullscreen();
+var app = Elm.Main.init({flags: true});
 
 const storage = window.localStorage || {
   setItem(key, value) {
@@ -19,4 +19,3 @@ app.ports.triggerStoreLoad.subscribe(function() {
     app.ports.loadStore.send(localStorage.getItem(storageKey));
   };
 });
-

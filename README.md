@@ -1,10 +1,11 @@
 Check out a demo at https://a5308y.github.io/Methodoly
 
-# Contributing
+# Running the app
 
 Compile the app with `elm-make Main.elm --output main.js`. There is no
-hotloading yet. Then open `index.html` in your browser. No need to run a server
-yet. The app uses a simple json storage. For now it's http://myjson.com/api (https://github.com/lramoth/myjson), but it could be our own Server.
+hotloading yet. Then run elm-reactor and open `index.html`. No need to run a backend server yet. The app uses a simple json storage. For now it's http://myjson.com/api (https://github.com/lramoth/myjson), but it could be our own Server.
+
+# Contributing
 
 For development it might be helpful to include the debug flag:
 `elm-make Main.elm --output main.js --debug`

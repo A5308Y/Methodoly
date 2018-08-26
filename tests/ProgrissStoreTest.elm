@@ -4,6 +4,7 @@ import Expect exposing (Expectation)
 import Json.Decode
 import ProgrissStore exposing (Action, ActionState(..), ProgrissStore)
 import Test exposing (Test, describe, test)
+import Time exposing (millisToPosix)
 
 
 suite : Test
@@ -176,10 +177,10 @@ suite =
 
                         updatedStore =
                             Maybe.map2
-                                (\firstAction firstContext ->
+                                (\mappedFirstAction mappedFirstContext ->
                                     populatedStore
-                                        |> ProgrissStore.associateActionToContext firstAction.id firstContext.id
-                                        |> ProgrissStore.getActionsForContext firstContext.id
+                                        |> ProgrissStore.associateActionToContext mappedFirstAction.id mappedFirstContext.id
+                                        |> ProgrissStore.getActionsForContext mappedFirstContext.id
                                 )
                                 firstAction
                                 firstContext
@@ -205,10 +206,10 @@ suite =
 
                         updatedStore =
                             Maybe.map2
-                                (\firstAction firstProject ->
+                                (\mappedFirstAction mappedFirstProject ->
                                     populatedStore
-                                        |> ProgrissStore.associateActionToProject firstAction.id firstProject.id
-                                        |> ProgrissStore.getActionsForProject firstProject.id
+                                        |> ProgrissStore.associateActionToProject mappedFirstAction.id mappedFirstProject.id
+                                        |> ProgrissStore.getActionsForProject mappedFirstProject.id
                                 )
                                 firstAction
                                 firstProject
@@ -250,20 +251,21 @@ suite =
                         (Maybe.map
                             (\action ->
                                 fixtureStore
-                                    |> ProgrissStore.updateAction (Action action.id "Call architect about garden" (Done 0))
+                                    |> ProgrissStore.updateAction
+                                        (Action action.id "Call architect about garden" (Done (Time.millisToPosix 0)))
                                     |> ProgrissStore.getAllActions
-                                    |> List.map (\action -> ( action.description, action.state ))
+                                    |> List.map (\mappedAction -> ( mappedAction.description, mappedAction.state ))
                             )
                             firstAction
                         )
                         (Just
-                            [ ( "Call architect about garden", Done 0 )
+                            [ ( "Call architect about garden", Done (Time.millisToPosix 0) )
                             , ( "Buy cat food", Active )
                             , ( "Call Florist about Mom's favourite flowers", Active )
                             ]
                         )
             ]
-        , describe "ProgrissStore.checkOffAction"
+        , describe "ProgrissStore.toggleActionDone"
             [ test "returns a new store with the action marked as done" <|
                 \_ ->
                     let
@@ -274,14 +276,14 @@ suite =
                         (Maybe.map
                             (\action ->
                                 fixtureStore
-                                    |> ProgrissStore.checkOffAction action.id
+                                    |> ProgrissStore.toggleActionDone action.id
                                     |> ProgrissStore.getAllActions
-                                    |> List.map (\action -> ( action.description, action.state ))
+                                    |> List.map (\mappedAction -> ( mappedAction.description, mappedAction.state ))
                             )
                             firstAction
                         )
                         (Just
-                            [ ( "Call architect about garden", Done 0 )
+                            [ ( "Call architect about garden", Done (Time.millisToPosix 0) )
                             , ( "Buy cat food", Active )
                             , ( "Call Florist about Mom's favourite flowers", Active )
                             ]
@@ -315,7 +317,7 @@ decodeStore : String -> ProgrissStore
 decodeStore jsonData =
     case Json.Decode.decodeString ProgrissStore.decoder jsonData of
         Err message ->
-            Debug.crash message
+            Debug.todo (Debug.toString message)
 
         Ok store ->
             store

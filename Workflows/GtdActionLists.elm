@@ -1,19 +1,9 @@
 module Workflows.GtdActionLists exposing (Model, Msg, initialModel, navbarContent, update, view)
 
-import Bootstrap.Button as Button
-import Bootstrap.ButtonGroup as ButtonGroup
-import Bootstrap.Card as Card
-import Bootstrap.Card.Block as Block
-import Bootstrap.Form as Form
-import Bootstrap.Form.Input as Input
-import Bootstrap.Form.InputGroup as InputGroup
-import Bootstrap.Grid as Grid
-import Bootstrap.Grid.Col as Col
-import Bootstrap.Grid.Row as Row
-import Dom
-import Html exposing (Html, a, div, header, hr, i, li, span, text, ul)
-import Html.Attributes exposing (class, classList, defaultValue, href, id, value)
-import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions)
+import Browser.Dom
+import Html exposing (Html, a, button, div, form, header, hr, i, input, li, span, text, ul)
+import Html.Attributes exposing (class, classList, disabled, href, id, placeholder, value)
+import Html.Events exposing (custom, onClick, onInput, onSubmit)
 import Json.Decode
 import ProgrissStore as Store
     exposing
@@ -60,7 +50,7 @@ type Msg
     | UpdateActionProject ActionId ProjectId
     | UpdateActionDescription Action String
     | SetFocusTo String
-    | FocusResult (Result Dom.Error ())
+    | FocusResult (Result Browser.Dom.Error ())
 
 
 type alias Model =
@@ -131,13 +121,13 @@ update msg store model =
                 EditingAction actionId actionEditState ->
                     let
                         domId =
-                            "edit-" ++ toString actionId
+                            "edit-" ++ Store.actionIdToString actionId
                     in
                     case actionEditState of
                         EditingDescription ->
                             ( { model | editingAction = editingAction }
                             , store
-                            , Task.attempt FocusResult (Dom.focus domId)
+                            , Task.attempt FocusResult (Browser.Dom.focus domId)
                             )
 
                         _ ->
@@ -147,11 +137,11 @@ update msg store model =
                     ( { model | editingAction = editingAction }, store, Cmd.none )
 
         SetFocusTo domId ->
-            ( model, store, Task.attempt FocusResult (Dom.focus domId) )
+            ( model, store, Task.attempt FocusResult (Browser.Dom.focus domId) )
 
         FocusResult result ->
             case result of
-                Err (Dom.NotFound id) ->
+                Err (Browser.Dom.NotFound id) ->
                     ( model, store, Cmd.none )
 
                 Ok () ->
@@ -188,7 +178,7 @@ view store model =
 
 actionContainer : ProgrissStore -> Model -> Html Msg
 actionContainer store model =
-    Grid.container []
+    div [ class "container" ]
         [ renderActions store model.editingAction (actionsToRender store model.selectedContext)
         , renderNewActionFormCard model
         ]
@@ -196,52 +186,38 @@ actionContainer store model =
 
 renderNewActionFormCard : Model -> Html Msg
 renderNewActionFormCard model =
-    Card.config [ Card.light ]
-        |> Card.block []
-            [ Block.custom
-                (Grid.row [ Row.middleXs ]
-                    [ Grid.col [ Col.xs2, Col.md1 ]
-                        [ Button.button
-                            [ Button.success
-                            , Button.attrs
-                                [ class "bmd-btn-fab bmd-btn-fab-sm"
-                                , onClick (SetFocusTo "new-action-description")
-                                ]
-                            ]
-                            [ i [ class "material-icons" ] [ text "add" ] ]
+    div [ class "card bg-light" ]
+        [ div [ class "card-body" ]
+            [ div [ class "row align-middle" ]
+                [ div [ class "col-2 col-md-1" ]
+                    [ button
+                        [ class "btn btn-success bmd-btn-fab bmd-btn-fab-sm"
+                        , onClick (SetFocusTo "new-action-description")
                         ]
-                    , Grid.col [] [ newActionForm model ]
+                        [ i [ class "material-icons" ] [ text "add" ] ]
                     ]
-                )
+                , div [ class "col" ] [ newActionForm model ]
+                ]
             ]
-        |> Card.view
+        ]
 
 
 newActionForm : Model -> Html Msg
 newActionForm model =
-    Form.form
-        [ onSubmit CreateNewAction
-        , Html.Attributes.action "javascript:void(0);"
-        ]
-        [ InputGroup.config
-            (InputGroup.text
-                [ Input.placeholder "Add an Action"
-                , Input.attrs
-                    [ value model.newActionDescription
-                    , onInput UpdateNewActionDescription
-                    , id "new-action-description"
-                    ]
+    form
+        [ onSubmit CreateNewAction ]
+        [ div [ class "input-group" ]
+            [ input
+                [ placeholder "Add an Action"
+                , class "form-control"
+                , value model.newActionDescription
+                , onInput UpdateNewActionDescription
+                , id "new-action-description"
                 ]
-            )
-            |> InputGroup.successors
-                [ InputGroup.button
-                    [ Button.success
-                    , Button.disabled (String.isEmpty model.newActionDescription)
-                    , Button.attrs []
-                    ]
-                    [ text "Create Action" ]
-                ]
-            |> InputGroup.view
+                []
+            , div [ class "input-group-append", disabled (String.isEmpty model.newActionDescription) ]
+                [ button [ class "btn btn-success" ] [ text "Create Action" ] ]
+            ]
         ]
 
 
@@ -312,16 +288,16 @@ renderActions store editingAction actions =
 
 actionCard : ProgrissStore -> EditingActionState -> Action -> Html Msg
 actionCard store editingAction action =
-    Card.config (cardConfigForAction action)
-        |> actionCardBlock editingAction action
-        |> actionCardFooter store editingAction action
-        |> Card.view
+    div [ class (cardClassForAction action) ]
+        [ actionCardBlock editingAction action
+        , actionCardFooter store editingAction action
+        ]
 
 
-actionCardBlock : EditingActionState -> Action -> Card.Config Msg -> Card.Config Msg
+actionCardBlock : EditingActionState -> Action -> Html Msg
 actionCardBlock editingAction action =
     let
-        blockAttrs =
+        cardClickEvent =
             if editingAction == EditingAction action.id SelectingEditedAttribute then
                 [ onClick (SelectActionToEdit NotEditingAction) ]
 
@@ -331,55 +307,56 @@ actionCardBlock editingAction action =
             else
                 [ onClick (SelectActionToEdit (EditingAction action.id SelectingEditedAttribute)) ]
     in
-    Card.block [ Block.attrs blockAttrs ]
-        [ Block.custom
-            (Grid.row [ Row.middleXs ]
-                [ Grid.col [ Col.xs2, Col.md1 ]
-                    [ Button.button
-                        [ buttonColorForActionState action.state
-                        , Button.attrs
-                            [ onWithOptions "click"
-                                { preventDefault = True, stopPropagation = True }
-                                (Json.Decode.succeed (ToggleActionDone action.id))
-                            , class "bmd-btn-fab bmd-btn-fab-sm"
-                            ]
-                        ]
-                        [ i [ class "material-icons" ]
-                            [ text (iconForActionState action.state) ]
-                        ]
-                    ]
-                , if editingAction == EditingAction action.id EditingDescription then
-                    Grid.col
-                        []
-                        [ Form.form
-                            [ class "edit-action-form"
-                            , Html.Attributes.action "javascript:void(0);"
-                            , onSubmit (SelectActionToEdit NotEditingAction)
-                            ]
-                            [ InputGroup.config
-                                (InputGroup.text
-                                    [ Input.small
-                                    , Input.attrs
-                                        [ onInput (UpdateActionDescription action)
-                                        , defaultValue action.description
-                                        , id ("edit-" ++ toString action.id)
-                                        ]
-                                    ]
-                                )
-                                |> InputGroup.successors
-                                    [ InputGroup.button [ Button.success ] [ text "Save" ] ]
-                                |> InputGroup.view
-                            ]
-                        ]
+    div ([ class "card-body" ] ++ cardClickEvent)
+        [ div [ class "row align-items-center" ]
+            [ div [ class "col-2 col-md-1" ] [ toggleDoneButton action ]
+            , if editingAction == EditingAction action.id EditingDescription then
+                div [ class "col" ] [ editActionForm action ]
 
-                  else
-                    Grid.col [] [ text action.description ]
-                ]
-            )
+              else
+                div [ class "col" ] [ text action.description ]
+            ]
         ]
 
 
-actionCardFooter : ProgrissStore -> EditingActionState -> Action -> Card.Config Msg -> Card.Config Msg
+toggleDoneButton action =
+    button
+        [ class ("btn bmd-btn-fab bmd-btn-fab-sm " ++ buttonColorForActionState action.state)
+        , custom "click"
+            (Json.Decode.succeed
+                { message = ToggleActionDone action.id
+                , preventDefault = True
+                , stopPropagation = True
+                }
+            )
+        ]
+        [ i [ class "material-icons" ]
+            [ text (iconForActionState action.state) ]
+        ]
+
+
+editActionForm action =
+    div [ class "col" ]
+        [ form
+            [ class "edit-action-form"
+            , onSubmit (SelectActionToEdit NotEditingAction)
+            ]
+            [ div [ class "input-group" ]
+                [ input
+                    [ class "form-control form-control-sm"
+                    , onInput (UpdateActionDescription action)
+                    , value action.description
+                    , id ("edit-" ++ Store.actionIdToString action.id)
+                    ]
+                    []
+                , div [ class "input-group-append", disabled (String.isEmpty action.description) ]
+                    [ button [ class "btn btn-success" ] [ text "Save" ] ]
+                ]
+            ]
+        ]
+
+
+actionCardFooter : ProgrissStore -> EditingActionState -> Action -> Html Msg
 actionCardFooter store editingAction action =
     let
         footerClass =
@@ -388,45 +365,29 @@ actionCardFooter store editingAction action =
                     || (editingAction == EditingAction action.id EditingContext)
                     || (editingAction == EditingAction action.id EditingProject)
             then
-                "visible-footer"
+                "card-body visible-footer"
 
             else
-                "hidden-footer"
+                "card-body hidden-footer"
     in
-    Card.block [ Block.attrs [ class footerClass ] ]
-        [ Block.custom <|
-            div
-                []
-                [ ButtonGroup.buttonGroup
-                    [ ButtonGroup.small
-                    , ButtonGroup.attrs [ class "footer-button-group" ]
-                    ]
-                    [ ButtonGroup.button
-                        [ Button.primary
-                        , Button.attrs
-                            [ onClick (SelectActionToEdit (EditingAction action.id EditingDescription))
-                            , class "footer-button"
-                            ]
-                        ]
-                        [ text "Edit" ]
-                    , ButtonGroup.button
-                        [ Button.primary
-                        , Button.attrs
-                            [ onClick (SelectActionToEdit (EditingAction action.id EditingContext))
-                            , class "footer-button"
-                            ]
-                        ]
-                        [ text (contextName store action) ]
-                    , ButtonGroup.button
-                        [ Button.primary
-                        , Button.attrs
-                            [ onClick (SelectActionToEdit (EditingAction action.id EditingProject))
-                            , class "footer-button"
-                            ]
-                        ]
-                        [ text (projectName store action) ]
-                    ]
+    div [ class footerClass ]
+        [ div [ class "btn-group btn-group-sm footer-button-group" ]
+            [ button
+                [ onClick (SelectActionToEdit (EditingAction action.id EditingDescription))
+                , class "btn btn-primary footer-button"
                 ]
+                [ text "Edit" ]
+            , button
+                [ onClick (SelectActionToEdit (EditingAction action.id EditingContext))
+                , class "btn btn-primary footer-button"
+                ]
+                [ text (contextName store action) ]
+            , button
+                [ onClick (SelectActionToEdit (EditingAction action.id EditingProject))
+                , class "btn btn-primary footer-button"
+                ]
+                [ text (projectName store action) ]
+            ]
         ]
 
 
@@ -450,14 +411,14 @@ projectName store action =
             project.title
 
 
-buttonColorForActionState : ActionState -> Button.Option Msg
+buttonColorForActionState : ActionState -> String
 buttonColorForActionState state =
     case state of
         Done time ->
-            Button.success
+            "btn-success"
 
         _ ->
-            Button.primary
+            "btn-primary"
 
 
 iconForActionState : ActionState -> String
@@ -470,14 +431,14 @@ iconForActionState state =
             "check_box_outline_blank"
 
 
-cardConfigForAction : Action -> List (Card.Option msg)
-cardConfigForAction action =
+cardClassForAction : Action -> String
+cardClassForAction action =
     case action.state of
         Done time ->
-            [ Card.light ]
+            "card bg-light"
 
         _ ->
-            []
+            "card"
 
 
 navbarContent : ProgrissStore -> Model -> Html Msg

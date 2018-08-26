@@ -1,9 +1,7 @@
 module Workflows.Settings exposing (Model, Msg, initialModel, update, view)
 
-import Bootstrap.Button as Button
-import Bootstrap.Grid as Grid
-import Html exposing (Html, h1, h2, text)
-import Html.Attributes exposing (classList)
+import Html exposing (Html, button, div, h1, h2, text)
+import Html.Attributes exposing (class, classList)
 import Html.Events exposing (onClick)
 import ProgrissStore as Store exposing (ProgrissStore)
 import SettingsStore
@@ -47,40 +45,44 @@ view store model =
                 |> SettingsStore.getSettingsForProjectOverview
                 |> .projectsPerRow
     in
-    Grid.container []
+    div [ class "container" ]
         [ h1 [] [ text "Settings" ]
         , h2 [] [ text "Project Overview" ]
         , text "Projects per row: "
-        , Button.button
-            [ Button.primary
-            , Button.attrs
-                [ onClick (ChangeNumberOfProjectsPerRow 1)
-                , classList [ ( "active", projectsPerRow == 1 ) ]
+        , button
+            [ classList
+                [ ( "btn", True )
+                , ( "btn-primary", True )
+                , ( "active", projectsPerRow == 1 )
                 ]
+            , onClick (ChangeNumberOfProjectsPerRow 1)
             ]
             [ text "1" ]
-        , Button.button
-            [ Button.primary
-            , Button.attrs
-                [ onClick (ChangeNumberOfProjectsPerRow 2)
-                , classList [ ( "active", projectsPerRow == 2 ) ]
+        , button
+            [ classList
+                [ ( "btn", True )
+                , ( "btn-primary", True )
+                , ( "active", projectsPerRow == 2 )
                 ]
+            , onClick (ChangeNumberOfProjectsPerRow 2)
             ]
             [ text "2" ]
-        , Button.button
-            [ Button.primary
-            , Button.attrs
-                [ onClick (ChangeNumberOfProjectsPerRow 3)
-                , classList [ ( "active", projectsPerRow == 3 ) ]
+        , button
+            [ classList
+                [ ( "btn", True )
+                , ( "btn-primary", True )
+                , ( "active", projectsPerRow == 3 )
                 ]
+            , onClick (ChangeNumberOfProjectsPerRow 3)
             ]
             [ text "3" ]
-        , Button.button
-            [ Button.primary
-            , Button.attrs
-                [ onClick (ChangeNumberOfProjectsPerRow 4)
-                , classList [ ( "active", projectsPerRow == 4 ) ]
+        , button
+            [ classList
+                [ ( "btn", True )
+                , ( "btn-primary", True )
+                , ( "active", projectsPerRow == 4 )
                 ]
+            , onClick (ChangeNumberOfProjectsPerRow 4)
             ]
             [ text "4" ]
         ]

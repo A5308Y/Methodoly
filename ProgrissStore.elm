@@ -7,6 +7,7 @@ module ProgrissStore exposing
     , ProgrissStore
     , Project
     , ProjectId
+    , actionIdToString
     , associateActionToAnywhereContext
     , associateActionToContext
     , associateActionToNoProject
@@ -35,11 +36,11 @@ module ProgrissStore exposing
     )
 
 import Dict exposing (Dict)
-import Json.Decode exposing (Decoder, float, int, nullable, string)
-import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required)
+import Json.Decode exposing (Decoder, float, int, nullable, string, succeed)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Json.Encode
 import SettingsStore exposing (SettingsStore)
-import Time exposing (Time)
+import Time exposing (..)
 
 
 type ProgrissStore
@@ -102,8 +103,8 @@ type ActionId
 
 type ActionState
     = Active
-    | Done Time
-    | Deleted Time
+    | Done Time.Posix
+    | Deleted Time.Posix
 
 
 type ContextId
@@ -116,6 +117,10 @@ type ProjectId
 
 type NoteId
     = NoteId Int
+
+
+actionIdToString (ActionId id) =
+    "ActionId" ++ String.fromInt id
 
 
 empty : ProgrissStore
@@ -212,7 +217,7 @@ actionsStateAfterToggle actionData =
                     Active
 
                 Active ->
-                    Done 0
+                    Done (Time.millisToPosix 0)
 
                 Deleted time ->
                     Deleted time
@@ -387,7 +392,7 @@ castNoteDataToNote ( id, noteData ) =
 
 decoder : Decoder ProgrissStore
 decoder =
-    decode progrissStoreConstructor
+    succeed progrissStoreConstructor
         |> optional "actions" (Json.Decode.list actionDecoder) []
         |> optional "contexts" (Json.Decode.list contextDecoder) []
         |> optional "projects" (Json.Decode.list projectDecoder) []
@@ -407,18 +412,18 @@ progrissStoreConstructor actions contexts projects notes =
 
 actionDecoder : Decoder ( Int, ActionData )
 actionDecoder =
-    decode actionDataConstructor
+    succeed actionDataConstructor
         |> required "id" int
         |> required "description" string
         |> optional "context_id" (nullable int) Nothing
         |> optional "project_id" (nullable int) Nothing
-        |> optional "finished_at" (nullable float) Nothing
-        |> optional "deleted_at" (nullable float) Nothing
+        |> optional "finished_at" (nullable int) Nothing
+        |> optional "deleted_at" (nullable int) Nothing
 
 
 noteDecoder : Decoder ( Int, NoteData )
 noteDecoder =
-    decode noteDataConstructor
+    succeed noteDataConstructor
         |> required "id" int
         |> required "body" string
         |> required "project_id" int
@@ -426,19 +431,19 @@ noteDecoder =
 
 projectDecoder : Decoder ( Int, ProjectData )
 projectDecoder =
-    decode projectDataConstructor
+    succeed projectDataConstructor
         |> required "id" int
         |> required "title" string
 
 
 contextDecoder : Decoder ( Int, ContextData )
 contextDecoder =
-    decode contextDataConstructor
+    succeed contextDataConstructor
         |> required "id" int
         |> required "name" string
 
 
-actionDataConstructor : Int -> String -> Maybe Int -> Maybe Int -> Maybe Time -> Maybe Time -> ( Int, ActionData )
+actionDataConstructor : Int -> String -> Maybe Int -> Maybe Int -> Maybe Int -> Maybe Int -> ( Int, ActionData )
 actionDataConstructor id description maybeContextId maybeProjectId finishedAt deletedAt =
     let
         state =
@@ -449,10 +454,10 @@ actionDataConstructor id description maybeContextId maybeProjectId finishedAt de
                             Active
 
                         Just time ->
-                            Done time
+                            Done (millisToPosix time)
 
                 Just time ->
-                    Deleted time
+                    Deleted (millisToPosix time)
     in
     ( id, ActionData description maybeContextId maybeProjectId state )
 
@@ -479,10 +484,10 @@ noteDataConstructor id content projectId =
 encoder : ProgrissStore -> Json.Decode.Value
 encoder (ProgrissStore store) =
     Json.Encode.object
-        [ ( "actions", Json.Encode.list (List.map encodeAction (store.actions |> Dict.toList)) )
-        , ( "contexts", Json.Encode.list (List.map encodeContext (store.contexts |> Dict.toList)) )
-        , ( "projects", Json.Encode.list (List.map encodeProject (store.projects |> Dict.toList)) )
-        , ( "notes", Json.Encode.list (List.map encodeNote (store.notes |> Dict.toList)) )
+        [ ( "actions", Json.Encode.list encodeAction (store.actions |> Dict.toList) )
+        , ( "contexts", Json.Encode.list encodeContext (store.contexts |> Dict.toList) )
+        , ( "projects", Json.Encode.list encodeProject (store.projects |> Dict.toList) )
+        , ( "notes", Json.Encode.list encodeNote (store.notes |> Dict.toList) )
         ]
 
 
@@ -510,7 +515,7 @@ encodeAction ( id, actionData ) =
         , ( "deleted_at"
           , case actionData.state of
                 Deleted time ->
-                    Json.Encode.float time
+                    Json.Encode.int (Time.posixToMillis time)
 
                 _ ->
                     Json.Encode.null
@@ -518,7 +523,7 @@ encodeAction ( id, actionData ) =
         , ( "finished_at"
           , case actionData.state of
                 Done time ->
-                    Json.Encode.float time
+                    Json.Encode.int (Time.posixToMillis time)
 
                 _ ->
                     Json.Encode.null
