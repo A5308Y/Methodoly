@@ -2,8 +2,9 @@ Check out a demo at https://a5308y.github.io/Methodoly
 
 # Running the app
 
-Compile the app with `elm-make Main.elm --output main.js`. There is no
-hotloading yet. Then run elm-reactor and open `index.html`. No need to run a backend server yet. The app uses a simple json storage. For now it's http://myjson.com/api (https://github.com/lramoth/myjson), but it could be our own Server.
+Compile the app with `elm-make Main.elm --output main.js`. Then run elm-reactor and open `index.html`.
+Alternatively you can install elm-live via npm (`npm install -g elm-live`) and run `elm-live Main.elm --open -- --output=main.js` for hot reloading.
+No need to run a backend server yet. The app uses a simple json storage. For now it's http://myjson.com/api (https://github.com/lramoth/myjson), but it could be our own Server.
 
 # Contributing
 
